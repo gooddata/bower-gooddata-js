@@ -1,7 +1,7 @@
 /* Copyright (C) 2007-2013, GoodData(R) Corporation. All rights reserved. */
-/* gooddata - v0.1.1 */
-/* 2014-03-31 15:23:54 */
-/* Latest git commit: "5589629" */
+/* gooddata - v0.1.2 */
+/* 2014-04-07 14:55:05 */
+/* Latest git commit: "47b5cd9" */
 
 (function(window, factory) {
   if (typeof define === 'function' && define.amd) {
