@@ -1,7 +1,7 @@
 /* Copyright (C) 2007-2013, GoodData(R) Corporation. All rights reserved. */
-/* gooddata - v0.1.2 */
-/* 2014-04-07 14:55:05 */
-/* Latest git commit: "47b5cd9" */
+/* gooddata - v0.1.3 */
+/* 2014-04-25 09:38:06 */
+/* Latest git commit: "1262597" */
 
 (function(window, factory) {
   if (typeof define === 'function' && define.amd) {
@@ -227,6 +227,11 @@ define('xhr',['_jquery'], function($) {
             }
         }).done(function(data, textStatus, xhr) {
             if (xhr.status === 202) {
+                // if the response is 202 and Location header is not empty, let's poll on the new Location
+                var location = xhr.getResponseHeader('Location');
+                if (location){
+                    settings.url = location;
+                }
                 handlePolling(settings, d);
             } else {
                 d.resolve(data, textStatus, xhr);
@@ -963,6 +968,12 @@ define('project',['xhr', 'util'], function(xhr, util) {
      */
     var getCurrentProjectId = function() {
         return xhr.get('/gdc/app/account/bootstrap').then(function(result) {
+            var currentProject = result.bootstrapResource.current.project;
+            // handle situation in which current project is missing (e.g. new user)
+            if (!currentProject) {
+                return null;
+            }
+
             return result.bootstrapResource.current.project.links.self.split('/').pop();
         });
     };
