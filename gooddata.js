@@ -1,7 +1,7 @@
 /* Copyright (C) 2007-2013, GoodData(R) Corporation. All rights reserved. */
-/* gooddata - v0.1.3 */
-/* 2014-04-25 09:38:06 */
-/* Latest git commit: "1262597" */
+/* gooddata - v0.1.4 */
+/* 2014-05-14 09:32:46 */
+/* Latest git commit: "9e12fbb" */
 
 (function(window, factory) {
   if (typeof define === 'function' && define.amd) {
@@ -399,13 +399,32 @@ define('user',['xhr'], function(xhr) {
         return d.promise();
     };
 
+    var getAccountInfo = function() {
+        var d = $.Deferred();
+
+        xhr.get('/gdc/app/account/bootstrap').then(function(result) {
+            var br = result.bootstrapResource;
+            var accountInfo = {
+                login: br.accountSetting.login,
+                loginMD5: br.current.loginMD5,
+                firstName: br.accountSetting.firstName,
+                lastName: br.accountSetting.lastName,
+                organizationName: br.settings.organizationName
+            };
+
+            d.resolve(accountInfo);
+        }, d.reject);
+
+        return d.promise();
+    };
+
 
     return {
         isLoggedIn: isLoggedIn,
         login: login,
-        logout: logout
+        logout: logout,
+        getAccountInfo: getAccountInfo
     };
-
 });
 
 // Copyright (C) 2007-2014, GoodData(R) Corporation. All rights reserved.
