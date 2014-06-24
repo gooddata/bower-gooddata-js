@@ -1,7 +1,7 @@
 /* Copyright (C) 2007-2013, GoodData(R) Corporation. All rights reserved. */
-/* gooddata - v0.1.4 */
-/* 2014-05-14 09:32:46 */
-/* Latest git commit: "9e12fbb" */
+/* gooddata - v0.1.5 */
+/* 2014-06-24 14:53:21 */
+/* Latest git commit: "4034d0d" */
 
 (function(window, factory) {
   if (typeof define === 'function' && define.amd) {
@@ -86,8 +86,58 @@ define('_jquery',[],function() {
 });
 
 
+// Copyright (C) 2007-2014, GoodData(R) Corporation. All rights reserved.
+define('config',[
+], function(
+) {
+    
+    /**
+     * Config module holds SDK configuration variables
+     *
+     * Currently its only custom domain - which enabled using
+     * sdk from different domain (using CORS)
+     *
+     * Never set properties directly - always use setter methods
+     *
+     * @module config
+     * @class config
+     */
+
+    var module = { domain: undefined },
+        r = '(?:(https)://+|(www\\.)?)\\w[:;,\\.?\\[\\]\\w/~%&=+#-@!]*';
+
+    /**
+     * Sets custom domain. Parameter is url which has always to be https://
+     * (if you don't provide it, we will do it for you).
+     *
+     * RegExp inspired taken from
+     * https://github.com/jarib/google-closure-library/blob/master/closure/goog/string/linkify.js
+     *
+     * @method setCustomDomain
+     */
+    var setCustomDomain = function(d) {
+        var link = d.match(r);
+
+        if (!link) {
+            throw new Error(d + ' is not a valid url');
+        }
+
+        // ensure https:// prefix
+        // and strip possible trailing /
+        module.domain = 'https://' + link[0]
+                        .replace(/^https:\/\//, '')
+                        .replace(/\/$/, '');
+    };
+
+    module.setCustomDomain = setCustomDomain;
+
+    return module;
+});
+
+
+
 // Copyright (C) 2007-2013, GoodData(R) Corporation. All rights reserved.
-define('xhr',['_jquery'], function($) { 
+define('xhr',['_jquery', 'config'], function($, config) { 
 
     /**
      * Ajax wrapper around GDC authentication mechanisms, SST and TT token handling and polling.
@@ -104,6 +154,19 @@ define('xhr',['_jquery'], function($) {
     var tokenRequest,
         xhrSettings,
         xhr = {}; // returned module
+
+    xhr.enrichSettingWithCustomDomain = function(settings, domain) {
+        if (domain) {
+            // protect url to be prepended with domain on retry
+            if (settings.url.indexOf(domain) === -1) {
+                settings.url = domain + settings.url;
+            }
+            settings.xhrFields = settings.xhrFields || {};
+            settings.xhrFields.withCredentials = true;
+        }
+
+        return settings;
+    };
 
     var retryAjaxRequest = function(req, deferred) {
         // still use our extended ajax, because is still possible to fail recoverably in again
@@ -129,7 +192,7 @@ define('xhr',['_jquery'], function($) {
         if (!tokenRequest) {
             // Create only single token request for any number of waiting request.
             // If token request exist, just listen for it's end.
-            tokenRequest = $.ajax('/gdc/account/token/').always(function() {
+            tokenRequest = $.ajax(xhr.enrichSettingWithCustomDomain({ url: '/gdc/account/token/' }, config.domain)).always(function() {
                 tokenRequest = null;
             }).fail(function(xhr, textStatus, err) {
                 //unauthorized when retrieving token -> not logged
@@ -206,6 +269,7 @@ define('xhr',['_jquery'], function($) {
         if (url) {
             settings.url = url;
         }
+
         if ($.isPlainObject(settings.data)) {
             settings.data = JSON.stringify(settings.data);
         }
@@ -219,7 +283,8 @@ define('xhr',['_jquery'], function($) {
             continueAfterTokenRequest(settings, d);
             return d;
         }
-        $.ajax(settings).fail(function(xhr, textStatus, err) {
+
+        $.ajax(xhr.enrichSettingWithCustomDomain(settings, config.domain)).fail(function(xhr, textStatus, err) {
             if (xhr.status === 401) {
                 handleUnauthorized(settings, d);
             } else {
@@ -269,7 +334,7 @@ define('xhr',['_jquery'], function($) {
      */
     xhr.put = xhrMethod('PUT');
 
-    // setup dafault settings
+    // setup default settings
     xhr.ajaxSetup({});
     return xhr;
 
@@ -399,6 +464,10 @@ define('user',['xhr'], function(xhr) {
         return d.promise();
     };
 
+    /**
+     * Returns info about currently logged in user from bootstrap resource
+     * @method getAccountInfo
+     */
     var getAccountInfo = function() {
         var d = $.Deferred();
 
@@ -1117,14 +1186,16 @@ define('gooddata',[
     'user',
     'metadata',
     'execution',
-    'project'
+    'project',
+    'config'
 ], function(
     xhr,
     util,
     user,
     metadata,
     execution,
-    project
+    project,
+    config
 ) {
     
 
@@ -1150,6 +1221,7 @@ define('gooddata',[
      * @class sdk
      */
     return {
+        config: config,
         xhr: xhr,
         user: user,
         md: metadata,
