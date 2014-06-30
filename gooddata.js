@@ -1,7 +1,7 @@
 /* Copyright (C) 2007-2013, GoodData(R) Corporation. All rights reserved. */
-/* gooddata - v0.1.5 */
-/* 2014-06-24 14:53:21 */
-/* Latest git commit: "4034d0d" */
+/* gooddata - v0.1.6 */
+/* 2014-06-30 09:09:56 */
+/* Latest git commit: "cfb250e" */
 
 (function(window, factory) {
   if (typeof define === 'function' && define.amd) {
@@ -981,15 +981,28 @@ define('execution',['xhr'], function(xhr) {
      * @method getData
      * @param {String} projectId - GD project identifier
      * @param {Array} elements - An array of attribute or metric identifiers.
+     * @param {Object} executionConfiguration - Execution configuration - can contain for example
+     *                 property "filters" containing execution context filters
+     *                 property "where" containing query-like filters
      * @return {Object} Structure with `headers` and `rawData` keys filled with values from execution.
      */
-    var getData = function(projectId, elements) {
+    var getData = function(projectId, elements, executionConfiguration) {
         // Create request and result structures
         var request = {
             execution: {
                 columns: elements
             }
         };
+
+        // enrich configuration with supported properties such as
+        // where clause with query-like filters or execution context filters
+        executionConfiguration = executionConfiguration || {};
+        ['filters', 'where'].forEach(function(property) {
+            if (executionConfiguration[property]) {
+                request.execution[property] = executionConfiguration[property];
+            }
+        });
+
         var executedReport = {
             isLoaded: false
         };
