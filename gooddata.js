@@ -1,7 +1,7 @@
 /* Copyright (C) 2007-2013, GoodData(R) Corporation. All rights reserved. */
-/* gooddata - v0.1.6 */
-/* 2014-06-30 09:09:56 */
-/* Latest git commit: "cfb250e" */
+/* gooddata - v0.1.7 */
+/* 2014-07-08 08:11:07 */
+/* Latest git commit: "d64b956" */
 
 (function(window, factory) {
   if (typeof define === 'function' && define.amd) {
@@ -1035,7 +1035,7 @@ define('execution',['xhr'], function(xhr) {
             return xhr.ajax(result.executionResult.tabularDataResult);
         }, d.reject).then(function(result) {
             // After the retrieving computed tabularData, resolve the promise
-            executedReport.rawData = result.tabularDataResult.values;
+            executedReport.rawData = (result && result.tabularDataResult) ? result.tabularDataResult.values : [];
             executedReport.isLoaded = true;
             d.resolve(executedReport);
         }, d.reject);
