@@ -1,7 +1,7 @@
 /* Copyright (C) 2007-2013, GoodData(R) Corporation. All rights reserved. */
-/* gooddata - v0.1.8 */
-/* 2014-09-10 13:11:46 */
-/* Latest git commit: "5d230e2" */
+/* gooddata - v0.1.9 */
+/* 2014-09-26 16:28:12 */
+/* Latest git commit: "35bf735" */
 
 (function(window, factory) {
   if (typeof define === 'function' && define.amd) {
@@ -197,7 +197,7 @@ define('xhr',['_jquery', 'config'], function($, config) {
             }).fail(function(xhr, textStatus, err) {
                 //unauthorized when retrieving token -> not logged
                 if ((xhr.status === 401) && ($.isFunction(req.unauthorized))) {
-                    req.unauthorized(xhr);
+                    req.unauthorized(xhr, textStatus, err, deferred);
                     return;
                 }
                 // unauthorized handler is not defined or not http 401
