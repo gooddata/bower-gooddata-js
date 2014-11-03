@@ -1,7 +1,7 @@
 /* Copyright (C) 2007-2013, GoodData(R) Corporation. All rights reserved. */
-/* gooddata - v0.1.9 */
-/* 2014-09-26 16:28:12 */
-/* Latest git commit: "35bf735" */
+/* gooddata - v0.1.10 */
+/* 2014-11-03 16:25:40 */
+/* Latest git commit: "8612b04" */
 
 (function(window, factory) {
   if (typeof define === 'function' && define.amd) {
@@ -244,7 +244,10 @@ define('xhr',['_jquery', 'config'], function($, config) {
         xhrSettings = $.extend({
             contentType: 'application/json',
             dataType: 'json',
-            pollDelay: 1000
+            pollDelay: 1000,
+            headers : {
+                'Accept' : 'application/json; charset=utf-8'
+            }
         }, settings);
     };
 
@@ -933,14 +936,14 @@ define('metadata',['xhr', 'util'], function(xhr, util) {
                 return getObjectDetails(found[0].uri);
             }
 
-            d.reject('identifier not found');
+            return $.Deferred().reject('identifier not found');
         }, d.reject).then(function(objData) {
             if (!objData.attributeDisplayForm) {
                 return d.resolve(uriFinder(objData));
             } else {
                 return getObjectDetails(objData.attributeDisplayForm.content.formOf).then(function(objData) {
-                            d.resolve(uriFinder(objData));
-                        }, d.reject);
+                    d.resolve(uriFinder(objData));
+                }, d.reject);
             }
         }, d.reject);
 
@@ -984,6 +987,9 @@ define('execution',['xhr'], function(xhr) {
      * @param {Object} executionConfiguration - Execution configuration - can contain for example
      *                 property "filters" containing execution context filters
      *                 property "where" containing query-like filters
+     *                 property "orderBy" contains array of sorted properties to order in form
+     *                      [{column: 'identifier', direction: 'asc|desc'}]
+     *
      * @return {Object} Structure with `headers` and `rawData` keys filled with values from execution.
      */
     var getData = function(projectId, elements, executionConfiguration) {
@@ -997,7 +1003,7 @@ define('execution',['xhr'], function(xhr) {
         // enrich configuration with supported properties such as
         // where clause with query-like filters or execution context filters
         executionConfiguration = executionConfiguration || {};
-        ['filters', 'where'].forEach(function(property) {
+        ['filters', 'where', 'orderBy'].forEach(function(property) {
             if (executionConfiguration[property]) {
                 request.execution[property] = executionConfiguration[property];
             }
