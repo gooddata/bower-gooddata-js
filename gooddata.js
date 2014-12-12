@@ -1,7 +1,7 @@
 /* Copyright (C) 2007-2013, GoodData(R) Corporation. All rights reserved. */
-/* gooddata - v0.1.10 */
-/* 2014-11-03 16:25:40 */
-/* Latest git commit: "8612b04" */
+/* gooddata - v0.1.11 */
+/* 2014-12-12 14:08:56 */
+/* Latest git commit: "87f87fa" */
 
 (function(window, factory) {
   if (typeof define === 'function' && define.amd) {
@@ -1003,7 +1003,7 @@ define('execution',['xhr'], function(xhr) {
         // enrich configuration with supported properties such as
         // where clause with query-like filters or execution context filters
         executionConfiguration = executionConfiguration || {};
-        ['filters', 'where', 'orderBy'].forEach(function(property) {
+        ['filters', 'where', 'orderBy', 'definitions'].forEach(function(property) {
             if (executionConfiguration[property]) {
                 request.execution[property] = executionConfiguration[property];
             }
