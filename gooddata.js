@@ -1,16 +1,16 @@
 /* Copyright (C) 2007-2013, GoodData(R) Corporation. All rights reserved. */
-/* gooddata - v0.1.14 */
-/* 2015-05-22 15:31:47 */
-/* Latest git commit: "8427373" */
+/* gooddata - v0.1.15 */
+/* 2015-05-26 09:24:06 */
+/* Latest git commit: "19566b0" */
 
 
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
-		module.exports = factory(require("jQuery"));
+		module.exports = factory(require("jquery"));
 	else if(typeof define === 'function' && define.amd)
-		define(["jQuery"], factory);
+		define(["jquery"], factory);
 	else if(typeof exports === 'object')
-		exports["gooddata"] = factory(require("jQuery"));
+		exports["gooddata"] = factory(require("jquery"));
 	else
 		root["gooddata"] = factory(root["jQuery"]);
 })(this, function(__WEBPACK_EXTERNAL_MODULE_2__) {
