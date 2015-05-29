@@ -1,7 +1,7 @@
 /* Copyright (C) 2007-2013, GoodData(R) Corporation. All rights reserved. */
-/* gooddata - v0.1.15 */
-/* 2015-05-26 09:24:06 */
-/* Latest git commit: "19566b0" */
+/* gooddata - v0.1.16 */
+/* 2015-05-29 11:02:23 */
+/* Latest git commit: "28b3728" */
 
 
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -452,7 +452,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;// Copyright (C) 2007-2014, GoodData(R) Corporation. All rights reserved.
-	!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(1)], __WEBPACK_AMD_DEFINE_RESULT__ = function(xhr) {
+	!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(2), __webpack_require__(1)], __WEBPACK_AMD_DEFINE_RESULT__ = function($, xhr) {
 	    'use strict';
 
 	    /**
@@ -557,7 +557,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;// Copyright (C) 2007-2014, GoodData(R) Corporation. All rights reserved.
-	!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(1), __webpack_require__(4)], __WEBPACK_AMD_DEFINE_RESULT__ = function(xhr, util) {
+	!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(2), __webpack_require__(1), __webpack_require__(4)], __WEBPACK_AMD_DEFINE_RESULT__ = function($, xhr, util) {
 	    'use strict';
 
 	    /**
@@ -1068,7 +1068,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;// Copyright (C) 2007-2014, GoodData(R) Corporation. All rights reserved.
-	!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(1)], __WEBPACK_AMD_DEFINE_RESULT__ = function(xhr) {
+	!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(2), __webpack_require__(1)], __WEBPACK_AMD_DEFINE_RESULT__ = function($, xhr) {
 	    'use strict';
 
 	    /**
@@ -1162,7 +1162,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;// Copyright (C) 2007-2014, GoodData(R) Corporation. All rights reserved.
-	!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(1), __webpack_require__(4)], __WEBPACK_AMD_DEFINE_RESULT__ = function(xhr, util) {
+	!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(2), __webpack_require__(1), __webpack_require__(4)], __WEBPACK_AMD_DEFINE_RESULT__ = function($, xhr, util) {
 	    'use strict';
 
 	    /**
