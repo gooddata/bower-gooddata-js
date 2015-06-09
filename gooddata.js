@@ -1,7 +1,7 @@
 /* Copyright (C) 2007-2013, GoodData(R) Corporation. All rights reserved. */
-/* gooddata - v0.1.16 */
-/* 2015-05-29 11:02:23 */
-/* Latest git commit: "28b3728" */
+/* gooddata - v0.1.17 */
+/* 2015-06-09 14:58:53 */
+/* Latest git commit: "7e224be" */
 
 
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -1133,6 +1133,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    return {
 	                        type: 'metric',
 	                        id: col.metric.meta.identifier,
+	                        uri: col.metric.meta.uri,
 	                        title: col.metric.meta.title,
 	                        format: col.metric.content.format
 	                    };
