@@ -1,7 +1,7 @@
 /* Copyright (C) 2007-2013, GoodData(R) Corporation. All rights reserved. */
-/* gooddata - v0.1.17 */
-/* 2015-06-09 14:58:53 */
-/* Latest git commit: "7e224be" */
+/* gooddata - v0.1.18 */
+/* 2015-07-24 14:41:50 */
+/* Latest git commit: "e3b50a6" */
 
 
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -533,7 +533,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	                loginMD5: br.current.loginMD5,
 	                firstName: br.accountSetting.firstName,
 	                lastName: br.accountSetting.lastName,
-	                organizationName: br.settings.organizationName
+	                organizationName: br.settings.organizationName,
+	                profileUri: br.accountSetting.links.self
 	            };
 
 	            d.resolve(accountInfo);
