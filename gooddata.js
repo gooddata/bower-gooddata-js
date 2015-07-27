@@ -1,7 +1,7 @@
 /* Copyright (C) 2007-2013, GoodData(R) Corporation. All rights reserved. */
-/* gooddata - v0.1.18 */
-/* 2015-07-24 14:41:50 */
-/* Latest git commit: "e3b50a6" */
+/* gooddata - v0.1.19 */
+/* 2015-07-27 15:05:07 */
+/* Latest git commit: "9b36b89" */
 
 
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -281,6 +281,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                if (location){
 	                    settings.url = location;
 	                }
+	                settings.method = "GET";
 	                handlePolling(settings, d);
 	            } else {
 	                d.resolve(data, textStatus, xhr);
