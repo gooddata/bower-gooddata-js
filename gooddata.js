@@ -1,7 +1,7 @@
 /* Copyright (C) 2007-2013, GoodData(R) Corporation. All rights reserved. */
-/* gooddata - v0.1.19 */
-/* 2015-07-27 15:05:07 */
-/* Latest git commit: "9b36b89" */
+/* gooddata - v0.1.20 */
+/* 2015-08-10 11:09:02 */
+/* Latest git commit: "3f30505" */
 
 
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -275,7 +275,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                d.reject(xhr, textStatus, err);
 	            }
 	        }).done(function(data, textStatus, xhr) {
-	            if (xhr.status === 202) {
+	            if (xhr.status === 202 && !settings.dontPollOnResult) {
 	                // if the response is 202 and Location header is not empty, let's poll on the new Location
 	                var location = xhr.getResponseHeader('Location');
 	                if (location){
@@ -1122,25 +1122,30 @@ return /******/ (function(modules) { // webpackBootstrap
 	        xhr.post('/gdc/internal/projects/'+projectId+'/experimental/executions', {
 	            data: JSON.stringify(request)
 	        }, d.reject).then(function(result) {
-	            // Populate result's header section
-	            executedReport.headers = result.executionResult.columns.map(function(col) {
-	                if (col.attributeDisplayForm) {
-	                    return {
-	                        type: 'attrLabel',
-	                        id: col.attributeDisplayForm.meta.identifier,
-	                        uri: col.attributeDisplayForm.meta.uri,
-	                        title: col.attributeDisplayForm.meta.title
-	                    };
-	                } else {
-	                    return {
-	                        type: 'metric',
-	                        id: col.metric.meta.identifier,
-	                        uri: col.metric.meta.uri,
-	                        title: col.metric.meta.title,
-	                        format: col.metric.content.format
-	                    };
-	                }
-	            });
+	            // TODO: when executionResult.headers will be globaly available columns map code should be removed
+	            if (result.executionResult.headers) {
+	                executedReport.headers = result.executionResult.headers;
+	            } else {
+	                // Populate result's header section if is not available
+	                executedReport.headers = result.executionResult.columns.map(function(col) {
+	                    if (col.attributeDisplayForm) {
+	                        return {
+	                            type: 'attrLabel',
+	                            id: col.attributeDisplayForm.meta.identifier,
+	                            uri: col.attributeDisplayForm.meta.uri,
+	                            title: col.attributeDisplayForm.meta.title
+	                        };
+	                    } else {
+	                        return {
+	                            type: 'metric',
+	                            id: col.metric.meta.identifier,
+	                            uri: col.metric.meta.uri,
+	                            title: col.metric.meta.title,
+	                            format: col.metric.content.format
+	                        };
+	                    }
+	                });
+	            }
 	            // Start polling on url returned in the executionResult for tabularData
 	            return xhr.ajax(result.executionResult.tabularDataResult);
 	        }, d.reject).then(function(result) {
