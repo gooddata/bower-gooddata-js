@@ -1,7 +1,7 @@
 /* Copyright (C) 2007-2015, GoodData(R) Corporation. All rights reserved. */
-/* gooddata - v0.1.24 */
-/* 2016-03-29 09:49:31 */
-/* Latest git commit: "5866fc9" */
+/* gooddata - v0.1.25 */
+/* 2016-03-29 13:57:59 */
+/* Latest git commit: "b3e1855" */
 
 
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -2779,7 +2779,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 	var getGeneratedMetricIdentifier = function getGeneratedMetricIdentifier(item) {
-	    var aggregation = (0, _lodashObjectGet2['default'])(item, 'aggregation', 'base');
+	    var aggregation = (0, _lodashObjectGet2['default'])(item, 'aggregation', 'base').toLowerCase();
 
 	    var _get$split = (0, _lodashObjectGet2['default'])(item, 'objectUri').split('/');
 
@@ -2798,7 +2798,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    var prefix = hasNoFilters || allFiltersEmpty ? '' : 'filtered_';
 
-	    return type + '_' + identifier + '.generated.' + prefix + aggregation.toLowerCase() + '.' + hash;
+	    return type + '_' + identifier + '.generated.' + prefix + aggregation + '.' + hash;
 	};
 
 	var generatedMetricDefinition = function generatedMetricDefinition(item) {
@@ -2853,7 +2853,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }), generatedMetricDefinition);
 	    var metrics = (0, _lodashCollectionMap2['default'])((0, _lodashCollectionFilter2['default'])(measures, function (m) {
 	        return m.type === 'metric';
-	    }), metricToDefinition);
+	    }), function (metric) {
+	        if ((0, _lodashLangIsEmpty2['default'])(metric.metricAttributeFilters)) {
+	            return metricToDefinition(metric);
+	        }
+
+	        return generatedMetricDefinition(metric);
+	    });
 	    var attributeMetrics = (0, _lodashCollectionMap2['default'])((0, _lodashCollectionFilter2['default'])(measures, function (m) {
 	        return m.type === 'attribute';
 	    }), generatedMetricDefinition);
@@ -2891,7 +2897,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	    });
 	    metrics.forEach(function (_ref9) {
 	        var element = _ref9.element;
-	        return columns.push(element);
+	        var definition = _ref9.definition;
+
+	        columns.push(element);
+	        if (definition) {
+	            definitions.push(definition);
+	        }
 	    });
 	    var where = [].concat(attributeFilters, dateFilters).reduce(function (acc, f) {
 	        return (0, _lodashObjectAssign2['default'])(acc, f);
