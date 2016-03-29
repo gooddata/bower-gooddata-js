@@ -1,7 +1,7 @@
 /* Copyright (C) 2007-2015, GoodData(R) Corporation. All rights reserved. */
-/* gooddata - v0.1.23 */
-/* 2016-03-24 13:41:07 */
-/* Latest git commit: "e4269c1" */
+/* gooddata - v0.1.24 */
+/* 2016-03-29 09:49:31 */
+/* Latest git commit: "5866fc9" */
 
 
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -2871,25 +2871,25 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    var columns = [];
 	    var definitions = [];
-	    factMetrics.forEach(function (_ref6) {
+	    attributes.forEach(function (_ref6) {
 	        var element = _ref6.element;
-	        var definition = _ref6.definition;
-
-	        columns.push(element);
-	        definitions.push(definition);
+	        return columns.push(element);
 	    });
-	    attributeMetrics.forEach(function (_ref7) {
+	    factMetrics.forEach(function (_ref7) {
 	        var element = _ref7.element;
 	        var definition = _ref7.definition;
 
 	        columns.push(element);
 	        definitions.push(definition);
 	    });
-	    metrics.forEach(function (_ref8) {
+	    attributeMetrics.forEach(function (_ref8) {
 	        var element = _ref8.element;
-	        return columns.push(element);
+	        var definition = _ref8.definition;
+
+	        columns.push(element);
+	        definitions.push(definition);
 	    });
-	    attributes.forEach(function (_ref9) {
+	    metrics.forEach(function (_ref9) {
 	        var element = _ref9.element;
 	        return columns.push(element);
 	    });
