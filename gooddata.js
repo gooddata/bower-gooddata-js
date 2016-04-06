@@ -1,7 +1,7 @@
 /* Copyright (C) 2007-2015, GoodData(R) Corporation. All rights reserved. */
-/* gooddata - v0.1.26 */
-/* 2016-04-05 15:36:05 */
-/* Latest git commit: "555fb95" */
+/* gooddata - v0.1.27 */
+/* 2016-04-06 14:49:53 */
+/* Latest git commit: "ab0f2ed" */
 
 
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -2856,7 +2856,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        getMetricExpression = (0, _lodashFunctionPartial2['default'])(getPercentMetricExpression, attribute, '{' + (0, _lodashObjectGet2['default'])(generated, 'definition.metricDefinition.identifier') + '}');
 	    }
 	    var title = ('% ' + (0, _lodashObjectGet2['default'])(item, 'title')).replace(/^(% )+/, '% ');
-	    var format = ((0, _lodashObjectGet2['default'])(item, 'format') + '%').replace(/%+$/, '%');
+	    var format = '#,##0.00%';
 	    var hasher = (0, _lodashFunctionPartial2['default'])(getGeneratedMetricHash, title, format);
 	    var result = [{
 	        element: getGeneratedMetricIdentifier(item, false, getMetricExpression, hasher),
