@@ -1,7 +1,7 @@
 /* Copyright (C) 2007-2015, GoodData(R) Corporation. All rights reserved. */
-/* gooddata - v0.1.27 */
-/* 2016-04-06 14:49:53 */
-/* Latest git commit: "ab0f2ed" */
+/* gooddata - v0.1.28 */
+/* 2016-04-06 15:20:07 */
+/* Latest git commit: "91e2aa7" */
 
 
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -2804,6 +2804,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return (0, _md52['default'])(expression + '#' + title + '#' + format);
 	};
 
+	var allFiltersEmpty = function allFiltersEmpty(item) {
+	    return (0, _lodashCollectionEvery2['default'])((0, _lodashCollectionMap2['default'])((0, _lodashObjectGet2['default'])(item, 'metricAttributeFilters', []), function (f) {
+	        return (0, _lodashLangIsEmpty2['default'])((0, _lodashObjectGet2['default'])(f, 'listAttributeFilter.default.attributeElements', []));
+	    }));
+	};
+
 	var getGeneratedMetricIdentifier = function getGeneratedMetricIdentifier(item, useBasicAggregation, expressionCreator, hasher) {
 	    if (useBasicAggregation === undefined) useBasicAggregation = true;
 
@@ -2822,12 +2828,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var identifier = prjId + '_' + id;
 	    var hash = hasher(expressionCreator(item));
 	    var hasNoFilters = (0, _lodashLangIsEmpty2['default'])((0, _lodashObjectGet2['default'])(item, 'metricAttributeFilters', []));
-	    var allFiltersEmpty = (0, _lodashCollectionEvery2['default'])((0, _lodashCollectionMap2['default'])((0, _lodashObjectGet2['default'])(item, 'metricAttributeFilters', []), function (f) {
-	        return (0, _lodashLangIsEmpty2['default'])((0, _lodashObjectGet2['default'])(f, 'listAttributeFilter.default.attributeElements', []));
-	    }));
 	    var type = (0, _lodashObjectGet2['default'])(item, 'type');
 
-	    var prefix = hasNoFilters || allFiltersEmpty ? '' : 'filtered_';
+	    var prefix = hasNoFilters || allFiltersEmpty(item) ? '' : 'filtered_';
 
 	    return type + '_' + identifier + '.generated.' + prefix + aggregation + '.' + hash;
 	};
@@ -2851,7 +2854,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var type = (0, _lodashObjectGet2['default'])(item, 'type');
 	    var generated = undefined;
 	    var getMetricExpression = (0, _lodashFunctionPartial2['default'])(getPercentMetricExpression, attribute, '[' + (0, _lodashObjectGet2['default'])(item, 'objectUri') + ']');
-	    if (type === 'fact' || type === 'attribute') {
+	    if (type === 'fact' || type === 'attribute' || !allFiltersEmpty(item)) {
 	        generated = generatedMetricDefinition(item);
 	        getMetricExpression = (0, _lodashFunctionPartial2['default'])(getPercentMetricExpression, attribute, '{' + (0, _lodashObjectGet2['default'])(generated, 'definition.metricDefinition.identifier') + '}');
 	    }
