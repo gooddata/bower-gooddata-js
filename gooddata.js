@@ -1,7 +1,7 @@
 /* Copyright (C) 2007-2015, GoodData(R) Corporation. All rights reserved. */
-/* gooddata - v0.1.28 */
-/* 2016-04-06 15:20:07 */
-/* Latest git commit: "91e2aa7" */
+/* gooddata - v0.1.29 */
+/* 2016-04-12 08:18:51 */
+/* Latest git commit: "f0a15bb" */
 
 
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -2909,13 +2909,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 	var mdToExecutionConfiguration = function mdToExecutionConfiguration(mdObj) {
-	    var measures = mdObj.measures;
-	    var categories = mdObj.categories;
 	    var filters = mdObj.filters;
 
-	    var attributes = (0, _lodashCollectionMap2['default'])((0, _lodashCollectionFilter2['default'])(categories, function (c) {
-	        return c.collection === 'attribute';
-	    }), categoryToElement);
+	    var measures = (0, _lodashCollectionMap2['default'])(mdObj.measures, function (_ref4) {
+	        var measure = _ref4.measure;
+	        return measure;
+	    });
+	    var categories = (0, _lodashCollectionMap2['default'])(mdObj.categories, function (_ref5) {
+	        var category = _ref5.category;
+	        return category;
+	    });
+	    var attributes = (0, _lodashCollectionMap2['default'])(categories, categoryToElement);
 	    var contributionMetrics = (0, _lodashCollectionMap2['default'])((0, _lodashCollectionFilter2['default'])(measures, function (m) {
 	        return m.showInPercent;
 	    }), (0, _lodashFunctionPartial2['default'])(contributionMetricDefinition, (0, _lodashCollectionFind2['default'])(categories, function (c) {
@@ -2936,12 +2940,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var attributeMetrics = (0, _lodashCollectionMap2['default'])((0, _lodashCollectionFilter2['default'])(measures, function (m) {
 	        return m.type === 'attribute' && !m.showInPercent;
 	    }), generatedMetricDefinition);
-	    var attributeFilters = (0, _lodashCollectionMap2['default'])((0, _lodashCollectionFilter2['default'])(filters, function (_ref4) {
-	        var listAttributeFilter = _ref4.listAttributeFilter;
+	    var attributeFilters = (0, _lodashCollectionMap2['default'])((0, _lodashCollectionFilter2['default'])(filters, function (_ref6) {
+	        var listAttributeFilter = _ref6.listAttributeFilter;
 	        return listAttributeFilter !== undefined;
 	    }), attributeFilterToWhere);
-	    var dateFilters = (0, _lodashCollectionMap2['default'])((0, _lodashCollectionFilter2['default'])(filters, function (_ref5) {
-	        var dateFilterSettings = _ref5.dateFilterSettings;
+	    var dateFilters = (0, _lodashCollectionMap2['default'])((0, _lodashCollectionFilter2['default'])(filters, function (_ref7) {
+	        var dateFilterSettings = _ref7.dateFilterSettings;
 	        return dateFilterSettings !== undefined;
 	    }), dateFilterToWhere);
 
