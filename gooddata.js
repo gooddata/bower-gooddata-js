@@ -1,7 +1,7 @@
 /* Copyright (C) 2007-2015, GoodData(R) Corporation. All rights reserved. */
-/* gooddata - v0.1.29 */
-/* 2016-04-12 08:18:51 */
-/* Latest git commit: "f0a15bb" */
+/* gooddata - v0.1.30 */
+/* 2016-04-14 15:24:43 */
+/* Latest git commit: "e473666" */
 
 
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -2682,6 +2682,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var _lodashArrayFlatten2 = _interopRequireDefault(_lodashArrayFlatten);
 
 	var notEmpty = (0, _lodashFunctionNegate2['default'])(_lodashLangIsEmpty2['default']);
+
 	/**
 	 * Module for execution on experimental execution resource
 	 *
@@ -2770,6 +2771,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return d.promise();
 	}
 
+	var CONTRIBUTION_METRIC_FORMAT = '#,##0.00%';
+
 	var getFilterExpression = function getFilterExpression(listAttributeFilter) {
 	    var attributeUri = (0, _lodashObjectGet2['default'])(listAttributeFilter, 'listAttributeFilter.attribute');
 	    var elements = (0, _lodashObjectGet2['default'])(listAttributeFilter, 'listAttributeFilter.default.attributeElements', []);
@@ -2800,6 +2803,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return 'SELECT (SELECT ' + metricId + ') / (SELECT ' + metricId + ' BY ALL [' + attributeUri + '])';
 	};
 
+	var getPoPExpression = function getPoPExpression(attribute, metricId) {
+	    var attributeUri = (0, _lodashObjectGet2['default'])(attribute, 'attribute');
+
+	    return 'SELECT (SELECT ' + metricId + ') FOR PREVIOUS ([' + attributeUri + '])';
+	};
+
 	var getGeneratedMetricHash = function getGeneratedMetricHash(title, format, expression) {
 	    return (0, _md52['default'])(expression + '#' + title + '#' + format);
 	};
@@ -2810,14 +2819,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }));
 	};
 
-	var getGeneratedMetricIdentifier = function getGeneratedMetricIdentifier(item, useBasicAggregation, expressionCreator, hasher) {
-	    if (useBasicAggregation === undefined) useBasicAggregation = true;
-
-	    var aggregation = (0, _lodashObjectGet2['default'])(item, 'aggregation', 'base').toLowerCase();
-	    if ((0, _lodashObjectGet2['default'])(item, 'showInPercent') && !useBasicAggregation) {
-	        aggregation = 'percent';
-	    }
-
+	var getGeneratedMetricIdentifier = function getGeneratedMetricIdentifier(item, aggregation, expressionCreator, hasher) {
 	    var _get$split = (0, _lodashObjectGet2['default'])(item, 'objectUri').split('/');
 
 	    var _get$split2 = _slicedToArray(_get$split, 6);
@@ -2836,39 +2838,46 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 	var generatedMetricDefinition = function generatedMetricDefinition(item) {
-	    var hasher = (0, _lodashFunctionPartial2['default'])(getGeneratedMetricHash, (0, _lodashObjectGet2['default'])(item, 'title'), (0, _lodashObjectGet2['default'])(item, 'format'));
-	    var element = getGeneratedMetricIdentifier(item, true, getGeneratedMetricExpression, hasher);
+	    var title = item.title;
+	    var format = item.format;
+
+	    var hasher = (0, _lodashFunctionPartial2['default'])(getGeneratedMetricHash, title, format);
+	    var aggregation = (0, _lodashObjectGet2['default'])(item, 'aggregation', 'base').toLowerCase();
+	    var element = getGeneratedMetricIdentifier(item, aggregation, getGeneratedMetricExpression, hasher);
 	    var definition = {
 	        metricDefinition: {
-	            identifier: getGeneratedMetricIdentifier(item, true, getGeneratedMetricExpression, hasher),
+	            identifier: element,
 	            expression: getGeneratedMetricExpression(item),
-	            title: (0, _lodashObjectGet2['default'])(item, 'title'),
-	            format: (0, _lodashObjectGet2['default'])(item, 'format')
+	            title: title,
+	            format: format
 	        }
 	    };
 
 	    return { element: element, definition: definition };
 	};
 
-	var contributionMetricDefinition = function contributionMetricDefinition(attribute, item) {
+	var isDerivedMetric = function isDerivedMetric(item) {
 	    var type = (0, _lodashObjectGet2['default'])(item, 'type');
+	    return type === 'fact' || type === 'attribute' || !allFiltersEmpty(item);
+	};
+
+	var contributionMetricDefinition = function contributionMetricDefinition(attribute, item) {
 	    var generated = undefined;
 	    var getMetricExpression = (0, _lodashFunctionPartial2['default'])(getPercentMetricExpression, attribute, '[' + (0, _lodashObjectGet2['default'])(item, 'objectUri') + ']');
-	    if (type === 'fact' || type === 'attribute' || !allFiltersEmpty(item)) {
+	    if (isDerivedMetric(item)) {
 	        generated = generatedMetricDefinition(item);
 	        getMetricExpression = (0, _lodashFunctionPartial2['default'])(getPercentMetricExpression, attribute, '{' + (0, _lodashObjectGet2['default'])(generated, 'definition.metricDefinition.identifier') + '}');
 	    }
 	    var title = ('% ' + (0, _lodashObjectGet2['default'])(item, 'title')).replace(/^(% )+/, '% ');
-	    var format = '#,##0.00%';
-	    var hasher = (0, _lodashFunctionPartial2['default'])(getGeneratedMetricHash, title, format);
+	    var hasher = (0, _lodashFunctionPartial2['default'])(getGeneratedMetricHash, title, CONTRIBUTION_METRIC_FORMAT);
 	    var result = [{
-	        element: getGeneratedMetricIdentifier(item, false, getMetricExpression, hasher),
+	        element: getGeneratedMetricIdentifier(item, 'percent', getMetricExpression, hasher),
 	        definition: {
 	            metricDefinition: {
-	                identifier: getGeneratedMetricIdentifier(item, false, getMetricExpression, hasher),
+	                identifier: getGeneratedMetricIdentifier(item, 'percent', getMetricExpression, hasher),
 	                expression: getMetricExpression(item),
 	                title: title,
-	                format: format
+	                format: CONTRIBUTION_METRIC_FORMAT
 	            }
 	        }
 	    }];
@@ -2878,6 +2887,68 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 
 	    return result;
+	};
+
+	var popMetricDefinition = function popMetricDefinition(attribute, item) {
+	    var title = (0, _lodashObjectGet2['default'])(item, 'title') + ' - previous year';
+	    var format = (0, _lodashObjectGet2['default'])(item, 'format');
+	    var hasher = (0, _lodashFunctionPartial2['default'])(getGeneratedMetricHash, title, format);
+
+	    var generated = undefined;
+	    var getMetricExpression = (0, _lodashFunctionPartial2['default'])(getPoPExpression, attribute, '[' + (0, _lodashObjectGet2['default'])(item, 'objectUri') + ']');
+
+	    if (isDerivedMetric(item)) {
+	        generated = generatedMetricDefinition(item);
+	        getMetricExpression = (0, _lodashFunctionPartial2['default'])(getPoPExpression, attribute, '{' + (0, _lodashObjectGet2['default'])(generated, 'definition.metricDefinition.identifier') + '}');
+	    }
+
+	    var identifier = getGeneratedMetricIdentifier(item, 'pop', getMetricExpression, hasher);
+
+	    var result = [{
+	        element: identifier,
+	        definition: {
+	            metricDefinition: {
+	                identifier: identifier,
+	                expression: getMetricExpression(),
+	                title: title,
+	                format: format
+	            }
+	        }
+	    }];
+
+	    if (generated) {
+	        result.push(generated);
+	    }
+
+	    return result;
+	};
+
+	var contributionPoPMetricDefinition = function contributionPoPMetricDefinition(date, attribute, item) {
+	    var generated = contributionMetricDefinition(attribute ? attribute : date, item);
+
+	    var title = ('% ' + (0, _lodashObjectGet2['default'])(item, 'title') + ' - previous year').replace(/^(% )+/, '% ');
+	    var format = CONTRIBUTION_METRIC_FORMAT;
+	    var hasher = (0, _lodashFunctionPartial2['default'])(getGeneratedMetricHash, title, format);
+
+	    var getMetricExpression = (0, _lodashFunctionPartial2['default'])(getPoPExpression, (0, _lodashObjectGet2['default'])(date, 'dateFilterSettings', date), '{' + (0, _lodashArrayLast2['default'])(generated).element + '}');
+
+	    var identifier = getGeneratedMetricIdentifier(item, 'pop', getMetricExpression, hasher);
+
+	    var result = [{
+	        element: identifier,
+	        definition: {
+	            metricDefinition: {
+	                identifier: identifier,
+	                expression: getMetricExpression(),
+	                title: title,
+	                format: format
+	            }
+	        }
+	    }];
+
+	    result.push(generated);
+
+	    return (0, _lodashArrayFlatten2['default'])(result);
 	};
 
 	var categoryToElement = function categoryToElement(c) {
@@ -2921,12 +2992,25 @@ return /******/ (function(modules) { // webpackBootstrap
 	    });
 	    var attributes = (0, _lodashCollectionMap2['default'])(categories, categoryToElement);
 	    var contributionMetrics = (0, _lodashCollectionMap2['default'])((0, _lodashCollectionFilter2['default'])(measures, function (m) {
-	        return m.showInPercent;
+	        return m.showInPercent && !m.showPoP;
 	    }), (0, _lodashFunctionPartial2['default'])(contributionMetricDefinition, (0, _lodashCollectionFind2['default'])(categories, function (c) {
-	        return c.collection === 'attribute';
+	        return c.type === 'attribute' || c.type === 'date';
+	    })));
+
+	    var date = (0, _lodashCollectionFind2['default'])([].concat(categories, filters), function (c) {
+	        return c.type === 'date' || c.dateFilterSettings;
+	    });
+
+	    var popMetrics = (0, _lodashCollectionMap2['default'])((0, _lodashCollectionFilter2['default'])(measures, function (m) {
+	        return m.showPoP && !m.showInPercent;
+	    }), (0, _lodashFunctionPartial2['default'])(popMetricDefinition, date));
+	    var contributionPoPMetrics = (0, _lodashCollectionMap2['default'])((0, _lodashCollectionFilter2['default'])(measures, function (m) {
+	        return m.showPoP && m.showInPercent;
+	    }), (0, _lodashFunctionPartial2['default'])(contributionPoPMetricDefinition, date, (0, _lodashCollectionFind2['default'])(categories, function (c) {
+	        return c.type === 'attribute' || c.type === 'date';
 	    })));
 	    var factMetrics = (0, _lodashCollectionMap2['default'])((0, _lodashCollectionFilter2['default'])(measures, function (m) {
-	        return m.type === 'fact' && !m.showInPercent;
+	        return m.type === 'fact' && !m.showInPercent && !m.showPoP;
 	    }), generatedMetricDefinition);
 	    var metrics = (0, _lodashCollectionMap2['default'])((0, _lodashCollectionFilter2['default'])(measures, function (m) {
 	        return m.type === 'metric' && !m.showInPercent;
@@ -2938,7 +3022,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return generatedMetricDefinition(metric);
 	    });
 	    var attributeMetrics = (0, _lodashCollectionMap2['default'])((0, _lodashCollectionFilter2['default'])(measures, function (m) {
-	        return m.type === 'attribute' && !m.showInPercent;
+	        return m.type === 'attribute' && !m.showInPercent && !m.showPoP;
 	    }), generatedMetricDefinition);
 	    var attributeFilters = (0, _lodashCollectionMap2['default'])((0, _lodashCollectionFilter2['default'])(filters, function (_ref6) {
 	        var listAttributeFilter = _ref6.listAttributeFilter;
@@ -2949,13 +3033,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return dateFilterSettings !== undefined;
 	    }), dateFilterToWhere);
 
-	    var allMetrics = [].concat(attributes, factMetrics, attributeMetrics, metrics, (0, _lodashArrayFlatten2['default'])(contributionMetrics));
+	    var allMetrics = [].concat(attributes, factMetrics, attributeMetrics, (0, _lodashArrayFlatten2['default'])(popMetrics), metrics, (0, _lodashArrayFlatten2['default'])(contributionMetrics), (0, _lodashArrayFlatten2['default'])(contributionPoPMetrics));
 
-	    var where = [].concat(attributeFilters, dateFilters).reduce(function (acc, f) {
-	        return (0, _lodashObjectAssign2['default'])(acc, f);
-	    }, {});
+	    var where = [].concat(attributeFilters, dateFilters).reduce(_lodashObjectAssign2['default'], {});
 
-	    return { 'execution': {
+	    return { execution: {
 	            columns: (0, _lodashCollectionFilter2['default'])((0, _lodashCollectionPluck2['default'])(allMetrics, 'element'), _lodashUtilityIdentity2['default']),
 	            where: where,
 	            definitions: (0, _lodashCollectionFilter2['default'])((0, _lodashCollectionPluck2['default'])(allMetrics, 'definition'), _lodashUtilityIdentity2['default'])
