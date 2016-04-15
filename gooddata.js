@@ -1,7 +1,7 @@
 /* Copyright (C) 2007-2015, GoodData(R) Corporation. All rights reserved. */
-/* gooddata - v0.1.30 */
-/* 2016-04-14 15:24:43 */
-/* Latest git commit: "e473666" */
+/* gooddata - v0.1.31 */
+/* 2016-04-15 14:30:14 */
+/* Latest git commit: "5efa091" */
 
 
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -2889,17 +2889,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return result;
 	};
 
+	var getDate = function getDate(date) {
+	    return (0, _lodashObjectGet2['default'])(date, 'dateFilterSettings', date);
+	};
+
 	var popMetricDefinition = function popMetricDefinition(attribute, item) {
 	    var title = (0, _lodashObjectGet2['default'])(item, 'title') + ' - previous year';
 	    var format = (0, _lodashObjectGet2['default'])(item, 'format');
 	    var hasher = (0, _lodashFunctionPartial2['default'])(getGeneratedMetricHash, title, format);
 
+	    var date = getDate(attribute);
+
 	    var generated = undefined;
-	    var getMetricExpression = (0, _lodashFunctionPartial2['default'])(getPoPExpression, attribute, '[' + (0, _lodashObjectGet2['default'])(item, 'objectUri') + ']');
+	    var getMetricExpression = (0, _lodashFunctionPartial2['default'])(getPoPExpression, date, '[' + (0, _lodashObjectGet2['default'])(item, 'objectUri') + ']');
 
 	    if (isDerivedMetric(item)) {
 	        generated = generatedMetricDefinition(item);
-	        getMetricExpression = (0, _lodashFunctionPartial2['default'])(getPoPExpression, attribute, '{' + (0, _lodashObjectGet2['default'])(generated, 'definition.metricDefinition.identifier') + '}');
+	        getMetricExpression = (0, _lodashFunctionPartial2['default'])(getPoPExpression, date, '{' + (0, _lodashObjectGet2['default'])(generated, 'definition.metricDefinition.identifier') + '}');
 	    }
 
 	    var identifier = getGeneratedMetricIdentifier(item, 'pop', getMetricExpression, hasher);
@@ -2930,7 +2936,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var format = CONTRIBUTION_METRIC_FORMAT;
 	    var hasher = (0, _lodashFunctionPartial2['default'])(getGeneratedMetricHash, title, format);
 
-	    var getMetricExpression = (0, _lodashFunctionPartial2['default'])(getPoPExpression, (0, _lodashObjectGet2['default'])(date, 'dateFilterSettings', date), '{' + (0, _lodashArrayLast2['default'])(generated).element + '}');
+	    var getMetricExpression = (0, _lodashFunctionPartial2['default'])(getPoPExpression, getDate(date), '{' + (0, _lodashArrayLast2['default'])(generated).element + '}');
 
 	    var identifier = getGeneratedMetricIdentifier(item, 'pop', getMetricExpression, hasher);
 
