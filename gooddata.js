@@ -1,7 +1,7 @@
 /* Copyright (C) 2007-2015, GoodData(R) Corporation. All rights reserved. */
-/* gooddata - v0.1.33 */
-/* 2016-05-02 10:53:13 */
-/* Latest git commit: "ab83756" */
+/* gooddata - v0.1.34 */
+/* 2016-05-02 13:15:24 */
+/* Latest git commit: "9ffbb5e" */
 
 
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -17405,7 +17405,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	                title: title,
 	                format: CONTRIBUTION_METRIC_FORMAT
 	            }
-	        }
+	        },
+	        sort: (0, _lodash.get)(item, 'sort')
 	    }];
 
 	    if (generated) {
@@ -17478,7 +17479,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	                title: title,
 	                format: format
 	            }
-	        }
+	        },
+	        sort: (0, _lodash.get)(item, 'sort')
 	    }];
 
 	    result.push(generated);
