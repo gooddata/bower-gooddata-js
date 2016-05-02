@@ -1,7 +1,7 @@
 /* Copyright (C) 2007-2015, GoodData(R) Corporation. All rights reserved. */
-/* gooddata - v0.1.32 */
-/* 2016-04-26 11:37:17 */
-/* Latest git commit: "f5d7a5e" */
+/* gooddata - v0.1.33 */
+/* 2016-05-02 10:53:13 */
+/* Latest git commit: "ab83756" */
 
 
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -17293,6 +17293,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var CONTRIBUTION_METRIC_FORMAT = '#,##0.00%';
 
+	var hashItem = function hashItem(item) {
+	    return (0, _md52['default'])('' + (0, _lodash.filter)((0, _lodash.values)(item), _lodash.isString).join('#'));
+	};
+
 	var getFilterExpression = function getFilterExpression(listAttributeFilter) {
 	    var attributeUri = (0, _lodash.get)(listAttributeFilter, 'listAttributeFilter.attribute');
 	    var elements = (0, _lodash.get)(listAttributeFilter, 'listAttributeFilter.default.attributeElements', []);
@@ -17360,6 +17364,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var generatedMetricDefinition = function generatedMetricDefinition(item) {
 	    var title = item.title;
 	    var format = item.format;
+	    var sort = item.sort;
 
 	    var hasher = (0, _lodash.partial)(getGeneratedMetricHash, title, format);
 	    var aggregation = (0, _lodash.get)(item, 'aggregation', 'base').toLowerCase();
@@ -17373,7 +17378,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	    };
 
-	    return { element: element, definition: definition };
+	    return { element: element, hash: hashItem(item), definition: definition, sort: sort };
 	};
 
 	var isDerivedMetric = function isDerivedMetric(item) {
@@ -17392,6 +17397,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var hasher = (0, _lodash.partial)(getGeneratedMetricHash, title, CONTRIBUTION_METRIC_FORMAT);
 	    var result = [{
 	        element: getGeneratedMetricIdentifier(item, 'percent', getMetricExpression, hasher),
+	        hash: hashItem(item),
 	        definition: {
 	            metricDefinition: {
 	                identifier: getGeneratedMetricIdentifier(item, 'percent', getMetricExpression, hasher),
@@ -17403,7 +17409,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }];
 
 	    if (generated) {
-	        result.unshift({ definition: generated.definition });
+	        result.unshift({ hash: hashItem(item), definition: generated.definition });
 	    }
 
 	    return result;
@@ -17432,6 +17438,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    var result = [{
 	        element: identifier,
+	        hash: hashItem(item),
 	        definition: {
 	            metricDefinition: {
 	                identifier: identifier,
@@ -17439,7 +17446,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	                title: title,
 	                format: format
 	            }
-	        }
+	        },
+	        sort: (0, _lodash.get)(item, 'sort')
 	    }];
 
 	    if (generated) {
@@ -17462,6 +17470,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    var result = [{
 	        element: identifier,
+	        hash: hashItem(item),
 	        definition: {
 	            metricDefinition: {
 	                identifier: identifier,
@@ -17478,7 +17487,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 	var categoryToElement = function categoryToElement(c) {
-	    return { element: (0, _lodash.get)(c, 'displayForm') };
+	    return { element: (0, _lodash.get)(c, 'displayForm'), hash: hashItem(c), sort: (0, _lodash.get)(c, 'sort') };
 	};
 
 	var attributeFilterToWhere = function attributeFilterToWhere(f) {
@@ -17502,14 +17511,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 	var metricToDefinition = function metricToDefinition(metric) {
-	    return { element: (0, _lodash.get)(metric, 'objectUri') };
+	    return {
+	        element: (0, _lodash.get)(metric, 'objectUri'),
+	        hash: hashItem(metric),
+	        sort: !metric.showPoP ? (0, _lodash.get)(metric, 'sort') : null
+	    };
 	};
+
 	var isDateFilterExecutable = function isDateFilterExecutable(dateFilter) {
 	    return (0, _lodash.get)(dateFilter, 'from') !== undefined && (0, _lodash.get)(dateFilter, 'to') !== undefined;
 	};
 
 	var isAttributeFilterExecutable = function isAttributeFilterExecutable(listAttributeFilter) {
 	    return notEmpty((0, _lodash.get)(listAttributeFilter, ['default', 'attributeElements']));
+	};
+
+	var sortToOrderBy = function sortToOrderBy(item) {
+	    return { column: (0, _lodash.get)(item, 'element'), direction: (0, _lodash.get)(item, 'sort') };
 	};
 
 	var mdToExecutionConfiguration = function mdToExecutionConfiguration(mdObj) {
@@ -17519,6 +17537,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var measure = _ref4.measure;
 	        return measure;
 	    });
+	    var measureSort = (0, _lodash.map)(measures, hashItem);
 	    var categories = (0, _lodash.map)(mdObj.categories, function (_ref5) {
 	        var category = _ref5.category;
 	        return category;
@@ -17566,14 +17585,26 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return isDateFilterExecutable(dateFilter);
 	    }), dateFilterToWhere);
 
-	    var allMetrics = [].concat(attributes, factMetrics, attributeMetrics, (0, _lodash.flatten)(popMetrics), metrics, (0, _lodash.flatten)(contributionMetrics), (0, _lodash.flatten)(contributionPoPMetrics));
+	    var allMetrics = [].concat(factMetrics, attributeMetrics, popMetrics, metrics, contributionMetrics, contributionPoPMetrics);
 
+	    var allMetricsSorted = (0, _lodash.map)(measureSort, function (hash) {
+	        return (0, _lodash.filter)((0, _lodash.flatten)(allMetrics), function (metric) {
+	            return metric.hash === hash;
+	        });
+	    });
+
+	    var allItems = [].concat(attributes, (0, _lodash.flatten)(allMetricsSorted));
+
+	    var orderBy = (0, _lodash.map)((0, _lodash.filter)(allItems, function (item) {
+	        return !!item.sort;
+	    }), sortToOrderBy);
 	    var where = [].concat(attributeFilters, dateFilters).reduce(_lodash.assign, {});
 
 	    return { execution: {
-	            columns: (0, _lodash.filter)((0, _lodash.map)(allMetrics, 'element'), _lodash.identity),
+	            columns: (0, _lodash.filter)((0, _lodash.map)(allItems, 'element'), _lodash.identity),
+	            orderBy: orderBy,
 	            where: where,
-	            definitions: (0, _lodash.filter)((0, _lodash.map)(allMetrics, 'definition'), _lodash.identity)
+	            definitions: (0, _lodash.filter)((0, _lodash.map)(allItems, 'definition'), _lodash.identity)
 	        } };
 	};
 
