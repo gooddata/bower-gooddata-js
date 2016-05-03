@@ -1,7 +1,7 @@
 /* Copyright (C) 2007-2015, GoodData(R) Corporation. All rights reserved. */
-/* gooddata - v0.1.34 */
-/* 2016-05-02 13:15:24 */
-/* Latest git commit: "9ffbb5e" */
+/* gooddata - v0.1.35 */
+/* 2016-05-03 20:40:54 */
+/* Latest git commit: "8e1a894" */
 
 
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -93,6 +93,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var config = _interopRequireWildcard(_config);
 
+	var _catalogue = __webpack_require__(15);
+
+	var catalogue = _interopRequireWildcard(_catalogue);
+
 	/**
 	 * # JS SDK
 	 * Here is a set of functions that mostly are a thin wraper over the [GoodData API](https://developer.gooddata.com/api).
@@ -114,7 +118,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @module sdk
 	 * @class sdk
 	 */
-	exports['default'] = { config: config, xhr: xhr, user: user, md: md, execution: execution, project: project };
+	exports['default'] = { config: config, xhr: xhr, user: user, md: md, execution: execution, project: project, catalogue: catalogue };
 	module.exports = exports['default'];
 
 /***/ },
@@ -18143,6 +18147,85 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }).then(d.resolve, d.reject);
 
 	    return d.promise();
+	}
+
+/***/ },
+/* 15 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+	exports.loadItems = loadItems;
+
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj['default'] = obj; return newObj; } }
+
+	var _lodash = __webpack_require__(4);
+
+	var _xhr = __webpack_require__(1);
+
+	var xhr = _interopRequireWildcard(_xhr);
+
+	var _execution = __webpack_require__(9);
+
+	var SELECT_LENGTH = 'SELECT '.length;
+	var REQUEST_DEFAULTS = {
+	    types: ['attribute', 'metric', 'fact'],
+	    paging: {
+	        offset: 0
+	    }
+	};
+
+	function bucketItemsToExecConfig(bucketItems) {
+	    var executionConfig = (0, _execution.mdToExecutionConfiguration)(bucketItems);
+	    var definitions = (0, _lodash.get)(executionConfig, 'execution.definitions');
+	    var idToExpr = (0, _lodash.fromPairs)(definitions.map(function (_ref) {
+	        var metricDefinition = _ref.metricDefinition;
+	        return [metricDefinition.identifier, metricDefinition.expression];
+	    }));
+
+	    return (0, _lodash.get)(executionConfig, 'execution.columns').map(function (column) {
+	        var definition = (0, _lodash.find)(definitions, function (_ref2) {
+	            var metricDefinition = _ref2.metricDefinition;
+	            return (0, _lodash.get)(metricDefinition, 'identifier') === column;
+	        });
+	        var maql = (0, _lodash.get)(definition, 'metricDefinition.expression');
+
+	        if (maql) {
+	            return maql.replace(/{[^}]+}/g, function (match) {
+	                var expression = idToExpr[(0, _lodash.trim)(match, '{}')];
+	                return expression.substr(SELECT_LENGTH);
+	            });
+	        }
+	        return column;
+	    });
+	}
+
+	function loadCatalog(projectId, request) {
+	    var uri = '/gdc/internal/projects/' + projectId + '/loadCatalog';
+	    return xhr.ajax(uri, {
+	        type: 'POST',
+	        data: { catalogRequest: request }
+	    }).then(function (data) {
+	        return data.catalogResponse;
+	    });
+	}
+
+	function loadItems(projectId) {
+	    var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+
+	    var bucketItems = (0, _lodash.get)(options, 'bucketItems.buckets');
+
+	    if (bucketItems) {
+	        bucketItems = bucketItemsToExecConfig(bucketItems);
+	    }
+
+	    return loadCatalog(projectId, _extends({}, REQUEST_DEFAULTS, options, { bucketItems: bucketItems }));
 	}
 
 /***/ }
