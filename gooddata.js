@@ -1,7 +1,7 @@
 /* Copyright (C) 2007-2015, GoodData(R) Corporation. All rights reserved. */
-/* gooddata - v0.1.35 */
-/* 2016-05-03 20:40:54 */
-/* Latest git commit: "8e1a894" */
+/* gooddata - v0.1.36 */
+/* 2016-05-12 17:41:14 */
+/* Latest git commit: "0d4c6d5" */
 
 
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -85,7 +85,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var execution = _interopRequireWildcard(_execution);
 
-	var _project = __webpack_require__(14);
+	var _project = __webpack_require__(17);
 
 	var project = _interopRequireWildcard(_project);
 
@@ -93,7 +93,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var config = _interopRequireWildcard(_config);
 
-	var _catalogue = __webpack_require__(15);
+	var _catalogue = __webpack_require__(18);
 
 	var catalogue = _interopRequireWildcard(_catalogue);
 
@@ -17191,6 +17191,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function _objectWithoutProperties(obj, keys) { var target = {}; for (var i in obj) { if (keys.indexOf(i) >= 0) continue; if (!Object.prototype.hasOwnProperty.call(obj, i)) continue; target[i] = obj[i]; } return target; }
 
+	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) arr2[i] = arr[i]; return arr2; } else { return Array.from(arr); } }
+
 	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 	var _jquery = __webpack_require__(2);
@@ -17202,6 +17204,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	var _md52 = _interopRequireDefault(_md5);
 
 	var _xhr = __webpack_require__(1);
+
+	var _utilsRules = __webpack_require__(14);
+
+	var _utilsRules2 = _interopRequireDefault(_utilsRules);
+
+	var _invariant = __webpack_require__(15);
+
+	var _invariant2 = _interopRequireDefault(_invariant);
 
 	var _lodash = __webpack_require__(4);
 
@@ -17297,10 +17307,6 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var CONTRIBUTION_METRIC_FORMAT = '#,##0.00%';
 
-	var hashItem = function hashItem(item) {
-	    return (0, _md52['default'])('' + (0, _lodash.filter)((0, _lodash.values)(item), _lodash.isString).join('#'));
-	};
-
 	var getFilterExpression = function getFilterExpression(listAttributeFilter) {
 	    var attributeUri = (0, _lodash.get)(listAttributeFilter, 'listAttributeFilter.attribute');
 	    var elements = (0, _lodash.get)(listAttributeFilter, 'listAttributeFilter.default.attributeElements', []);
@@ -17325,8 +17331,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return 'SELECT ' + (aggregation ? aggregation + '([' + objectUri + '])' : '[' + objectUri + ']') + (notEmpty(where) ? ' WHERE ' + where.join(' AND ') : '');
 	};
 
-	var getPercentMetricExpression = function getPercentMetricExpression(attribute, metricId) {
-	    var attributeUri = (0, _lodash.get)(attribute, 'attribute');
+	var getPercentMetricExpression = function getPercentMetricExpression(_ref4, metricId) {
+	    var category = _ref4.category;
+
+	    var attributeUri = (0, _lodash.get)(category, 'attribute');
 
 	    return 'SELECT (SELECT ' + metricId + ') / (SELECT ' + metricId + ' BY ALL [' + attributeUri + '])';
 	};
@@ -17365,85 +17373,122 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return type + '_' + identifier + '.generated.' + prefix + aggregation + '.' + hash;
 	};
 
-	var generatedMetricDefinition = function generatedMetricDefinition(item) {
-	    var title = item.title;
-	    var format = item.format;
-	    var sort = item.sort;
+	var isDerived = function isDerived(measure) {
+	    var type = (0, _lodash.get)(measure, 'type');
+	    return type === 'fact' || type === 'attribute' || !allFiltersEmpty(measure);
+	};
+
+	var isDateCategory = function isDateCategory(_ref5) {
+	    var category = _ref5.category;
+	    return category.type === 'date';
+	};
+	var isDateFilter = function isDateFilter(_ref6) {
+	    var dateFilter = _ref6.dateFilter;
+	    return dateFilter;
+	};
+
+	var getCategories = function getCategories(_ref7) {
+	    var categories = _ref7.categories;
+	    return categories;
+	};
+	var getFilters = function getFilters(_ref8) {
+	    var filters = _ref8.filters;
+	    return filters;
+	};
+
+	var getDateCategory = function getDateCategory(mdObj) {
+	    var category = (0, _lodash.find)(getCategories(mdObj), isDateCategory);
+
+	    return (0, _lodash.get)(category, 'category');
+	};
+
+	var getDateFilter = function getDateFilter(mdObj) {
+	    var dateFilter = (0, _lodash.find)(getFilters(mdObj), isDateFilter);
+
+	    return (0, _lodash.get)(dateFilter, 'dateFilter');
+	};
+
+	var getDate = function getDate(mdObj) {
+	    return getDateCategory(mdObj) || getDateFilter(mdObj);
+	};
+
+	var createPureMetric = function createPureMetric(measure) {
+	    return {
+	        element: (0, _lodash.get)(measure, 'objectUri'),
+	        sort: !measure.showPoP ? (0, _lodash.get)(measure, 'sort') : null
+	    };
+	};
+
+	var createDerivedMetric = function createDerivedMetric(measure) {
+	    var title = measure.title;
+	    var format = measure.format;
+	    var sort = measure.sort;
 
 	    var hasher = (0, _lodash.partial)(getGeneratedMetricHash, title, format);
-	    var aggregation = (0, _lodash.get)(item, 'aggregation', 'base').toLowerCase();
-	    var element = getGeneratedMetricIdentifier(item, aggregation, getGeneratedMetricExpression, hasher);
+	    var aggregation = (0, _lodash.get)(measure, 'aggregation', 'base').toLowerCase();
+	    var element = getGeneratedMetricIdentifier(measure, aggregation, getGeneratedMetricExpression, hasher);
 	    var definition = {
 	        metricDefinition: {
 	            identifier: element,
-	            expression: getGeneratedMetricExpression(item),
+	            expression: getGeneratedMetricExpression(measure),
 	            title: title,
 	            format: format
 	        }
 	    };
 
-	    return { element: element, hash: hashItem(item), definition: definition, sort: sort };
+	    return { element: element, definition: definition, sort: sort };
 	};
 
-	var isDerivedMetric = function isDerivedMetric(item) {
-	    var type = (0, _lodash.get)(item, 'type');
-	    return type === 'fact' || type === 'attribute' || !allFiltersEmpty(item);
-	};
+	var createContributionMetric = function createContributionMetric(measure, mdObj) {
+	    var category = (0, _lodash.first)(getCategories(mdObj));
 
-	var contributionMetricDefinition = function contributionMetricDefinition(attribute, item) {
 	    var generated = undefined;
-	    var getMetricExpression = (0, _lodash.partial)(getPercentMetricExpression, attribute, '[' + (0, _lodash.get)(item, 'objectUri') + ']');
-	    if (isDerivedMetric(item)) {
-	        generated = generatedMetricDefinition(item);
-	        getMetricExpression = (0, _lodash.partial)(getPercentMetricExpression, attribute, '{' + (0, _lodash.get)(generated, 'definition.metricDefinition.identifier') + '}');
+	    var getMetricExpression = (0, _lodash.partial)(getPercentMetricExpression, category, '[' + (0, _lodash.get)(measure, 'objectUri') + ']');
+	    if (isDerived(measure)) {
+	        generated = createDerivedMetric(measure);
+	        getMetricExpression = (0, _lodash.partial)(getPercentMetricExpression, category, '{' + (0, _lodash.get)(generated, 'definition.metricDefinition.identifier') + '}');
 	    }
-	    var title = ('% ' + (0, _lodash.get)(item, 'title')).replace(/^(% )+/, '% ');
+	    var title = ('% ' + (0, _lodash.get)(measure, 'title')).replace(/^(% )+/, '% ');
 	    var hasher = (0, _lodash.partial)(getGeneratedMetricHash, title, CONTRIBUTION_METRIC_FORMAT);
 	    var result = [{
-	        element: getGeneratedMetricIdentifier(item, 'percent', getMetricExpression, hasher),
-	        hash: hashItem(item),
+	        element: getGeneratedMetricIdentifier(measure, 'percent', getMetricExpression, hasher),
 	        definition: {
 	            metricDefinition: {
-	                identifier: getGeneratedMetricIdentifier(item, 'percent', getMetricExpression, hasher),
-	                expression: getMetricExpression(item),
+	                identifier: getGeneratedMetricIdentifier(measure, 'percent', getMetricExpression, hasher),
+	                expression: getMetricExpression(measure),
 	                title: title,
 	                format: CONTRIBUTION_METRIC_FORMAT
 	            }
 	        },
-	        sort: (0, _lodash.get)(item, 'sort')
+	        sort: (0, _lodash.get)(measure, 'sort')
 	    }];
 
 	    if (generated) {
-	        result.unshift({ hash: hashItem(item), definition: generated.definition });
+	        result.unshift({ definition: generated.definition });
 	    }
 
 	    return result;
 	};
 
-	var getDate = function getDate(date) {
-	    return (0, _lodash.get)(date, 'dateFilter', date);
-	};
-
-	var popMetricDefinition = function popMetricDefinition(attribute, item) {
-	    var title = (0, _lodash.get)(item, 'title') + ' - previous year';
-	    var format = (0, _lodash.get)(item, 'format');
+	var createPoPMetric = function createPoPMetric(measure, mdObj) {
+	    var title = (0, _lodash.get)(measure, 'title') + ' - previous year';
+	    var format = (0, _lodash.get)(measure, 'format');
 	    var hasher = (0, _lodash.partial)(getGeneratedMetricHash, title, format);
 
-	    var date = getDate(attribute);
+	    var date = getDate(mdObj);
 
 	    var generated = undefined;
-	    var getMetricExpression = (0, _lodash.partial)(getPoPExpression, date, '[' + (0, _lodash.get)(item, 'objectUri') + ']');
+	    var getMetricExpression = (0, _lodash.partial)(getPoPExpression, date, '[' + (0, _lodash.get)(measure, 'objectUri') + ']');
 
-	    if (isDerivedMetric(item)) {
-	        generated = generatedMetricDefinition(item);
+	    if (isDerived(measure)) {
+	        generated = createDerivedMetric(measure);
 	        getMetricExpression = (0, _lodash.partial)(getPoPExpression, date, '{' + (0, _lodash.get)(generated, 'definition.metricDefinition.identifier') + '}');
 	    }
 
-	    var identifier = getGeneratedMetricIdentifier(item, 'pop', getMetricExpression, hasher);
+	    var identifier = getGeneratedMetricIdentifier(measure, 'pop', getMetricExpression, hasher);
 
 	    var result = [{
 	        element: identifier,
-	        hash: hashItem(item),
 	        definition: {
 	            metricDefinition: {
 	                identifier: identifier,
@@ -17452,30 +17497,33 @@ return /******/ (function(modules) { // webpackBootstrap
 	                format: format
 	            }
 	        },
-	        sort: (0, _lodash.get)(item, 'sort')
+	        sort: (0, _lodash.get)(measure, 'sort')
 	    }];
 
 	    if (generated) {
 	        result.push(generated);
+	    } else {
+	        result.push(createPureMetric(measure));
 	    }
 
 	    return result;
 	};
 
-	var contributionPoPMetricDefinition = function contributionPoPMetricDefinition(date, attribute, item) {
-	    var generated = contributionMetricDefinition(attribute ? attribute : date, item);
+	var createContributionPoPMetric = function createContributionPoPMetric(measure, mdObj) {
+	    var date = getDate(mdObj);
 
-	    var title = ('% ' + (0, _lodash.get)(item, 'title') + ' - previous year').replace(/^(% )+/, '% ');
+	    var generated = createContributionMetric(measure, mdObj);
+
+	    var title = ('% ' + (0, _lodash.get)(measure, 'title') + ' - previous year').replace(/^(% )+/, '% ');
 	    var format = CONTRIBUTION_METRIC_FORMAT;
 	    var hasher = (0, _lodash.partial)(getGeneratedMetricHash, title, format);
 
-	    var getMetricExpression = (0, _lodash.partial)(getPoPExpression, getDate(date), '{' + (0, _lodash.last)(generated).element + '}');
+	    var getMetricExpression = (0, _lodash.partial)(getPoPExpression, date, '{' + (0, _lodash.last)(generated).element + '}');
 
-	    var identifier = getGeneratedMetricIdentifier(item, 'pop', getMetricExpression, hasher);
+	    var identifier = getGeneratedMetricIdentifier(measure, 'pop', getMetricExpression, hasher);
 
 	    var result = [{
 	        element: identifier,
-	        hash: hashItem(item),
 	        definition: {
 	            metricDefinition: {
 	                identifier: identifier,
@@ -17484,7 +17532,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                format: format
 	            }
 	        },
-	        sort: (0, _lodash.get)(item, 'sort')
+	        sort: (0, _lodash.get)(measure, 'sort')
 	    }];
 
 	    result.push(generated);
@@ -17492,37 +17540,63 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return (0, _lodash.flatten)(result);
 	};
 
-	var categoryToElement = function categoryToElement(c) {
-	    return { element: (0, _lodash.get)(c, 'displayForm'), hash: hashItem(c), sort: (0, _lodash.get)(c, 'sort') };
+	var categoryToElement = function categoryToElement(_ref9) {
+	    var category = _ref9.category;
+	    return { element: (0, _lodash.get)(category, 'displayForm'), sort: (0, _lodash.get)(category, 'sort') };
 	};
 
 	var attributeFilterToWhere = function attributeFilterToWhere(f) {
-	    var dfUri = (0, _lodash.get)(f, 'listAttributeFilter.displayForm');
 	    var elements = (0, _lodash.get)(f, 'listAttributeFilter.default.attributeElements', []);
 	    var elementsForQuery = (0, _lodash.map)(elements, function (e) {
-	        return {
-	            id: (0, _lodash.last)(e.split('='))
-	        };
+	        return { id: (0, _lodash.last)(e.split('=')) };
 	    });
-	    var negative = (0, _lodash.get)(f, 'listAttributeFilter.default.negativeSelection') ? 'NOT ' : '';
+
+	    var dfUri = (0, _lodash.get)(f, 'listAttributeFilter.displayForm');
+	    var negative = (0, _lodash.get)(f, 'listAttributeFilter.default.negativeSelection');
 
 	    return negative ? _defineProperty({}, dfUri, { '$not': { '$in': elementsForQuery } }) : _defineProperty({}, dfUri, { '$in': elementsForQuery });
 	};
 
 	var dateFilterToWhere = function dateFilterToWhere(f) {
-	    var dimensionUri = (0, _lodash.get)(f, 'dateFilter.dimension');
+	    var dateUri = (0, _lodash.get)(f, 'dateFilter.dimension') || (0, _lodash.get)(f, 'dateFilter.dataset');
 	    var granularity = (0, _lodash.get)(f, 'dateFilter.granularity');
 	    var between = [(0, _lodash.get)(f, 'dateFilter.from'), (0, _lodash.get)(f, 'dateFilter.to')];
-	    return _defineProperty({}, dimensionUri, { '$between': between, '$granularity': granularity });
+	    return _defineProperty({}, dateUri, { '$between': between, '$granularity': granularity });
 	};
 
-	var metricToDefinition = function metricToDefinition(metric) {
-	    return {
-	        element: (0, _lodash.get)(metric, 'objectUri'),
-	        hash: hashItem(metric),
-	        sort: !metric.showPoP ? (0, _lodash.get)(metric, 'sort') : null
-	    };
+	var isPoP = function isPoP(_ref10) {
+	    var showPoP = _ref10.showPoP;
+	    return showPoP;
 	};
+	var isContribution = function isContribution(_ref11) {
+	    var showInPercent = _ref11.showInPercent;
+	    return showInPercent;
+	};
+
+	var isCalculatedMeasure = function isCalculatedMeasure(_ref12) {
+	    var type = _ref12.type;
+	    return type === 'metric';
+	};
+
+	var rules = new _utilsRules2['default']();
+
+	rules.addRule([isPoP, isContribution], createContributionPoPMetric);
+
+	rules.addRule([isPoP], createPoPMetric);
+
+	rules.addRule([isContribution], createContributionMetric);
+
+	rules.addRule([isDerived], createDerivedMetric);
+
+	rules.addRule([isCalculatedMeasure], createPureMetric);
+
+	function getMetricFactory(measure) {
+	    var factory = rules.match(measure);
+
+	    (0, _invariant2['default'])(factory, 'Unknown factory for: ' + measure);
+
+	    return factory;
+	}
 
 	var isDateFilterExecutable = function isDateFilterExecutable(dateFilter) {
 	    return (0, _lodash.get)(dateFilter, 'from') !== undefined && (0, _lodash.get)(dateFilter, 'to') !== undefined;
@@ -17532,85 +17606,44 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return notEmpty((0, _lodash.get)(listAttributeFilter, ['default', 'attributeElements']));
 	};
 
+	function getWhere(_ref13) {
+	    var filters = _ref13.filters;
+
+	    var attributeFilters = (0, _lodash.map)((0, _lodash.filter)(filters, function (_ref14) {
+	        var listAttributeFilter = _ref14.listAttributeFilter;
+	        return isAttributeFilterExecutable(listAttributeFilter);
+	    }), attributeFilterToWhere);
+	    var dateFilters = (0, _lodash.map)((0, _lodash.filter)(filters, function (_ref15) {
+	        var dateFilter = _ref15.dateFilter;
+	        return isDateFilterExecutable(dateFilter);
+	    }), dateFilterToWhere);
+
+	    return [].concat(_toConsumableArray(attributeFilters), _toConsumableArray(dateFilters)).reduce(_lodash.assign, {});
+	}
+
 	var sortToOrderBy = function sortToOrderBy(item) {
 	    return { column: (0, _lodash.get)(item, 'element'), direction: (0, _lodash.get)(item, 'sort') };
 	};
 
 	var mdToExecutionConfiguration = function mdToExecutionConfiguration(mdObj) {
-	    var filters = mdObj.filters;
-
-	    var measures = (0, _lodash.map)(mdObj.measures, function (_ref4) {
-	        var measure = _ref4.measure;
+	    var measures = (0, _lodash.map)(mdObj.measures, function (_ref16) {
+	        var measure = _ref16.measure;
 	        return measure;
 	    });
-	    var measureSort = (0, _lodash.map)(measures, hashItem);
-	    var categories = (0, _lodash.map)(mdObj.categories, function (_ref5) {
-	        var category = _ref5.category;
-	        return category;
-	    });
-	    var attributes = (0, _lodash.map)(categories, categoryToElement);
-	    var contributionMetrics = (0, _lodash.map)((0, _lodash.filter)(measures, function (m) {
-	        return m.showInPercent && !m.showPoP;
-	    }), (0, _lodash.partial)(contributionMetricDefinition, (0, _lodash.find)(categories, function (c) {
-	        return c.type === 'attribute' || c.type === 'date';
-	    })));
+	    var metrics = (0, _lodash.flatten)((0, _lodash.map)(measures, function (measure) {
+	        return getMetricFactory(measure)(measure, mdObj);
+	    }));
 
-	    var date = (0, _lodash.find)([].concat(categories, filters), function (c) {
-	        return c.type === 'date' || c.dateFilter;
-	    });
-
-	    var popMetrics = (0, _lodash.map)((0, _lodash.filter)(measures, function (m) {
-	        return m.showPoP && !m.showInPercent;
-	    }), (0, _lodash.partial)(popMetricDefinition, date));
-	    var contributionPoPMetrics = (0, _lodash.map)((0, _lodash.filter)(measures, function (m) {
-	        return m.showPoP && m.showInPercent;
-	    }), (0, _lodash.partial)(contributionPoPMetricDefinition, date, (0, _lodash.find)(categories, function (c) {
-	        return c.type === 'attribute' || c.type === 'date';
-	    })));
-	    var factMetrics = (0, _lodash.map)((0, _lodash.filter)(measures, function (m) {
-	        return m.type === 'fact' && !m.showInPercent && !m.showPoP;
-	    }), generatedMetricDefinition);
-	    var metrics = (0, _lodash.map)((0, _lodash.filter)(measures, function (m) {
-	        return m.type === 'metric' && !m.showInPercent;
-	    }), function (metric) {
-	        if ((0, _lodash.isEmpty)(metric.measureFilters)) {
-	            return metricToDefinition(metric);
-	        }
-
-	        return generatedMetricDefinition(metric);
-	    });
-	    var attributeMetrics = (0, _lodash.map)((0, _lodash.filter)(measures, function (m) {
-	        return m.type === 'attribute' && !m.showInPercent && !m.showPoP;
-	    }), generatedMetricDefinition);
-	    var attributeFilters = (0, _lodash.map)((0, _lodash.filter)(filters, function (_ref6) {
-	        var listAttributeFilter = _ref6.listAttributeFilter;
-	        return isAttributeFilterExecutable(listAttributeFilter);
-	    }), attributeFilterToWhere);
-	    var dateFilters = (0, _lodash.map)((0, _lodash.filter)(filters, function (_ref7) {
-	        var dateFilter = _ref7.dateFilter;
-	        return isDateFilterExecutable(dateFilter);
-	    }), dateFilterToWhere);
-
-	    var allMetrics = [].concat(factMetrics, attributeMetrics, popMetrics, metrics, contributionMetrics, contributionPoPMetrics);
-
-	    var allMetricsSorted = (0, _lodash.map)(measureSort, function (hash) {
-	        return (0, _lodash.filter)((0, _lodash.flatten)(allMetrics), function (metric) {
-	            return metric.hash === hash;
-	        });
-	    });
-
-	    var allItems = [].concat(attributes, (0, _lodash.flatten)(allMetricsSorted));
-
-	    var orderBy = (0, _lodash.map)((0, _lodash.filter)(allItems, function (item) {
-	        return !!item.sort;
-	    }), sortToOrderBy);
-	    var where = [].concat(attributeFilters, dateFilters).reduce(_lodash.assign, {});
+	    var categories = (0, _lodash.map)(getCategories(mdObj), categoryToElement);
+	    var allItems = [].concat(_toConsumableArray(categories), _toConsumableArray(metrics));
 
 	    return { execution: {
-	            columns: (0, _lodash.filter)((0, _lodash.map)(allItems, 'element'), _lodash.identity),
-	            orderBy: orderBy,
-	            where: where,
-	            definitions: (0, _lodash.filter)((0, _lodash.map)(allItems, 'definition'), _lodash.identity)
+	            columns: (0, _lodash.compact)((0, _lodash.map)(allItems, 'element')),
+	            orderBy: (0, _lodash.map)((0, _lodash.filter)(allItems, function (item) {
+	                return item.sort;
+	            }), sortToOrderBy),
+	            definitions: (0, _lodash.compact)((0, _lodash.map)(metrics, 'definition')),
+	            where: getWhere(mdObj)
 	        } };
 	};
 
@@ -17961,6 +17994,225 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 14 */
 /***/ function(module, exports, __webpack_require__) {
 
+	'use strict';
+
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+
+	var _slicedToArray = (function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i['return']) _i['return'](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError('Invalid attempt to destructure non-iterable instance'); } }; })();
+
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+	var _invariant = __webpack_require__(15);
+
+	var _invariant2 = _interopRequireDefault(_invariant);
+
+	var _lodash = __webpack_require__(4);
+
+	var Rules = (function () {
+	    function Rules() {
+	        _classCallCheck(this, Rules);
+
+	        this.rules = [];
+	    }
+
+	    _createClass(Rules, [{
+	        key: 'addRule',
+	        value: function addRule(tests, callback) {
+	            this.rules.push([tests, callback]);
+	        }
+	    }, {
+	        key: 'match',
+	        value: function match(subject) {
+	            var _find = (0, _lodash.find)(this.rules, function (_ref) {
+	                var _ref2 = _slicedToArray(_ref, 1);
+
+	                var tests = _ref2[0];
+	                return (0, _lodash.every)(tests, function (test) {
+	                    return test(subject);
+	                });
+	            });
+
+	            var _find2 = _slicedToArray(_find, 2);
+
+	            var callback = _find2[1];
+
+	            (0, _invariant2['default'])(callback, 'Callback not found :-(');
+
+	            return callback;
+	        }
+	    }]);
+
+	    return Rules;
+	})();
+
+	exports['default'] = Rules;
+	module.exports = exports['default'];
+
+/***/ },
+/* 15 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(process) {/**
+	 * Copyright 2013-2015, Facebook, Inc.
+	 * All rights reserved.
+	 *
+	 * This source code is licensed under the BSD-style license found in the
+	 * LICENSE file in the root directory of this source tree. An additional grant
+	 * of patent rights can be found in the PATENTS file in the same directory.
+	 */
+
+	'use strict';
+
+	/**
+	 * Use invariant() to assert state which your program assumes to be true.
+	 *
+	 * Provide sprintf-style format (only %s is supported) and arguments
+	 * to provide information about what broke and what you were
+	 * expecting.
+	 *
+	 * The invariant message will be stripped in production, but the invariant
+	 * will remain to ensure logic does not differ in production.
+	 */
+
+	var invariant = function(condition, format, a, b, c, d, e, f) {
+	  if (process.env.NODE_ENV !== 'production') {
+	    if (format === undefined) {
+	      throw new Error('invariant requires an error message argument');
+	    }
+	  }
+
+	  if (!condition) {
+	    var error;
+	    if (format === undefined) {
+	      error = new Error(
+	        'Minified exception occurred; use the non-minified dev environment ' +
+	        'for the full error message and additional helpful warnings.'
+	      );
+	    } else {
+	      var args = [a, b, c, d, e, f];
+	      var argIndex = 0;
+	      error = new Error(
+	        format.replace(/%s/g, function() { return args[argIndex++]; })
+	      );
+	      error.name = 'Invariant Violation';
+	    }
+
+	    error.framesToPop = 1; // we don't care about invariant's own frame
+	    throw error;
+	  }
+	};
+
+	module.exports = invariant;
+
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(16)))
+
+/***/ },
+/* 16 */
+/***/ function(module, exports) {
+
+	// shim for using process in browser
+
+	var process = module.exports = {};
+	var queue = [];
+	var draining = false;
+	var currentQueue;
+	var queueIndex = -1;
+
+	function cleanUpNextTick() {
+	    draining = false;
+	    if (currentQueue.length) {
+	        queue = currentQueue.concat(queue);
+	    } else {
+	        queueIndex = -1;
+	    }
+	    if (queue.length) {
+	        drainQueue();
+	    }
+	}
+
+	function drainQueue() {
+	    if (draining) {
+	        return;
+	    }
+	    var timeout = setTimeout(cleanUpNextTick);
+	    draining = true;
+
+	    var len = queue.length;
+	    while(len) {
+	        currentQueue = queue;
+	        queue = [];
+	        while (++queueIndex < len) {
+	            if (currentQueue) {
+	                currentQueue[queueIndex].run();
+	            }
+	        }
+	        queueIndex = -1;
+	        len = queue.length;
+	    }
+	    currentQueue = null;
+	    draining = false;
+	    clearTimeout(timeout);
+	}
+
+	process.nextTick = function (fun) {
+	    var args = new Array(arguments.length - 1);
+	    if (arguments.length > 1) {
+	        for (var i = 1; i < arguments.length; i++) {
+	            args[i - 1] = arguments[i];
+	        }
+	    }
+	    queue.push(new Item(fun, args));
+	    if (queue.length === 1 && !draining) {
+	        setTimeout(drainQueue, 0);
+	    }
+	};
+
+	// v8 likes predictible objects
+	function Item(fun, array) {
+	    this.fun = fun;
+	    this.array = array;
+	}
+	Item.prototype.run = function () {
+	    this.fun.apply(null, this.array);
+	};
+	process.title = 'browser';
+	process.browser = true;
+	process.env = {};
+	process.argv = [];
+	process.version = ''; // empty string to avoid regexp issues
+	process.versions = {};
+
+	function noop() {}
+
+	process.on = noop;
+	process.addListener = noop;
+	process.once = noop;
+	process.off = noop;
+	process.removeListener = noop;
+	process.removeAllListeners = noop;
+	process.emit = noop;
+
+	process.binding = function (name) {
+	    throw new Error('process.binding is not supported');
+	};
+
+	process.cwd = function () { return '/' };
+	process.chdir = function (dir) {
+	    throw new Error('process.chdir is not supported');
+	};
+	process.umask = function() { return 0; };
+
+
+/***/ },
+/* 17 */
+/***/ function(module, exports, __webpack_require__) {
+
 	// Copyright (C) 2007-2014, GoodData(R) Corporation. All rights reserved.
 	'use strict';
 
@@ -18150,7 +18402,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 15 */
+/* 18 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
