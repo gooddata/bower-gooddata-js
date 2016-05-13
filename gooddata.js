@@ -1,7 +1,7 @@
 /* Copyright (C) 2007-2015, GoodData(R) Corporation. All rights reserved. */
-/* gooddata - v0.1.36 */
-/* 2016-05-12 17:41:14 */
-/* Latest git commit: "0d4c6d5" */
+/* gooddata - v0.1.37 */
+/* 2016-05-13 15:47:40 */
+/* Latest git commit: "3d13702" */
 
 
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -17415,7 +17415,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var createPureMetric = function createPureMetric(measure) {
 	    return {
 	        element: (0, _lodash.get)(measure, 'objectUri'),
-	        sort: !measure.showPoP ? (0, _lodash.get)(measure, 'sort') : null
+	        sort: (0, _lodash.get)(measure, 'sort')
 	    };
 	};
 
@@ -17496,8 +17496,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                title: title,
 	                format: format
 	            }
-	        },
-	        sort: (0, _lodash.get)(measure, 'sort')
+	        }
 	    }];
 
 	    if (generated) {
@@ -17531,8 +17530,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                title: title,
 	                format: format
 	            }
-	        },
-	        sort: (0, _lodash.get)(measure, 'sort')
+	        }
 	    }];
 
 	    result.push(generated);
