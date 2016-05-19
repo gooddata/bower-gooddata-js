@@ -1,7 +1,7 @@
 /* Copyright (C) 2007-2015, GoodData(R) Corporation. All rights reserved. */
-/* gooddata - v0.1.37 */
-/* 2016-05-13 15:47:40 */
-/* Latest git commit: "3d13702" */
+/* gooddata - v0.1.38 */
+/* 2016-05-19 12:19:54 */
+/* Latest git commit: "a067fda" */
 
 
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -18412,6 +18412,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 	exports.loadItems = loadItems;
+	exports.loadDateDataSets = loadDateDataSets;
 
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj['default'] = obj; return newObj; } }
 
@@ -18430,18 +18431,36 @@ return /******/ (function(modules) { // webpackBootstrap
 	        offset: 0
 	    }
 	};
+	var LOAD_DATE_DATASET_DEFAULTS = {
+	    includeUnavailableDateDataSetsCount: true,
+	    includeAvailableDateAttributes: true
+	};
+
+	var parseCategories = function parseCategories(bucketItems) {
+	    return (0, _lodash.get)(bucketItems, 'categories').map(function (_ref) {
+	        var category = _ref.category;
+	        return {
+	            category: _extends({}, category, {
+	                displayForm: (0, _lodash.get)(category, 'attribute')
+	            })
+	        };
+	    });
+	};
 
 	function bucketItemsToExecConfig(bucketItems) {
-	    var executionConfig = (0, _execution.mdToExecutionConfiguration)(bucketItems);
+	    var categories = parseCategories(bucketItems);
+	    var executionConfig = (0, _execution.mdToExecutionConfiguration)(_extends({}, bucketItems, {
+	        categories: categories
+	    }));
 	    var definitions = (0, _lodash.get)(executionConfig, 'execution.definitions');
-	    var idToExpr = (0, _lodash.fromPairs)(definitions.map(function (_ref) {
-	        var metricDefinition = _ref.metricDefinition;
+	    var idToExpr = (0, _lodash.fromPairs)(definitions.map(function (_ref2) {
+	        var metricDefinition = _ref2.metricDefinition;
 	        return [metricDefinition.identifier, metricDefinition.expression];
 	    }));
 
 	    return (0, _lodash.get)(executionConfig, 'execution.columns').map(function (column) {
-	        var definition = (0, _lodash.find)(definitions, function (_ref2) {
-	            var metricDefinition = _ref2.metricDefinition;
+	        var definition = (0, _lodash.find)(definitions, function (_ref3) {
+	            var metricDefinition = _ref3.metricDefinition;
 	            return (0, _lodash.get)(metricDefinition, 'identifier') === column;
 	        });
 	        var maql = (0, _lodash.get)(definition, 'metricDefinition.expression');
@@ -18473,9 +18492,35 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    if (bucketItems) {
 	        bucketItems = bucketItemsToExecConfig(bucketItems);
+	        return loadCatalog(projectId, _extends({}, REQUEST_DEFAULTS, options, {
+	            bucketItems: bucketItems
+	        }));
 	    }
 
-	    return loadCatalog(projectId, _extends({}, REQUEST_DEFAULTS, options, { bucketItems: bucketItems }));
+	    return loadCatalog(projectId, _extends({}, REQUEST_DEFAULTS, options));
+	}
+
+	function requestDateDataSets(projectId, request) {
+	    var uri = '/gdc/internal/projects/' + projectId + '/loadDateDataSets';
+
+	    return xhr.ajax(uri, {
+	        type: 'POST',
+	        data: { dateDataSetsRequest: request }
+	    });
+	}
+
+	function loadDateDataSets(projectId, options) {
+	    var bucketItems = (0, _lodash.get)(options, 'bucketItems.buckets');
+
+	    if (bucketItems) {
+	        bucketItems = bucketItemsToExecConfig(bucketItems);
+	    }
+
+	    var request = (0, _lodash.omit)(_extends({}, LOAD_DATE_DATASET_DEFAULTS, REQUEST_DEFAULTS, options, {
+	        bucketItems: bucketItems
+	    }), ['filter', 'types', 'paging', 'dataSetIdentifier']);
+
+	    return requestDateDataSets(projectId, request);
 	}
 
 /***/ }
