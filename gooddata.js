@@ -1,7 +1,7 @@
 /* Copyright (C) 2007-2015, GoodData(R) Corporation. All rights reserved. */
-/* gooddata - v0.1.38 */
-/* 2016-05-19 12:19:54 */
-/* Latest git commit: "a067fda" */
+/* gooddata - v0.1.39 */
+/* 2016-05-24 21:31:49 */
+/* Latest git commit: "c1aaff5" */
 
 
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -85,7 +85,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var execution = _interopRequireWildcard(_execution);
 
-	var _project = __webpack_require__(17);
+	var _project = __webpack_require__(18);
 
 	var project = _interopRequireWildcard(_project);
 
@@ -93,7 +93,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var config = _interopRequireWildcard(_config);
 
-	var _catalogue = __webpack_require__(18);
+	var _catalogue = __webpack_require__(19);
 
 	var catalogue = _interopRequireWildcard(_catalogue);
 
@@ -17209,6 +17209,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _utilsRules2 = _interopRequireDefault(_utilsRules);
 
+	var _utilsDefinitions = __webpack_require__(17);
+
 	var _invariant = __webpack_require__(15);
 
 	var _invariant2 = _interopRequireDefault(_invariant);
@@ -17640,7 +17642,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            orderBy: (0, _lodash.map)((0, _lodash.filter)(allItems, function (item) {
 	                return item.sort;
 	            }), sortToOrderBy),
-	            definitions: (0, _lodash.compact)((0, _lodash.map)(metrics, 'definition')),
+	            definitions: (0, _utilsDefinitions.sortDefinitions)((0, _lodash.compact)((0, _lodash.map)(metrics, 'definition'))),
 	            where: getWhere(mdObj)
 	        } };
 	};
@@ -18211,6 +18213,82 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 17 */
 /***/ function(module, exports, __webpack_require__) {
 
+	'use strict';
+
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	exports.sortDefinitions = sortDefinitions;
+
+	var _lodash = __webpack_require__(4);
+
+	var IDENTIFIER_REGEX = /{\S+}/g;
+
+	function getDependencies(_ref) {
+	    var metricDefinition = _ref.metricDefinition;
+
+	    return (metricDefinition.expression.match(IDENTIFIER_REGEX) || []).map(function (s) {
+	        return s.substring(1, s.length - 1);
+	    });
+	}
+
+	function getIdentifier(_ref2) {
+	    var metricDefinition = _ref2.metricDefinition;
+
+	    return metricDefinition.identifier;
+	}
+
+	function resolvedDependencies(resolved, _ref3) {
+	    var dependencies = _ref3.dependencies;
+
+	    var identifiers = (0, _lodash.map)(resolved, 'identifier');
+
+	    return (0, _lodash.difference)(dependencies, identifiers).length === 0;
+	}
+
+	function scan(resolved, unresolved) {
+	    for (var i = 0; i < unresolved.length; i++) {
+	        var tested = unresolved[i];
+
+	        if (resolvedDependencies(resolved, tested)) {
+	            resolved.push(tested);
+	            unresolved.splice(i--, 1);
+	        }
+	    }
+	}
+
+	function sort(unresolved) {
+	    var resolved = [];
+	    var lastLength = undefined;
+
+	    while (unresolved.length > 0) {
+	        lastLength = unresolved.length;
+	        scan(resolved, unresolved);
+
+	        if (unresolved.length === lastLength) {
+	            throw new Error('Metric defintions cannot be sorted due to missing dependencies.');
+	        }
+	    }
+
+	    return resolved;
+	}
+
+	function sortDefinitions(definitions) {
+	    var indexed = definitions.map(function (definition) {
+	        return {
+	            definition: definition,
+	            identifier: getIdentifier(definition),
+	            dependencies: getDependencies(definition)
+	        };
+	    });
+
+	    return (0, _lodash.map)(sort(indexed), 'definition');
+	}
+
+/***/ },
+/* 18 */
+/***/ function(module, exports, __webpack_require__) {
+
 	// Copyright (C) 2007-2014, GoodData(R) Corporation. All rights reserved.
 	'use strict';
 
@@ -18400,7 +18478,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 18 */
+/* 19 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
