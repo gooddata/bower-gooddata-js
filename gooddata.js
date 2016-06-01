@@ -1,7 +1,7 @@
 /* Copyright (C) 2007-2015, GoodData(R) Corporation. All rights reserved. */
-/* gooddata - v0.1.39 */
-/* 2016-05-24 21:31:49 */
-/* Latest git commit: "c1aaff5" */
+/* gooddata - v0.1.40 */
+/* 2016-06-01 16:09:00 */
+/* Latest git commit: "8730dec" */
 
 
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -18594,7 +18594,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	        bucketItems = bucketItemsToExecConfig(bucketItems);
 	    }
 
-	    var request = (0, _lodash.omit)(_extends({}, LOAD_DATE_DATASET_DEFAULTS, REQUEST_DEFAULTS, options, {
+	    // /loadDateDataSets has different parameter for dataSet loading then /loadCatalog
+	    // see https://github.com/gooddata/gdc-bear/blob/develop/resources/specification/internal/date_data_sets.res
+	    var requestSpecificOptions = {
+	        csvDataSetIdentifier: (0, _lodash.get)(options, 'dataSetIdentifier')
+	    };
+
+	    var request = (0, _lodash.omit)(_extends({}, LOAD_DATE_DATASET_DEFAULTS, REQUEST_DEFAULTS, options, requestSpecificOptions, {
 	        bucketItems: bucketItems
 	    }), ['filter', 'types', 'paging', 'dataSetIdentifier']);
 
