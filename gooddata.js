@@ -1,7 +1,7 @@
 /* Copyright (C) 2007-2015, GoodData(R) Corporation. All rights reserved. */
-/* gooddata - v0.1.40 */
-/* 2016-06-01 16:09:00 */
-/* Latest git commit: "8730dec" */
+/* gooddata - v0.1.41 */
+/* 2016-06-06 17:02:23 */
+/* Latest git commit: "0020935" */
 
 
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -17625,31 +17625,42 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return { column: (0, _lodash.get)(item, 'element'), direction: (0, _lodash.get)(item, 'sort') };
 	};
 
+	var getOrderBy = function getOrderBy(metrics, categories, type) {
+	    // For bar chart we always override sorting to sort by values (first metric)
+	    if (type === 'bar' && notEmpty(metrics)) {
+	        return [{
+	            column: (0, _lodash.first)((0, _lodash.compact)((0, _lodash.map)(metrics, 'element'))),
+	            direction: 'desc'
+	        }];
+	    }
+
+	    return (0, _lodash.map)((0, _lodash.filter)([].concat(_toConsumableArray(categories), _toConsumableArray(metrics)), function (item) {
+	        return item.sort;
+	    }), sortToOrderBy);
+	};
+
 	var mdToExecutionConfiguration = function mdToExecutionConfiguration(mdObj) {
-	    var measures = (0, _lodash.map)(mdObj.measures, function (_ref16) {
+	    var buckets = (0, _lodash.get)(mdObj, 'buckets');
+	    var measures = (0, _lodash.map)(buckets.measures, function (_ref16) {
 	        var measure = _ref16.measure;
 	        return measure;
 	    });
 	    var metrics = (0, _lodash.flatten)((0, _lodash.map)(measures, function (measure) {
-	        return getMetricFactory(measure)(measure, mdObj);
+	        return getMetricFactory(measure)(measure, buckets);
 	    }));
-
-	    var categories = (0, _lodash.map)(getCategories(mdObj), categoryToElement);
-	    var allItems = [].concat(_toConsumableArray(categories), _toConsumableArray(metrics));
+	    var categories = (0, _lodash.map)(getCategories(buckets), categoryToElement);
 
 	    return { execution: {
-	            columns: (0, _lodash.compact)((0, _lodash.map)(allItems, 'element')),
-	            orderBy: (0, _lodash.map)((0, _lodash.filter)(allItems, function (item) {
-	                return item.sort;
-	            }), sortToOrderBy),
+	            columns: (0, _lodash.compact)((0, _lodash.map)([].concat(_toConsumableArray(categories), _toConsumableArray(metrics)), 'element')),
+	            orderBy: getOrderBy(metrics, categories, (0, _lodash.get)(mdObj, 'type')),
 	            definitions: (0, _utilsDefinitions.sortDefinitions)((0, _lodash.compact)((0, _lodash.map)(metrics, 'definition'))),
-	            where: getWhere(mdObj)
+	            where: getWhere(buckets)
 	        } };
 	};
 
 	exports.mdToExecutionConfiguration = mdToExecutionConfiguration;
 	var getDataForVis = function getDataForVis(projectId, mdObj) {
-	    var _mdToExecutionConfiguration = mdToExecutionConfiguration((0, _lodash.get)(mdObj, 'buckets'));
+	    var _mdToExecutionConfiguration = mdToExecutionConfiguration(mdObj);
 
 	    var execution = _mdToExecutionConfiguration.execution;
 	    var columns = execution.columns;
@@ -18527,9 +18538,11 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function bucketItemsToExecConfig(bucketItems) {
 	    var categories = parseCategories(bucketItems);
-	    var executionConfig = (0, _execution.mdToExecutionConfiguration)(_extends({}, bucketItems, {
-	        categories: categories
-	    }));
+	    var executionConfig = (0, _execution.mdToExecutionConfiguration)({
+	        buckets: _extends({}, bucketItems, {
+	            categories: categories
+	        })
+	    });
 	    var definitions = (0, _lodash.get)(executionConfig, 'execution.definitions');
 	    var idToExpr = (0, _lodash.fromPairs)(definitions.map(function (_ref2) {
 	        var metricDefinition = _ref2.metricDefinition;
