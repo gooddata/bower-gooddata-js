@@ -1,7 +1,7 @@
 /* Copyright (C) 2007-2015, GoodData(R) Corporation. All rights reserved. */
-/* gooddata - v0.1.41 */
-/* 2016-06-06 17:02:23 */
-/* Latest git commit: "0020935" */
+/* gooddata - v0.1.42 */
+/* 2016-06-08 12:59:17 */
+/* Latest git commit: "3f36558" */
 
 
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -17307,6 +17307,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return d.promise();
 	}
 
+	var MAX_TITLE_LENGTH = 255;
+	var getMetricTitle = function getMetricTitle(suffix, title) {
+	    var maxLength = MAX_TITLE_LENGTH - suffix.length;
+	    if (title && title.length > maxLength) {
+	        if (title[title.length - 1] === ')') {
+	            return title.substring(0, maxLength - 2) + '…)' + suffix;
+	        }
+	        return title.substring(0, maxLength - 1) + '…' + suffix;
+	    }
+	    return '' + title + suffix;
+	};
+
+	var getBaseMetricTitle = (0, _lodash.partial)(getMetricTitle, '');
+
+	var POP_SUFFIX = ' - previous year';
+	var getPoPMetricTitle = (0, _lodash.partial)(getMetricTitle, POP_SUFFIX);
+
 	var CONTRIBUTION_METRIC_FORMAT = '#,##0.00%';
 
 	var getFilterExpression = function getFilterExpression(listAttributeFilter) {
@@ -17422,9 +17439,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 	var createDerivedMetric = function createDerivedMetric(measure) {
-	    var title = measure.title;
 	    var format = measure.format;
 	    var sort = measure.sort;
+
+	    var title = getBaseMetricTitle(measure.title);
 
 	    var hasher = (0, _lodash.partial)(getGeneratedMetricHash, title, format);
 	    var aggregation = (0, _lodash.get)(measure, 'aggregation', 'base').toLowerCase();
@@ -17450,7 +17468,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        generated = createDerivedMetric(measure);
 	        getMetricExpression = (0, _lodash.partial)(getPercentMetricExpression, category, '{' + (0, _lodash.get)(generated, 'definition.metricDefinition.identifier') + '}');
 	    }
-	    var title = ('% ' + (0, _lodash.get)(measure, 'title')).replace(/^(% )+/, '% ');
+	    var title = getBaseMetricTitle(('% ' + (0, _lodash.get)(measure, 'title')).replace(/^(% )+/, '% '));
 	    var hasher = (0, _lodash.partial)(getGeneratedMetricHash, title, CONTRIBUTION_METRIC_FORMAT);
 	    var result = [{
 	        element: getGeneratedMetricIdentifier(measure, 'percent', getMetricExpression, hasher),
@@ -17473,7 +17491,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 	var createPoPMetric = function createPoPMetric(measure, mdObj) {
-	    var title = (0, _lodash.get)(measure, 'title') + ' - previous year';
+	    var title = getPoPMetricTitle((0, _lodash.get)(measure, 'title'));
 	    var format = (0, _lodash.get)(measure, 'format');
 	    var hasher = (0, _lodash.partial)(getGeneratedMetricHash, title, format);
 
@@ -17514,8 +17532,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var date = getDate(mdObj);
 
 	    var generated = createContributionMetric(measure, mdObj);
+	    var title = getPoPMetricTitle(('% ' + (0, _lodash.get)(measure, 'title')).replace(/^(% )+/, '% '));
 
-	    var title = ('% ' + (0, _lodash.get)(measure, 'title') + ' - previous year').replace(/^(% )+/, '% ');
 	    var format = CONTRIBUTION_METRIC_FORMAT;
 	    var hasher = (0, _lodash.partial)(getGeneratedMetricHash, title, format);
 
@@ -18520,6 +18538,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	        offset: 0
 	    }
 	};
+
+	var ID_REGEXP = /\{[^}]+\}/g;
+	var WHERE_REGEXP = /\s+WHERE\s+\[[^\]]+\]\s+(NOT\s+)*IN\s+\([^)]+\)/g;
+
 	var LOAD_DATE_DATASET_DEFAULTS = {
 	    includeUnavailableDateDataSetsCount: true,
 	    includeAvailableDateAttributes: true
@@ -18557,9 +18579,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var maql = (0, _lodash.get)(definition, 'metricDefinition.expression');
 
 	        if (maql) {
-	            return maql.replace(/{[^}]+}/g, function (match) {
+	            return maql.replace(ID_REGEXP, function (match) {
 	                var expression = idToExpr[(0, _lodash.trim)(match, '{}')];
-	                return expression.substr(SELECT_LENGTH);
+	                return expression.substr(SELECT_LENGTH).replace(WHERE_REGEXP, '');
 	            });
 	        }
 	        return column;
