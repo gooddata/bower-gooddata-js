@@ -1,7 +1,7 @@
 /* Copyright (C) 2007-2015, GoodData(R) Corporation. All rights reserved. */
-/* gooddata - v0.1.42 */
-/* 2016-06-08 12:59:17 */
-/* Latest git commit: "3f36558" */
+/* gooddata - v0.1.43 */
+/* 2016-06-13 22:20:05 */
+/* Latest git commit: "6f2cdba" */
 
 
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -18601,7 +18601,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	function loadItems(projectId) {
 	    var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 
-	    var bucketItems = (0, _lodash.get)(options, 'bucketItems.buckets');
+	    var bucketItems = (0, _lodash.get)((0, _lodash.cloneDeep)(options), 'bucketItems.buckets');
 
 	    if (bucketItems) {
 	        bucketItems = bucketItemsToExecConfig(bucketItems);
@@ -18622,10 +18622,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	    });
 	}
 
-	function loadDateDataSets(projectId, options) {
-	    var bucketItems = (0, _lodash.get)(options, 'bucketItems.buckets');
+	var hasOnlyDateBucketItems = function hasOnlyDateBucketItems(buckets) {
+	    return (0, _lodash.every)((0, _lodash.flatten)((0, _lodash.values)(buckets)), function (item) {
+	        return (0, _lodash.get)((0, _lodash.values)(item)[0], 'type', '') === 'date' || item.dateFilter;
+	    });
+	};
 
-	    if (bucketItems) {
+	function loadDateDataSets(projectId, options) {
+	    var bucketItems = (0, _lodash.get)((0, _lodash.cloneDeep)(options), 'bucketItems.buckets');
+
+	    if (bucketItems && hasOnlyDateBucketItems(bucketItems)) {
+	        bucketItems = [];
+	    } else if (bucketItems) {
 	        bucketItems = bucketItemsToExecConfig(bucketItems);
 	    }
 
