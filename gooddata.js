@@ -1,7 +1,7 @@
 /* Copyright (C) 2007-2015, GoodData(R) Corporation. All rights reserved. */
-/* gooddata - v0.1.43 */
-/* 2016-06-13 22:20:05 */
-/* Latest git commit: "6f2cdba" */
+/* gooddata - v0.1.44 */
+/* 2016-06-14 14:24:25 */
+/* Latest git commit: "989a172" */
 
 
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -17667,12 +17667,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return getMetricFactory(measure)(measure, buckets);
 	    }));
 	    var categories = (0, _lodash.map)(getCategories(buckets), categoryToElement);
+	    var columns = (0, _lodash.compact)((0, _lodash.map)([].concat(_toConsumableArray(categories), _toConsumableArray(metrics)), 'element'));
 
 	    return { execution: {
-	            columns: (0, _lodash.compact)((0, _lodash.map)([].concat(_toConsumableArray(categories), _toConsumableArray(metrics)), 'element')),
+	            columns: columns,
 	            orderBy: getOrderBy(metrics, categories, (0, _lodash.get)(mdObj, 'type')),
 	            definitions: (0, _utilsDefinitions.sortDefinitions)((0, _lodash.compact)((0, _lodash.map)(metrics, 'definition'))),
-	            where: getWhere(buckets)
+	            where: columns.length ? getWhere(buckets) : {}
 	        } };
 	};
 
