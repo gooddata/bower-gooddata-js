@@ -1,7 +1,7 @@
 /* Copyright (C) 2007-2015, GoodData(R) Corporation. All rights reserved. */
-/* gooddata - v0.1.44 */
-/* 2016-06-14 14:24:25 */
-/* Latest git commit: "989a172" */
+/* gooddata - v0.1.45 */
+/* 2016-06-16 06:45:44 */
+/* Latest git commit: "6b8acab" */
 
 
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -18640,13 +18640,26 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    // /loadDateDataSets has different parameter for dataSet loading then /loadCatalog
 	    // see https://github.com/gooddata/gdc-bear/blob/develop/resources/specification/internal/date_data_sets.res
-	    var requestSpecificOptions = {
-	        csvDataSetIdentifier: (0, _lodash.get)(options, 'dataSetIdentifier')
-	    };
+	    var requiredDataSets = undefined;
+	    if ((0, _lodash.get)(options, 'returnAllDateDataSets')) {
+	        requiredDataSets = {
+	            type: 'ALL'
+	        };
+	    } else if ((0, _lodash.get)(options, 'dataSetIdentifier')) {
+	        requiredDataSets = {
+	            type: 'CUSTOM',
+	            customIdentifiers: [(0, _lodash.get)(options, 'dataSetIdentifier')]
+	        };
+	    } else {
+	        requiredDataSets = {
+	            type: 'PRODUCTION'
+	        };
+	    }
 
-	    var request = (0, _lodash.omit)(_extends({}, LOAD_DATE_DATASET_DEFAULTS, REQUEST_DEFAULTS, options, requestSpecificOptions, {
+	    var request = (0, _lodash.omit)(_extends({}, LOAD_DATE_DATASET_DEFAULTS, REQUEST_DEFAULTS, options, {
+	        requiredDataSets: requiredDataSets,
 	        bucketItems: bucketItems
-	    }), ['filter', 'types', 'paging', 'dataSetIdentifier']);
+	    }), ['filter', 'types', 'paging', 'dataSetIdentifier', 'returnAllDateDataSets']);
 
 	    return requestDateDataSets(projectId, request);
 	}
