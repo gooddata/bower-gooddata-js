@@ -1,7 +1,7 @@
 /* Copyright (C) 2007-2015, GoodData(R) Corporation. All rights reserved. */
-/* gooddata - v0.1.45 */
-/* 2016-06-16 06:45:44 */
-/* Latest git commit: "6b8acab" */
+/* gooddata - v0.1.46 */
+/* 2016-06-17 13:34:39 */
+/* Latest git commit: "a4800e7" */
 
 
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -16477,6 +16477,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.isLoggedIn = isLoggedIn;
 	exports.login = login;
 	exports.logout = logout;
+	exports.updateProfileSettings = updateProfileSettings;
 	exports.getAccountInfo = getAccountInfo;
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
@@ -16549,6 +16550,25 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return (0, _xhr.ajax)('/gdc/account/login/' + userId, {
 	            method: 'delete'
 	        });
+	    }).then(d.resolve, d.reject);
+
+	    return d.promise();
+	}
+
+	/**
+	 * Updates user's profile settings
+	 * @method updateProfileSettings
+	 * @param {String} profileId - User profile identifier
+	 * @param {Object} profileSetting
+	*/
+
+	function updateProfileSettings(profileId, profileSetting) {
+	    /*eslint-disable new-cap*/
+	    var d = _jquery2['default'].Deferred();
+	    /*eslint-enable new-cap*/
+
+	    (0, _xhr.put)('/gdc/account/profile/' + profileId + '/settings', {
+	        data: profileSetting
 	    }).then(d.resolve, d.reject);
 
 	    return d.promise();
