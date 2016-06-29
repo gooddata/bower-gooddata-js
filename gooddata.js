@@ -1,7 +1,7 @@
 /* Copyright (C) 2007-2015, GoodData(R) Corporation. All rights reserved. */
-/* gooddata - v0.1.46 */
-/* 2016-06-17 13:34:39 */
-/* Latest git commit: "a4800e7" */
+/* gooddata - v0.1.47 */
+/* 2016-06-29 14:02:10 */
+/* Latest git commit: "ed523ec" */
 
 
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -17205,6 +17205,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _slicedToArray = (function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i['return']) _i['return'](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError('Invalid attempt to destructure non-iterable instance'); } }; })();
 
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
 	exports.getData = getData;
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
@@ -17239,6 +17241,23 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var notEmpty = (0, _lodash.negate)(_lodash.isEmpty);
 
+	var findHeaderForMappingFn = function findHeaderForMappingFn(mapping, header) {
+	    return (mapping.element === header.id || mapping.element === header.uri) && header.measureIndex === undefined;
+	};
+
+	var wrapMeasureIndexesFromMappings = function wrapMeasureIndexesFromMappings(metricMappings, headers) {
+	    if (metricMappings) {
+	        metricMappings.forEach(function (mapping) {
+	            var header = (0, _lodash.find)(headers, (0, _lodash.partial)(findHeaderForMappingFn, mapping));
+	            if (header) {
+	                header.measureIndex = mapping.measureIndex;
+	                header.isPoP = mapping.isPoP;
+	            }
+	        });
+	    }
+	    return headers;
+	};
+
 	/**
 	 * Module for execution on experimental execution resource
 	 *
@@ -17252,7 +17271,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 *
 	 * @method getData
 	 * @param {String} projectId - GD project identifier
-	 * @param {Array} elements - An array of attribute or metric identifiers.
+	 * @param {Array} columns - An array of attribute or metric identifiers.
 	 * @param {Object} executionConfiguration - Execution configuration - can contain for example
 	 *                 property "filters" containing execution context filters
 	 *                 property "where" containing query-like filters
@@ -17262,7 +17281,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @return {Object} Structure with `headers` and `rawData` keys filled with values from execution.
 	 */
 
-	function getData(projectId, elements) {
+	function getData(projectId, columns) {
 	    var executionConfiguration = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
 
 	    var executedReport = {
@@ -17271,9 +17290,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    // Create request and result structures
 	    var request = {
-	        execution: {
-	            columns: elements
-	        }
+	        execution: { columns: columns }
 	    };
 	    // enrich configuration with supported properties such as
 	    // where clause with query-like filters or execution context filters
@@ -17290,33 +17307,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	    // Execute request
 	    (0, _xhr.post)('/gdc/internal/projects/' + projectId + '/experimental/executions', {
 	        data: JSON.stringify(request)
-	    }, d.reject).then(function resolveSimpleExecution(result) {
-	        // TODO: when executionResult.headers will be globaly available columns map code should be removed
-	        if (result.executionResult.headers) {
-	            executedReport.headers = result.executionResult.headers;
-	        } else {
-	            // Populate result's header section if is not available
-	            executedReport.headers = result.executionResult.columns.map(function mapColsToHeaders(col) {
-	                if (col.attributeDisplayForm) {
-	                    return {
-	                        type: 'attrLabel',
-	                        id: col.attributeDisplayForm.meta.identifier,
-	                        uri: col.attributeDisplayForm.meta.uri,
-	                        title: col.attributeDisplayForm.meta.title
-	                    };
-	                }
-	                return {
-	                    type: 'metric',
-	                    id: col.metric.meta.identifier,
-	                    uri: col.metric.meta.uri,
-	                    title: col.metric.meta.title,
-	                    format: col.metric.content.format
-	                };
-	            });
-	        }
+	    }, d.reject).then(function (result) {
+	        executedReport.headers = wrapMeasureIndexesFromMappings((0, _lodash.get)(executionConfiguration, 'metricMappings'), result.executionResult.headers);
+
 	        // Start polling on url returned in the executionResult for tabularData
 	        return (0, _xhr.ajax)(result.executionResult.tabularDataResult);
-	    }, d.reject).then(function resolveDataResultPolling(result, message, response) {
+	    }, d.reject).then(function (result, message, response) {
 	        // After the retrieving computed tabularData, resolve the promise
 	        executedReport.rawData = result && result.tabularDataResult ? result.tabularDataResult.values : [];
 	        executedReport.isLoaded = true;
@@ -17451,14 +17447,28 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return getDateCategory(mdObj) || getDateFilter(mdObj);
 	};
 
-	var createPureMetric = function createPureMetric(measure) {
+	var getMetricSort = function getMetricSort(sort, isPoPMetric) {
+	    if ((0, _lodash.isString)(sort)) {
+	        // TODO: backward compatibility, remove when not used plain "sort: asc | desc" in measures
+	        return sort;
+	    }
+
+	    var sortByPoP = (0, _lodash.get)(sort, 'sortByPoP');
+	    if (isPoPMetric && sortByPoP || !isPoPMetric && !sortByPoP) {
+	        return (0, _lodash.get)(sort, 'direction');
+	    }
+	    return null;
+	};
+
+	var createPureMetric = function createPureMetric(measure, mdObj, measureIndex) {
 	    return {
 	        element: (0, _lodash.get)(measure, 'objectUri'),
-	        sort: (0, _lodash.get)(measure, 'sort')
+	        sort: getMetricSort((0, _lodash.get)(measure, 'sort')),
+	        meta: { measureIndex: measureIndex }
 	    };
 	};
 
-	var createDerivedMetric = function createDerivedMetric(measure) {
+	var createDerivedMetric = function createDerivedMetric(measure, mdObj, measureIndex) {
 	    var format = measure.format;
 	    var sort = measure.sort;
 
@@ -17476,16 +17486,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	    };
 
-	    return { element: element, definition: definition, sort: sort };
+	    return {
+	        element: element,
+	        definition: definition,
+	        sort: getMetricSort(sort),
+	        meta: {
+	            measureIndex: measureIndex
+	        }
+	    };
 	};
 
-	var createContributionMetric = function createContributionMetric(measure, mdObj) {
+	var createContributionMetric = function createContributionMetric(measure, mdObj, measureIndex) {
 	    var category = (0, _lodash.first)(getCategories(mdObj));
 
 	    var generated = undefined;
 	    var getMetricExpression = (0, _lodash.partial)(getPercentMetricExpression, category, '[' + (0, _lodash.get)(measure, 'objectUri') + ']');
 	    if (isDerived(measure)) {
-	        generated = createDerivedMetric(measure);
+	        generated = createDerivedMetric(measure, mdObj, measureIndex);
 	        getMetricExpression = (0, _lodash.partial)(getPercentMetricExpression, category, '{' + (0, _lodash.get)(generated, 'definition.metricDefinition.identifier') + '}');
 	    }
 	    var title = getBaseMetricTitle(('% ' + (0, _lodash.get)(measure, 'title')).replace(/^(% )+/, '% '));
@@ -17500,7 +17517,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	                format: CONTRIBUTION_METRIC_FORMAT
 	            }
 	        },
-	        sort: (0, _lodash.get)(measure, 'sort')
+	        sort: getMetricSort((0, _lodash.get)(measure, 'sort')),
+	        meta: {
+	            measureIndex: measureIndex
+	        }
 	    }];
 
 	    if (generated) {
@@ -17510,7 +17530,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return result;
 	};
 
-	var createPoPMetric = function createPoPMetric(measure, mdObj) {
+	var createPoPMetric = function createPoPMetric(measure, mdObj, measureIndex) {
 	    var title = getPoPMetricTitle((0, _lodash.get)(measure, 'title'));
 	    var format = (0, _lodash.get)(measure, 'format');
 	    var hasher = (0, _lodash.partial)(getGeneratedMetricHash, title, format);
@@ -17521,7 +17541,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var getMetricExpression = (0, _lodash.partial)(getPoPExpression, date, '[' + (0, _lodash.get)(measure, 'objectUri') + ']');
 
 	    if (isDerived(measure)) {
-	        generated = createDerivedMetric(measure);
+	        generated = createDerivedMetric(measure, mdObj, measureIndex);
 	        getMetricExpression = (0, _lodash.partial)(getPoPExpression, date, '{' + (0, _lodash.get)(generated, 'definition.metricDefinition.identifier') + '}');
 	    }
 
@@ -17536,22 +17556,27 @@ return /******/ (function(modules) { // webpackBootstrap
 	                title: title,
 	                format: format
 	            }
+	        },
+	        sort: getMetricSort((0, _lodash.get)(measure, 'sort'), true),
+	        meta: {
+	            measureIndex: measureIndex,
+	            isPoP: true
 	        }
 	    }];
 
 	    if (generated) {
 	        result.push(generated);
 	    } else {
-	        result.push(createPureMetric(measure));
+	        result.push(createPureMetric(measure, mdObj, measureIndex));
 	    }
 
 	    return result;
 	};
 
-	var createContributionPoPMetric = function createContributionPoPMetric(measure, mdObj) {
+	var createContributionPoPMetric = function createContributionPoPMetric(measure, mdObj, measureIndex) {
 	    var date = getDate(mdObj);
 
-	    var generated = createContributionMetric(measure, mdObj);
+	    var generated = createContributionMetric(measure, mdObj, measureIndex);
 	    var title = getPoPMetricTitle(('% ' + (0, _lodash.get)(measure, 'title')).replace(/^(% )+/, '% '));
 
 	    var format = CONTRIBUTION_METRIC_FORMAT;
@@ -17570,6 +17595,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	                title: title,
 	                format: format
 	            }
+	        },
+	        sort: getMetricSort((0, _lodash.get)(measure, 'sort'), true),
+	        meta: {
+	            measureIndex: measureIndex,
+	            isPoP: true
 	        }
 	    }];
 
@@ -17683,28 +17713,30 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var measure = _ref16.measure;
 	        return measure;
 	    });
-	    var metrics = (0, _lodash.flatten)((0, _lodash.map)(measures, function (measure) {
-	        return getMetricFactory(measure)(measure, buckets);
+	    var metrics = (0, _lodash.flatten)((0, _lodash.map)(measures, function (measure, index) {
+	        return getMetricFactory(measure)(measure, buckets, index);
 	    }));
 	    var categories = (0, _lodash.map)(getCategories(buckets), categoryToElement);
 	    var columns = (0, _lodash.compact)((0, _lodash.map)([].concat(_toConsumableArray(categories), _toConsumableArray(metrics)), 'element'));
 
-	    return { execution: {
-	            columns: columns,
-	            orderBy: getOrderBy(metrics, categories, (0, _lodash.get)(mdObj, 'type')),
-	            definitions: (0, _utilsDefinitions.sortDefinitions)((0, _lodash.compact)((0, _lodash.map)(metrics, 'definition'))),
-	            where: columns.length ? getWhere(buckets) : {}
-	        } };
+	    return {
+	        columns: columns,
+	        orderBy: getOrderBy(metrics, categories, (0, _lodash.get)(mdObj, 'type')),
+	        definitions: (0, _utilsDefinitions.sortDefinitions)((0, _lodash.compact)((0, _lodash.map)(metrics, 'definition'))),
+	        where: columns.length ? getWhere(buckets) : {},
+	        metricMappings: (0, _lodash.map)(metrics, function (m) {
+	            return _extends({ element: m.element }, m.meta);
+	        })
+	    };
 	};
 
 	exports.mdToExecutionConfiguration = mdToExecutionConfiguration;
 	var getDataForVis = function getDataForVis(projectId, mdObj) {
 	    var _mdToExecutionConfiguration = mdToExecutionConfiguration(mdObj);
 
-	    var execution = _mdToExecutionConfiguration.execution;
-	    var columns = execution.columns;
+	    var columns = _mdToExecutionConfiguration.columns;
 
-	    var executionConfiguration = _objectWithoutProperties(execution, ['columns']);
+	    var executionConfiguration = _objectWithoutProperties(_mdToExecutionConfiguration, ['columns']);
 
 	    return getData(projectId, columns, executionConfiguration);
 	};
@@ -18586,13 +18618,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	            categories: categories
 	        })
 	    });
-	    var definitions = (0, _lodash.get)(executionConfig, 'execution.definitions');
+	    var definitions = (0, _lodash.get)(executionConfig, 'definitions');
 	    var idToExpr = (0, _lodash.fromPairs)(definitions.map(function (_ref2) {
 	        var metricDefinition = _ref2.metricDefinition;
 	        return [metricDefinition.identifier, metricDefinition.expression];
 	    }));
 
-	    return (0, _lodash.get)(executionConfig, 'execution.columns').map(function (column) {
+	    return (0, _lodash.get)(executionConfig, 'columns').map(function (column) {
 	        var definition = (0, _lodash.find)(definitions, function (_ref3) {
 	            var metricDefinition = _ref3.metricDefinition;
 	            return (0, _lodash.get)(metricDefinition, 'identifier') === column;
