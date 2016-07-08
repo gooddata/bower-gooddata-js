@@ -1,7 +1,7 @@
 /* Copyright (C) 2007-2015, GoodData(R) Corporation. All rights reserved. */
-/* gooddata - v0.1.47 */
-/* 2016-06-29 14:02:10 */
-/* Latest git commit: "ed523ec" */
+/* gooddata - v0.1.48 */
+/* 2016-07-08 15:31:18 */
+/* Latest git commit: "abe85e7" */
 
 
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -18641,6 +18641,34 @@ return /******/ (function(modules) { // webpackBootstrap
 	    });
 	}
 
+	/**
+	 * Convert specific params in options to "requiredDataSets" structure. For more details look into
+	 * res file https://github.com/gooddata/gdc-bear/blob/develop/resources/specification/internal/catalog.res
+	 *
+	 * @param options Supported keys in options are:
+	 * <ul>
+	 * <li>dataSetIdentifier - in value is string identifier of dataSet - this leads to CUSTOM type
+	 * <li>returnAllDateDataSets - true value means to return ALL values without dataSet differentiation
+	 * <li>by default we get PRODUCTION dataSets
+	 * </ul>
+	 * @returns {Object} "requiredDataSets" object hash.
+	 */
+	var getRequiredDataSets = function getRequiredDataSets(options) {
+	    if ((0, _lodash.get)(options, 'returnAllDateDataSets')) {
+	        return {
+	            type: 'ALL'
+	        };
+	    } else if ((0, _lodash.get)(options, 'dataSetIdentifier')) {
+	        return {
+	            type: 'CUSTOM',
+	            customIdentifiers: [(0, _lodash.get)(options, 'dataSetIdentifier')]
+	        };
+	    }
+	    return {
+	        type: 'PRODUCTION'
+	    };
+	};
+
 	function loadCatalog(projectId, request) {
 	    var uri = '/gdc/internal/projects/' + projectId + '/loadCatalog';
 	    return xhr.ajax(uri, {
@@ -18654,16 +18682,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	function loadItems(projectId) {
 	    var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 
-	    var bucketItems = (0, _lodash.get)((0, _lodash.cloneDeep)(options), 'bucketItems.buckets');
+	    var request = (0, _lodash.omit)(_extends({}, REQUEST_DEFAULTS, options, {
+	        requiredDataSets: getRequiredDataSets(options)
+	    }), ['dataSetIdentifier', 'returnAllDateDataSets']);
 
+	    var bucketItems = (0, _lodash.get)((0, _lodash.cloneDeep)(options), 'bucketItems.buckets');
 	    if (bucketItems) {
 	        bucketItems = bucketItemsToExecConfig(bucketItems);
-	        return loadCatalog(projectId, _extends({}, REQUEST_DEFAULTS, options, {
+	        return loadCatalog(projectId, _extends({}, request, {
 	            bucketItems: bucketItems
 	        }));
 	    }
 
-	    return loadCatalog(projectId, _extends({}, REQUEST_DEFAULTS, options));
+	    return loadCatalog(projectId, request);
 	}
 
 	function requestDateDataSets(projectId, request) {
@@ -18689,24 +18720,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    } else if (bucketItems) {
 	        bucketItems = bucketItemsToExecConfig(bucketItems);
 	    }
-
-	    // /loadDateDataSets has different parameter for dataSet loading then /loadCatalog
-	    // see https://github.com/gooddata/gdc-bear/blob/develop/resources/specification/internal/date_data_sets.res
-	    var requiredDataSets = undefined;
-	    if ((0, _lodash.get)(options, 'returnAllDateDataSets')) {
-	        requiredDataSets = {
-	            type: 'ALL'
-	        };
-	    } else if ((0, _lodash.get)(options, 'dataSetIdentifier')) {
-	        requiredDataSets = {
-	            type: 'CUSTOM',
-	            customIdentifiers: [(0, _lodash.get)(options, 'dataSetIdentifier')]
-	        };
-	    } else {
-	        requiredDataSets = {
-	            type: 'PRODUCTION'
-	        };
-	    }
+	    var requiredDataSets = getRequiredDataSets(options);
 
 	    var request = (0, _lodash.omit)(_extends({}, LOAD_DATE_DATASET_DEFAULTS, REQUEST_DEFAULTS, options, {
 	        requiredDataSets: requiredDataSets,
