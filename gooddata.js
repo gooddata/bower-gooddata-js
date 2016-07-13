@@ -1,7 +1,7 @@
 /* Copyright (C) 2007-2015, GoodData(R) Corporation. All rights reserved. */
-/* gooddata - v0.1.48 */
-/* 2016-07-08 15:31:18 */
-/* Latest git commit: "abe85e7" */
+/* gooddata - v0.1.49 */
+/* 2016-07-13 10:47:01 */
+/* Latest git commit: "4671c07" */
 
 
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -218,9 +218,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 	function handlePolling(req, deferred) {
+	    var pollingDelay = (0, _lodash.result)(req, 'pollDelay');
+
 	    setTimeout(function poller() {
 	        retryAjaxRequest(req, deferred);
-	    }, req.pollDelay);
+	    }, pollingDelay);
 	}
 
 	// helper to coverts traditional ajax callbacks to deferred
@@ -241,8 +243,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	/**
 	 * additional ajax configuration specific for xhr module, keys
-	 *   unauthorized: function(xhr) - called when user is unathorized and token renewal failed
-	 *   pollDelay: int - polling interval in milisecodns, default 1000
+	 *   unauthorized: function(xhr) - called when user is unauthorized and token renewal failed
+	 *   pollDelay: int - polling interval in milliseconds, default 1000 - or generator function
 
 	 * method also accepts any option from original $.ajaxSetup. Options will be applied to all call of xhr.ajax().
 
@@ -267,7 +269,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Additionally content type is automatically json, and object in settings.data is converted to string
 	 * to be consumed by GDC backend.
 
-	 * settings additionally accepts keys: unathorized, pollDelay  (see xhrSetup for more details)
+	 * settings additionally accepts keys: unauthorized, pollDelay (see xhrSetup for more details)
 	 * @method ajax
 	 * @param url request url
 	 * @param settings settings object
@@ -17277,12 +17279,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	 *                 property "where" containing query-like filters
 	 *                 property "orderBy" contains array of sorted properties to order in form
 	 *                      [{column: 'identifier', direction: 'asc|desc'}]
+	 * @param {Object} settings - AJAX settings
 	 *
 	 * @return {Object} Structure with `headers` and `rawData` keys filled with values from execution.
 	 */
 
 	function getData(projectId, columns) {
 	    var executionConfiguration = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
+	    var settings = arguments.length <= 3 || arguments[3] === undefined ? {} : arguments[3];
 
 	    var executedReport = {
 	        isLoaded: false
@@ -17305,13 +17309,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	    /*eslint-enable new-cap*/
 
 	    // Execute request
-	    (0, _xhr.post)('/gdc/internal/projects/' + projectId + '/experimental/executions', {
+	    (0, _xhr.post)('/gdc/internal/projects/' + projectId + '/experimental/executions', _extends({}, settings, {
 	        data: JSON.stringify(request)
-	    }, d.reject).then(function (result) {
+	    }), d.reject).then(function (result) {
 	        executedReport.headers = wrapMeasureIndexesFromMappings((0, _lodash.get)(executionConfiguration, 'metricMappings'), result.executionResult.headers);
 
 	        // Start polling on url returned in the executionResult for tabularData
-	        return (0, _xhr.ajax)(result.executionResult.tabularDataResult);
+	        return (0, _xhr.ajax)(result.executionResult.tabularDataResult, settings);
 	    }, d.reject).then(function (result, message, response) {
 	        // After the retrieving computed tabularData, resolve the promise
 	        executedReport.rawData = result && result.tabularDataResult ? result.tabularDataResult.values : [];
@@ -17731,14 +17735,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 	exports.mdToExecutionConfiguration = mdToExecutionConfiguration;
-	var getDataForVis = function getDataForVis(projectId, mdObj) {
+	var getDataForVis = function getDataForVis(projectId, mdObj, settings) {
 	    var _mdToExecutionConfiguration = mdToExecutionConfiguration(mdObj);
 
 	    var columns = _mdToExecutionConfiguration.columns;
 
 	    var executionConfiguration = _objectWithoutProperties(_mdToExecutionConfiguration, ['columns']);
 
-	    return getData(projectId, columns, executionConfiguration);
+	    return getData(projectId, columns, executionConfiguration, settings);
 	};
 	exports.getDataForVis = getDataForVis;
 
