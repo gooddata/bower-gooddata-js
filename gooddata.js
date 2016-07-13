@@ -1,7 +1,7 @@
 /* Copyright (C) 2007-2015, GoodData(R) Corporation. All rights reserved. */
-/* gooddata - v0.1.49 */
-/* 2016-07-13 10:47:01 */
-/* Latest git commit: "4671c07" */
+/* gooddata - v0.1.50 */
+/* 2016-07-13 17:45:53 */
+/* Latest git commit: "a80c5b3" */
 
 
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -17509,7 +17509,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        generated = createDerivedMetric(measure, mdObj, measureIndex);
 	        getMetricExpression = (0, _lodash.partial)(getPercentMetricExpression, category, '{' + (0, _lodash.get)(generated, 'definition.metricDefinition.identifier') + '}');
 	    }
-	    var title = getBaseMetricTitle(('% ' + (0, _lodash.get)(measure, 'title')).replace(/^(% )+/, '% '));
+	    var title = getBaseMetricTitle((0, _lodash.get)(measure, 'title'));
 	    var hasher = (0, _lodash.partial)(getGeneratedMetricHash, title, CONTRIBUTION_METRIC_FORMAT);
 	    var result = [{
 	        element: getGeneratedMetricIdentifier(measure, 'percent', getMetricExpression, hasher),
@@ -17581,7 +17581,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var date = getDate(mdObj);
 
 	    var generated = createContributionMetric(measure, mdObj, measureIndex);
-	    var title = getPoPMetricTitle(('% ' + (0, _lodash.get)(measure, 'title')).replace(/^(% )+/, '% '));
+	    var title = getPoPMetricTitle((0, _lodash.get)(measure, 'title'));
 
 	    var format = CONTRIBUTION_METRIC_FORMAT;
 	    var hasher = (0, _lodash.partial)(getGeneratedMetricHash, title, format);
