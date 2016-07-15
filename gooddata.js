@@ -1,7 +1,7 @@
 /* Copyright (C) 2007-2015, GoodData(R) Corporation. All rights reserved. */
-/* gooddata - v0.1.50 */
-/* 2016-07-13 17:45:53 */
-/* Latest git commit: "a80c5b3" */
+/* gooddata - v0.1.51 */
+/* 2016-07-15 14:25:44 */
+/* Latest git commit: "32a5b21" */
 
 
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -18710,19 +18710,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	    });
 	}
 
-	var hasOnlyDateBucketItems = function hasOnlyDateBucketItems(buckets) {
-	    return (0, _lodash.every)((0, _lodash.flatten)((0, _lodash.values)(buckets)), function (item) {
-	        return (0, _lodash.get)((0, _lodash.values)(item)[0], 'type', '') === 'date' || item.dateFilter;
+	var removeDateBucketItems = function removeDateBucketItems(bucketItems) {
+	    return _extends({}, bucketItems, {
+	        categories: bucketItems.categories.filter(function (_ref4) {
+	            var category = _ref4.category;
+	            return category.type !== 'date';
+	        }),
+	        filters: bucketItems.filters.filter(function (item) {
+	            return !item.dateFilter;
+	        })
 	    });
 	};
 
 	function loadDateDataSets(projectId, options) {
 	    var bucketItems = (0, _lodash.get)((0, _lodash.cloneDeep)(options), 'bucketItems.buckets');
 
-	    if (bucketItems && hasOnlyDateBucketItems(bucketItems)) {
-	        bucketItems = [];
-	    } else if (bucketItems) {
-	        bucketItems = bucketItemsToExecConfig(bucketItems);
+	    if (bucketItems) {
+	        bucketItems = bucketItemsToExecConfig(removeDateBucketItems(bucketItems));
 	    }
 	    var requiredDataSets = getRequiredDataSets(options);
 
