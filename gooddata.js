@@ -1,7 +1,7 @@
 /* Copyright (C) 2007-2015, GoodData(R) Corporation. All rights reserved. */
-/* gooddata - v0.1.51 */
-/* 2016-07-15 14:25:44 */
-/* Latest git commit: "32a5b21" */
+/* gooddata - v0.1.52 */
+/* 2016-07-19 14:54:50 */
+/* Latest git commit: "a42a637" */
 
 
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -17678,15 +17678,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return notEmpty((0, _lodash.get)(listAttributeFilter, ['default', 'attributeElements']));
 	};
 
-	function getWhere(_ref13) {
-	    var filters = _ref13.filters;
-
-	    var attributeFilters = (0, _lodash.map)((0, _lodash.filter)(filters, function (_ref14) {
-	        var listAttributeFilter = _ref14.listAttributeFilter;
+	function getWhere(filters) {
+	    var attributeFilters = (0, _lodash.map)((0, _lodash.filter)(filters, function (_ref13) {
+	        var listAttributeFilter = _ref13.listAttributeFilter;
 	        return isAttributeFilterExecutable(listAttributeFilter);
 	    }), attributeFilterToWhere);
-	    var dateFilters = (0, _lodash.map)((0, _lodash.filter)(filters, function (_ref15) {
-	        var dateFilter = _ref15.dateFilter;
+	    var dateFilters = (0, _lodash.map)((0, _lodash.filter)(filters, function (_ref14) {
+	        var dateFilter = _ref14.dateFilter;
 	        return isDateFilterExecutable(dateFilter);
 	    }), dateFilterToWhere);
 
@@ -17712,22 +17710,37 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 	var mdToExecutionConfiguration = function mdToExecutionConfiguration(mdObj) {
+	    var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+
 	    var buckets = (0, _lodash.get)(mdObj, 'buckets');
-	    var measures = (0, _lodash.map)(buckets.measures, function (_ref16) {
-	        var measure = _ref16.measure;
+	    var measures = (0, _lodash.map)(buckets.measures, function (_ref15) {
+	        var measure = _ref15.measure;
 	        return measure;
 	    });
 	    var metrics = (0, _lodash.flatten)((0, _lodash.map)(measures, function (measure, index) {
 	        return getMetricFactory(measure)(measure, buckets, index);
 	    }));
-	    var categories = (0, _lodash.map)(getCategories(buckets), categoryToElement);
+
+	    var categories = getCategories(buckets);
+	    var filters = getFilters(buckets);
+	    if (options.removeDateItems) {
+	        categories = (0, _lodash.filter)(categories, function (_ref16) {
+	            var category = _ref16.category;
+	            return category.type !== 'date';
+	        });
+	        filters = (0, _lodash.filter)(filters, function (item) {
+	            return !item.dateFilter;
+	        });
+	    }
+	    categories = (0, _lodash.map)(categories, categoryToElement);
+
 	    var columns = (0, _lodash.compact)((0, _lodash.map)([].concat(_toConsumableArray(categories), _toConsumableArray(metrics)), 'element'));
 
 	    return {
 	        columns: columns,
 	        orderBy: getOrderBy(metrics, categories, (0, _lodash.get)(mdObj, 'type')),
 	        definitions: (0, _utilsDefinitions.sortDefinitions)((0, _lodash.compact)((0, _lodash.map)(metrics, 'definition'))),
-	        where: columns.length ? getWhere(buckets) : {},
+	        where: columns.length ? getWhere(filters) : {},
 	        metricMappings: (0, _lodash.map)(metrics, function (m) {
 	            return _extends({ element: m.element }, m.meta);
 	        })
@@ -18616,12 +18629,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 	function bucketItemsToExecConfig(bucketItems) {
+	    var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+
 	    var categories = parseCategories(bucketItems);
 	    var executionConfig = (0, _execution.mdToExecutionConfiguration)({
 	        buckets: _extends({}, bucketItems, {
 	            categories: categories
 	        })
-	    });
+	    }, options);
 	    var definitions = (0, _lodash.get)(executionConfig, 'definitions');
 	    var idToExpr = (0, _lodash.fromPairs)(definitions.map(function (_ref2) {
 	        var metricDefinition = _ref2.metricDefinition;
@@ -18710,24 +18725,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	    });
 	}
 
-	var removeDateBucketItems = function removeDateBucketItems(bucketItems) {
-	    return _extends({}, bucketItems, {
-	        categories: bucketItems.categories.filter(function (_ref4) {
-	            var category = _ref4.category;
-	            return category.type !== 'date';
-	        }),
-	        filters: bucketItems.filters.filter(function (item) {
-	            return !item.dateFilter;
-	        })
-	    });
-	};
-
 	function loadDateDataSets(projectId, options) {
 	    var bucketItems = (0, _lodash.get)((0, _lodash.cloneDeep)(options), 'bucketItems.buckets');
 
 	    if (bucketItems) {
-	        bucketItems = bucketItemsToExecConfig(removeDateBucketItems(bucketItems));
+	        bucketItems = bucketItemsToExecConfig(bucketItems, { removeDateItems: true });
 	    }
+
 	    var requiredDataSets = getRequiredDataSets(options);
 
 	    var request = (0, _lodash.omit)(_extends({}, LOAD_DATE_DATASET_DEFAULTS, REQUEST_DEFAULTS, options, {
