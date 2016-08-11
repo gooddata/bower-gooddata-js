@@ -1,7 +1,7 @@
 /* Copyright (C) 2007-2015, GoodData(R) Corporation. All rights reserved. */
-/* gooddata - v0.1.52 */
-/* 2016-07-19 14:54:50 */
-/* Latest git commit: "a42a637" */
+/* gooddata - v0.1.53 */
+/* 2016-08-11 09:27:48 */
+/* Latest git commit: "466f53d" */
 
 
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -18628,6 +18628,28 @@ return /******/ (function(modules) { // webpackBootstrap
 	    });
 	};
 
+	function recursiveReplace(_x3, _x4, _x5) {
+	    var _again = true;
+
+	    _function: while (_again) {
+	        var text = _x3,
+	            regexp = _x4,
+	            replaceFn = _x5;
+	        replacedText = undefined;
+	        _again = false;
+
+	        var replacedText = text.replace(regexp, replaceFn);
+	        if (text === replacedText) {
+	            return text;
+	        }
+	        _x3 = replacedText;
+	        _x4 = regexp;
+	        _x5 = replaceFn;
+	        _again = true;
+	        continue _function;
+	    }
+	}
+
 	function bucketItemsToExecConfig(bucketItems) {
 	    var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 
@@ -18651,7 +18673,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var maql = (0, _lodash.get)(definition, 'metricDefinition.expression');
 
 	        if (maql) {
-	            return maql.replace(ID_REGEXP, function (match) {
+	            return recursiveReplace(maql, ID_REGEXP, function (match) {
 	                var expression = idToExpr[(0, _lodash.trim)(match, '{}')];
 	                return expression.substr(SELECT_LENGTH).replace(WHERE_REGEXP, '');
 	            });
