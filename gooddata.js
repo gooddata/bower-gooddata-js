@@ -1,7 +1,7 @@
 /* Copyright (C) 2007-2015, GoodData(R) Corporation. All rights reserved. */
-/* gooddata - v0.1.53 */
-/* 2016-08-11 09:27:48 */
-/* Latest git commit: "466f53d" */
+/* gooddata - v0.1.54 */
+/* 2016-08-17 16:12:17 */
+/* Latest git commit: "abe8949" */
 
 
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -16612,6 +16612,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, '__esModule', {
 	    value: true
 	});
+	exports.getObjects = getObjects;
+	exports.getObjectUsing = getObjectUsing;
 	exports.getElementDetails = getElementDetails;
 	exports.getAttributes = getAttributes;
 	exports.getDimensions = getDimensions;
@@ -16636,12 +16638,90 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _util = __webpack_require__(8);
 
+	var _lodash = __webpack_require__(4);
+
 	/**
 	 * Functions for working with metadata objects
 	 *
 	 * @class metadata
 	 * @module metadata
 	 */
+
+	/**
+	 * Load all objects with given uris
+	 * (use bulk loading instead of getting objects one by one)
+	 *
+	 * @method getObjects
+	 * @param {String} projectId id of the project
+	 * @param {Array} objectUris array of uris for objects to be loaded
+	 * @return {Array} array of loaded elements
+	 */
+
+	function getObjects(projectId, objectUris) {
+	    var LIMIT = 50;
+	    var uri = '/gdc/md/' + projectId + '/objects/get';
+
+	    var objectsUrisChunks = (0, _lodash.chunk)(objectUris, LIMIT);
+
+	    var promises = objectsUrisChunks.map(function (objectUrisChunk) {
+	        var data = {
+	            get: {
+	                items: objectUrisChunk
+	            }
+	        };
+
+	        return (0, _xhr.post)(uri, {
+	            data: JSON.stringify(data)
+	        }).then(function (result) {
+	            return (0, _lodash.get)(result, ['objects', 'items']);
+	        });
+	    });
+
+	    return _jquery2['default'].when.apply(this, promises).then(function () {
+	        for (var _len = arguments.length, resultingEntries = Array(_len), _key = 0; _key < _len; _key++) {
+	            resultingEntries[_key] = arguments[_key];
+	        }
+
+	        return (0, _lodash.flatten)(resultingEntries);
+	    });
+	}
+
+	/**
+	 * Get MD objects from using2 resource. Include only objects of given types
+	 * and take care about fetching only nearest objects if requested.
+	 *
+	 * @method getObjectUsing
+	 * @param {String} projectId id of the project
+	 * @param {String} uri uri of the object for which dependencies are to be found
+	 * @param {Object} options objects with options:
+	 *        - types {Array} array of strings with object types to be included
+	 *        - nearest {Boolean} whether to include only nearest dependencies
+	 * @return {Array} entries returned by using2 resource
+	 */
+
+	function getObjectUsing(projectId, uri) {
+	    var options = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
+	    var _options$types = options.types;
+	    var types = _options$types === undefined ? [] : _options$types;
+	    var _options$nearest = options.nearest;
+	    var nearest = _options$nearest === undefined ? false : _options$nearest;
+
+	    var resourceUri = '/gdc/md/' + projectId + '/using2';
+
+	    var data = {
+	        inUse: {
+	            uri: uri,
+	            types: types,
+	            nearest: nearest ? 1 : 0
+	        }
+	    };
+
+	    return (0, _xhr.post)(resourceUri, {
+	        data: JSON.stringify(data)
+	    }).then(function (result) {
+	        return result.entries;
+	    });
+	}
 
 	/**
 	 * Get additional information about elements specified by their uris
