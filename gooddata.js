@@ -1,7 +1,7 @@
 /* Copyright (C) 2007-2015, GoodData(R) Corporation. All rights reserved. */
-/* gooddata - v0.1.54 */
-/* 2016-08-17 16:12:17 */
-/* Latest git commit: "abe8949" */
+/* gooddata - v0.1.55 */
+/* 2016-08-26 09:54:12 */
+/* Latest git commit: "a4fad7d" */
 
 
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -17278,7 +17278,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 9 */
 /***/ function(module, exports, __webpack_require__) {
 
-	// Copyright (C) 2007-2014, GoodData(R) Corporation. All rights reserved.
+	// Copyright (C) 2007-2016, GoodData(R) Corporation. All rights reserved.
 	'use strict';
 
 	Object.defineProperty(exports, '__esModule', {
@@ -17426,6 +17426,17 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var CONTRIBUTION_METRIC_FORMAT = '#,##0.00%';
 
+	var allFiltersEmpty = function allFiltersEmpty(item) {
+	    return (0, _lodash.every)((0, _lodash.map)((0, _lodash.get)(item, 'measureFilters', []), function (f) {
+	        return (0, _lodash.isEmpty)((0, _lodash.get)(f, 'listAttributeFilter.default.attributeElements', []));
+	    }));
+	};
+
+	var isDerived = function isDerived(measure) {
+	    var type = (0, _lodash.get)(measure, 'type');
+	    return type === 'fact' || type === 'attribute' || !allFiltersEmpty(measure);
+	};
+
 	var getFilterExpression = function getFilterExpression(listAttributeFilter) {
 	    var attributeUri = (0, _lodash.get)(listAttributeFilter, 'listAttributeFilter.attribute');
 	    var elements = (0, _lodash.get)(listAttributeFilter, 'listAttributeFilter.default.attributeElements', []);
@@ -17450,28 +17461,32 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return 'SELECT ' + (aggregation ? aggregation + '([' + objectUri + '])' : '[' + objectUri + ']') + (notEmpty(where) ? ' WHERE ' + where.join(' AND ') : '');
 	};
 
-	var getPercentMetricExpression = function getPercentMetricExpression(_ref4, metricId) {
+	var getPercentMetricExpression = function getPercentMetricExpression(_ref4, measure) {
 	    var category = _ref4.category;
 
-	    var attributeUri = (0, _lodash.get)(category, 'attribute');
+	    var metricExpressionWithoutFilters = 'SELECT [' + (0, _lodash.get)(measure, 'objectUri') + ']';
 
-	    return 'SELECT (SELECT ' + metricId + ') / (SELECT ' + metricId + ' BY ALL [' + attributeUri + '])';
+	    if (isDerived(measure)) {
+	        metricExpressionWithoutFilters = getGeneratedMetricExpression((0, _lodash.omit)(measure, 'measureFilters'));
+	    }
+
+	    var attributeUri = (0, _lodash.get)(category, 'attribute');
+	    var whereFilters = (0, _lodash.filter)((0, _lodash.map)((0, _lodash.get)(measure, 'measureFilters'), getFilterExpression), function (e) {
+	        return !!e;
+	    });
+	    var whereExpression = notEmpty(whereFilters) ? ' WHERE ' + whereFilters.join(' AND ') : '';
+
+	    return 'SELECT (' + metricExpressionWithoutFilters + whereExpression + ') / (' + metricExpressionWithoutFilters + ' BY ALL [' + attributeUri + ']' + whereExpression + ')';
 	};
 
-	var getPoPExpression = function getPoPExpression(attribute, metricId) {
+	var getPoPExpression = function getPoPExpression(attribute, metricExpression) {
 	    var attributeUri = (0, _lodash.get)(attribute, 'attribute');
 
-	    return 'SELECT (SELECT ' + metricId + ') FOR PREVIOUS ([' + attributeUri + '])';
+	    return 'SELECT ' + metricExpression + ' FOR PREVIOUS ([' + attributeUri + '])';
 	};
 
 	var getGeneratedMetricHash = function getGeneratedMetricHash(title, format, expression) {
 	    return (0, _md52['default'])(expression + '#' + title + '#' + format);
-	};
-
-	var allFiltersEmpty = function allFiltersEmpty(item) {
-	    return (0, _lodash.every)((0, _lodash.map)((0, _lodash.get)(item, 'measureFilters', []), function (f) {
-	        return (0, _lodash.isEmpty)((0, _lodash.get)(f, 'listAttributeFilter.default.attributeElements', []));
-	    }));
 	};
 
 	var getGeneratedMetricIdentifier = function getGeneratedMetricIdentifier(item, aggregation, expressionCreator, hasher) {
@@ -17490,11 +17505,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var prefix = hasNoFilters || allFiltersEmpty(item) ? '' : 'filtered_';
 
 	    return type + '_' + identifier + '.generated.' + prefix + aggregation + '.' + hash;
-	};
-
-	var isDerived = function isDerived(measure) {
-	    var type = (0, _lodash.get)(measure, 'type');
-	    return type === 'fact' || type === 'attribute' || !allFiltersEmpty(measure);
 	};
 
 	var isDateCategory = function isDateCategory(_ref5) {
@@ -17582,16 +17592,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var createContributionMetric = function createContributionMetric(measure, mdObj, measureIndex) {
 	    var category = (0, _lodash.first)(getCategories(mdObj));
-
-	    var generated = undefined;
-	    var getMetricExpression = (0, _lodash.partial)(getPercentMetricExpression, category, '[' + (0, _lodash.get)(measure, 'objectUri') + ']');
-	    if (isDerived(measure)) {
-	        generated = createDerivedMetric(measure, mdObj, measureIndex);
-	        getMetricExpression = (0, _lodash.partial)(getPercentMetricExpression, category, '{' + (0, _lodash.get)(generated, 'definition.metricDefinition.identifier') + '}');
-	    }
+	    var getMetricExpression = (0, _lodash.partial)(getPercentMetricExpression, category);
 	    var title = getBaseMetricTitle((0, _lodash.get)(measure, 'title'));
 	    var hasher = (0, _lodash.partial)(getGeneratedMetricHash, title, CONTRIBUTION_METRIC_FORMAT);
-	    var result = [{
+	    return {
 	        element: getGeneratedMetricIdentifier(measure, 'percent', getMetricExpression, hasher),
 	        definition: {
 	            metricDefinition: {
@@ -17605,13 +17609,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        meta: {
 	            measureIndex: measureIndex
 	        }
-	    }];
-
-	    if (generated) {
-	        result.unshift({ definition: generated.definition });
-	    }
-
-	    return result;
+	    };
 	};
 
 	var createPoPMetric = function createPoPMetric(measure, mdObj, measureIndex) {
@@ -17626,7 +17624,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    if (isDerived(measure)) {
 	        generated = createDerivedMetric(measure, mdObj, measureIndex);
-	        getMetricExpression = (0, _lodash.partial)(getPoPExpression, date, '{' + (0, _lodash.get)(generated, 'definition.metricDefinition.identifier') + '}');
+	        getMetricExpression = (0, _lodash.partial)(getPoPExpression, date, '(' + (0, _lodash.get)(generated, 'definition.metricDefinition.expression') + ')');
 	    }
 
 	    var identifier = getGeneratedMetricIdentifier(measure, 'pop', getMetricExpression, hasher);
@@ -17666,7 +17664,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var format = CONTRIBUTION_METRIC_FORMAT;
 	    var hasher = (0, _lodash.partial)(getGeneratedMetricHash, title, format);
 
-	    var getMetricExpression = (0, _lodash.partial)(getPoPExpression, date, '{' + (0, _lodash.last)(generated).element + '}');
+	    var getMetricExpression = (0, _lodash.partial)(getPoPExpression, date, '(' + (0, _lodash.get)(generated, 'definition.metricDefinition.expression') + ')');
 
 	    var identifier = getGeneratedMetricIdentifier(measure, 'pop', getMetricExpression, hasher);
 
@@ -17689,7 +17687,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    result.push(generated);
 
-	    return (0, _lodash.flatten)(result);
+	    return result;
 	};
 
 	var categoryToElement = function categoryToElement(_ref9) {
@@ -18304,6 +18302,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	var queueIndex = -1;
 
 	function cleanUpNextTick() {
+	    if (!draining || !currentQueue) {
+	        return;
+	    }
 	    draining = false;
 	    if (currentQueue.length) {
 	        queue = currentQueue.concat(queue);
@@ -18681,16 +18682,12 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _execution = __webpack_require__(9);
 
-	var SELECT_LENGTH = 'SELECT '.length;
 	var REQUEST_DEFAULTS = {
 	    types: ['attribute', 'metric', 'fact'],
 	    paging: {
 	        offset: 0
 	    }
 	};
-
-	var ID_REGEXP = /\{[^}]+\}/g;
-	var WHERE_REGEXP = /\s+WHERE\s+\[[^\]]+\]\s+(NOT\s+)*IN\s+\([^)]+\)/g;
 
 	var LOAD_DATE_DATASET_DEFAULTS = {
 	    includeUnavailableDateDataSetsCount: true,
@@ -18708,28 +18705,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    });
 	};
 
-	function recursiveReplace(_x3, _x4, _x5) {
-	    var _again = true;
-
-	    _function: while (_again) {
-	        var text = _x3,
-	            regexp = _x4,
-	            replaceFn = _x5;
-	        replacedText = undefined;
-	        _again = false;
-
-	        var replacedText = text.replace(regexp, replaceFn);
-	        if (text === replacedText) {
-	            return text;
-	        }
-	        _x3 = replacedText;
-	        _x4 = regexp;
-	        _x5 = replaceFn;
-	        _again = true;
-	        continue _function;
-	    }
-	}
-
 	function bucketItemsToExecConfig(bucketItems) {
 	    var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 
@@ -18740,23 +18715,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	        })
 	    }, options);
 	    var definitions = (0, _lodash.get)(executionConfig, 'definitions');
-	    var idToExpr = (0, _lodash.fromPairs)(definitions.map(function (_ref2) {
-	        var metricDefinition = _ref2.metricDefinition;
-	        return [metricDefinition.identifier, metricDefinition.expression];
-	    }));
 
 	    return (0, _lodash.get)(executionConfig, 'columns').map(function (column) {
-	        var definition = (0, _lodash.find)(definitions, function (_ref3) {
-	            var metricDefinition = _ref3.metricDefinition;
+	        var definition = (0, _lodash.find)(definitions, function (_ref2) {
+	            var metricDefinition = _ref2.metricDefinition;
 	            return (0, _lodash.get)(metricDefinition, 'identifier') === column;
 	        });
 	        var maql = (0, _lodash.get)(definition, 'metricDefinition.expression');
 
 	        if (maql) {
-	            return recursiveReplace(maql, ID_REGEXP, function (match) {
-	                var expression = idToExpr[(0, _lodash.trim)(match, '{}')];
-	                return expression.substr(SELECT_LENGTH).replace(WHERE_REGEXP, '');
-	            });
+	            return maql;
 	        }
 	        return column;
 	    });
