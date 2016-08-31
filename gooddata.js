@@ -1,7 +1,7 @@
 /* Copyright (C) 2007-2015, GoodData(R) Corporation. All rights reserved. */
-/* gooddata - v0.1.55 */
-/* 2016-08-26 09:54:12 */
-/* Latest git commit: "a4fad7d" */
+/* gooddata - v0.1.56 */
+/* 2016-08-31 15:08:13 */
+/* Latest git commit: "3cbaa6f" */
 
 
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -18738,24 +18738,28 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * <ul>
 	 * <li>dataSetIdentifier - in value is string identifier of dataSet - this leads to CUSTOM type
 	 * <li>returnAllDateDataSets - true value means to return ALL values without dataSet differentiation
+	 * <li>returnAllRelatedDateDataSets - only related date dataSets are loaded across all dataSets
 	 * <li>by default we get PRODUCTION dataSets
 	 * </ul>
 	 * @returns {Object} "requiredDataSets" object hash.
 	 */
 	var getRequiredDataSets = function getRequiredDataSets(options) {
-	    if ((0, _lodash.get)(options, 'returnAllDateDataSets')) {
-	        return {
-	            type: 'ALL'
-	        };
-	    } else if ((0, _lodash.get)(options, 'dataSetIdentifier')) {
-	        return {
-	            type: 'CUSTOM',
-	            customIdentifiers: [(0, _lodash.get)(options, 'dataSetIdentifier')]
-	        };
+	    if ((0, _lodash.get)(options, 'returnAllRelatedDateDataSets')) {
+	        return {};
 	    }
-	    return {
-	        type: 'PRODUCTION'
-	    };
+
+	    if ((0, _lodash.get)(options, 'returnAllDateDataSets')) {
+	        return { requiredDataSets: { type: 'ALL' } };
+	    }
+
+	    if ((0, _lodash.get)(options, 'dataSetIdentifier')) {
+	        return { requiredDataSets: {
+	                type: 'CUSTOM',
+	                customIdentifiers: [(0, _lodash.get)(options, 'dataSetIdentifier')]
+	            } };
+	    }
+
+	    return { requiredDataSets: { type: 'PRODUCTION' } };
 	};
 
 	function loadCatalog(projectId, request) {
@@ -18771,9 +18775,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	function loadItems(projectId) {
 	    var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 
-	    var request = (0, _lodash.omit)(_extends({}, REQUEST_DEFAULTS, options, {
-	        requiredDataSets: getRequiredDataSets(options)
-	    }), ['dataSetIdentifier', 'returnAllDateDataSets']);
+	    var request = (0, _lodash.omit)(_extends({}, REQUEST_DEFAULTS, options, getRequiredDataSets(options)), ['dataSetIdentifier', 'returnAllDateDataSets']);
 
 	    var bucketItems = (0, _lodash.get)((0, _lodash.cloneDeep)(options), 'bucketItems.buckets');
 	    if (bucketItems) {
@@ -18802,12 +18804,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	        bucketItems = bucketItemsToExecConfig(bucketItems, { removeDateItems: true });
 	    }
 
-	    var requiredDataSets = getRequiredDataSets(options);
-
-	    var request = (0, _lodash.omit)(_extends({}, LOAD_DATE_DATASET_DEFAULTS, REQUEST_DEFAULTS, options, {
-	        requiredDataSets: requiredDataSets,
+	    var request = (0, _lodash.omit)(_extends({}, LOAD_DATE_DATASET_DEFAULTS, REQUEST_DEFAULTS, options, getRequiredDataSets(options), {
 	        bucketItems: bucketItems
-	    }), ['filter', 'types', 'paging', 'dataSetIdentifier', 'returnAllDateDataSets']);
+	    }), ['filter', 'types', 'paging', 'dataSetIdentifier', 'returnAllDateDataSets', 'returnAllRelatedDateDataSets']);
 
 	    return requestDateDataSets(projectId, request);
 	}
