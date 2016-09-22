@@ -1,7 +1,7 @@
 /* Copyright (C) 2007-2015, GoodData(R) Corporation. All rights reserved. */
-/* gooddata - v0.1.56 */
-/* 2016-08-31 15:08:13 */
-/* Latest git commit: "3cbaa6f" */
+/* gooddata - v0.1.57 */
+/* 2016-09-22 14:45:21 */
+/* Latest git commit: "d0ea23b" */
 
 
 (function webpackUniversalModuleDefinition(root, factory) {
