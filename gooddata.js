@@ -1,7 +1,7 @@
 /* Copyright (C) 2007-2015, GoodData(R) Corporation. All rights reserved. */
-/* gooddata - v0.1.58 */
-/* 2016-09-29 17:37:36 */
-/* Latest git commit: "093085c" */
+/* gooddata - v0.1.59 */
+/* 2016-09-30 10:00:19 */
+/* Latest git commit: "ee7f4ec" */
 
 
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -18150,7 +18150,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 9 */
 /***/ function(module, exports, __webpack_require__) {
 
-	// Copyright (C) 2007-2016, GoodData(R) Corporation. All rights reserved.
+	// Copyright (C) 2008-2016, GoodData(R) Corporation. All rights reserved.
 	'use strict';
 
 	Object.defineProperty(exports, '__esModule', {
@@ -18698,14 +18698,44 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 	exports.mdToExecutionConfiguration = mdToExecutionConfiguration;
+	var getOriginalMetricFormats = function getOriginalMetricFormats(mdObj) {
+	    // for metrics with showPoP or measureFilters.length > 0 roundtrip for original metric format
+	    return _jquery2['default'].when.apply(undefined, (0, _lodash.map)((0, _lodash.map)((0, _lodash.get)(mdObj, 'buckets.measures'), function (_ref17) {
+	        var measure = _ref17.measure;
+	        return measure;
+	    }), function (measure) {
+	        if (measure.showPoP === true || measure.measureFilters.length > 0) {
+	            return (0, _xhr.get)(measure.objectUri).then(function (obj) {
+	                return _extends({}, measure, {
+	                    format: (0, _lodash.get)(obj, 'metric.content.format', measure.format)
+	                });
+	            });
+	        }
+
+	        /* eslint-disable new-cap */
+	        return _jquery2['default'].Deferred().resolve(measure);
+	        /* eslint-enable new-cap */
+	    }));
+	};
+
 	var getDataForVis = function getDataForVis(projectId, mdObj, settings) {
-	    var _mdToExecutionConfiguration = mdToExecutionConfiguration(mdObj);
+	    return getOriginalMetricFormats(mdObj).then(function () {
+	        for (var _len = arguments.length, measures = Array(_len), _key = 0; _key < _len; _key++) {
+	            measures[_key] = arguments[_key];
+	        }
 
-	    var columns = _mdToExecutionConfiguration.columns;
+	        mdObj.buckets.measures = (0, _lodash.map)([].concat(measures), function (measure) {
+	            return { measure: measure };
+	        });
 
-	    var executionConfiguration = _objectWithoutProperties(_mdToExecutionConfiguration, ['columns']);
+	        var _mdToExecutionConfiguration = mdToExecutionConfiguration(mdObj);
 
-	    return getData(projectId, columns, executionConfiguration, settings);
+	        var columns = _mdToExecutionConfiguration.columns;
+
+	        var executionConfiguration = _objectWithoutProperties(_mdToExecutionConfiguration, ['columns']);
+
+	        return getData(projectId, columns, executionConfiguration, settings);
+	    });
 	};
 	exports.getDataForVis = getDataForVis;
 
@@ -19020,26 +19050,22 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 13 */
 /***/ function(module, exports) {
 
-	/*!
-	 * Determine if an object is a Buffer
+	/**
+	 * Determine if an object is Buffer
 	 *
-	 * @author   Feross Aboukhadijeh <feross@feross.org> <http://feross.org>
-	 * @license  MIT
+	 * Author:   Feross Aboukhadijeh <feross@feross.org> <http://feross.org>
+	 * License:  MIT
+	 *
+	 * `npm install is-buffer`
 	 */
 
-	// The _isBuffer check is for Safari 5-7 support, because it's missing
-	// Object.prototype.constructor. Remove this eventually
 	module.exports = function (obj) {
-	  return obj != null && (isBuffer(obj) || isSlowBuffer(obj) || !!obj._isBuffer)
-	}
-
-	function isBuffer (obj) {
-	  return !!obj.constructor && typeof obj.constructor.isBuffer === 'function' && obj.constructor.isBuffer(obj)
-	}
-
-	// For Node v0.10 support. Remove this eventually.
-	function isSlowBuffer (obj) {
-	  return typeof obj.readFloatLE === 'function' && typeof obj.slice === 'function' && isBuffer(obj.slice(0, 0))
+	  return !!(obj != null &&
+	    (obj._isBuffer || // For Safari 5-7 (missing Object.prototype.constructor)
+	      (obj.constructor &&
+	      typeof obj.constructor.isBuffer === 'function' &&
+	      obj.constructor.isBuffer(obj))
+	    ))
 	}
 
 
