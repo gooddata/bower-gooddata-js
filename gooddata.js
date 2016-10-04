@@ -1,7 +1,7 @@
 /* Copyright (C) 2007-2015, GoodData(R) Corporation. All rights reserved. */
-/* gooddata - v0.1.59 */
-/* 2016-09-30 10:00:19 */
-/* Latest git commit: "ee7f4ec" */
+/* gooddata - v0.1.60 */
+/* 2016-10-04 09:30:51 */
+/* Latest git commit: "3cc120f" */
 
 
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -17486,6 +17486,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 	exports.getObjects = getObjects;
 	exports.getObjectUsing = getObjectUsing;
+	exports.getObjectUsingMany = getObjectUsingMany;
 	exports.getElementDetails = getElementDetails;
 	exports.getAttributes = getAttributes;
 	exports.getDimensions = getDimensions;
@@ -17568,7 +17569,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @param {Object} options objects with options:
 	 *        - types {Array} array of strings with object types to be included
 	 *        - nearest {Boolean} whether to include only nearest dependencies
-	 * @return {Array} entries returned by using2 resource
+	 * @return {jQuery promise} promise promise once resolved returns an array of
+	 *         entries returned by using2 resource
 	 */
 
 	function getObjectUsing(projectId, uri) {
@@ -17592,6 +17594,44 @@ return /******/ (function(modules) { // webpackBootstrap
 	        data: JSON.stringify(data)
 	    }).then(function (result) {
 	        return result.entries;
+	    });
+	}
+
+	/**
+	 * Get MD objects from using2 resource. Include only objects of given types
+	 * and take care about fetching only nearest objects if requested.
+	 *
+	 * @method getObjectUsingMany
+	 * @param {String} projectId id of the project
+	 * @param {Array} uris uris of objects for which dependencies are to be found
+	 * @param {Object} options objects with options:
+	 *        - types {Array} array of strings with object types to be included
+	 *        - nearest {Boolean} whether to include only nearest dependencies
+	 * @return {jQuery promise} promise promise once resolved returns an array of
+	 *         entries returned by using2 resource
+	 */
+
+	function getObjectUsingMany(projectId, uris) {
+	    var options = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
+	    var _options$types2 = options.types;
+	    var types = _options$types2 === undefined ? [] : _options$types2;
+	    var _options$nearest2 = options.nearest;
+	    var nearest = _options$nearest2 === undefined ? false : _options$nearest2;
+
+	    var resourceUri = '/gdc/md/' + projectId + '/using2';
+
+	    var data = {
+	        inUseMany: {
+	            uris: uris,
+	            types: types,
+	            nearest: nearest ? 1 : 0
+	        }
+	    };
+
+	    return (0, _xhr.post)(resourceUri, {
+	        data: JSON.stringify(data)
+	    }).then(function (result) {
+	        return result.useMany;
 	    });
 	}
 
@@ -19050,22 +19090,26 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 13 */
 /***/ function(module, exports) {
 
-	/**
-	 * Determine if an object is Buffer
+	/*!
+	 * Determine if an object is a Buffer
 	 *
-	 * Author:   Feross Aboukhadijeh <feross@feross.org> <http://feross.org>
-	 * License:  MIT
-	 *
-	 * `npm install is-buffer`
+	 * @author   Feross Aboukhadijeh <feross@feross.org> <http://feross.org>
+	 * @license  MIT
 	 */
 
+	// The _isBuffer check is for Safari 5-7 support, because it's missing
+	// Object.prototype.constructor. Remove this eventually
 	module.exports = function (obj) {
-	  return !!(obj != null &&
-	    (obj._isBuffer || // For Safari 5-7 (missing Object.prototype.constructor)
-	      (obj.constructor &&
-	      typeof obj.constructor.isBuffer === 'function' &&
-	      obj.constructor.isBuffer(obj))
-	    ))
+	  return obj != null && (isBuffer(obj) || isSlowBuffer(obj) || !!obj._isBuffer)
+	}
+
+	function isBuffer (obj) {
+	  return !!obj.constructor && typeof obj.constructor.isBuffer === 'function' && obj.constructor.isBuffer(obj)
+	}
+
+	// For Node v0.10 support. Remove this eventually.
+	function isSlowBuffer (obj) {
+	  return typeof obj.readFloatLE === 'function' && typeof obj.slice === 'function' && isBuffer(obj.slice(0, 0))
 	}
 
 
