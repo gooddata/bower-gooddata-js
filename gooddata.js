@@ -1,7 +1,7 @@
 /* Copyright (C) 2007-2015, GoodData(R) Corporation. All rights reserved. */
-/* gooddata - v0.1.60 */
-/* 2016-10-04 09:30:51 */
-/* Latest git commit: "3cc120f" */
+/* gooddata - v0.1.61 */
+/* 2016-10-17 10:02:37 */
+/* Latest git commit: "a68ad02" */
 
 
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -18620,7 +18620,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 	var dateFilterToWhere = function dateFilterToWhere(f) {
-	    var dateUri = (0, _lodash.get)(f, 'dateFilter.dimension') || (0, _lodash.get)(f, 'dateFilter.dataset');
+	    var dateUri = (0, _lodash.get)(f, 'dateFilter.dimension') || (0, _lodash.get)(f, 'dateFilter.dataSet') || (0, _lodash.get)(f, 'dateFilter.dataset'); // dataset with lowercase 's' is deprecated; kept here for backwards compatibility
 	    var granularity = (0, _lodash.get)(f, 'dateFilter.granularity');
 	    var between = [(0, _lodash.get)(f, 'dateFilter.from'), (0, _lodash.get)(f, 'dateFilter.to')];
 	    return _defineProperty({}, dateUri, { '$between': between, '$granularity': granularity });
