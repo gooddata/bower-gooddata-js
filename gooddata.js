@@ -1,7 +1,7 @@
 /* Copyright (C) 2007-2015, GoodData(R) Corporation. All rights reserved. */
-/* gooddata - v0.1.61 */
-/* 2016-10-17 10:02:37 */
-/* Latest git commit: "a68ad02" */
+/* gooddata - v0.1.62 */
+/* 2016-11-04 16:34:59 */
+/* Latest git commit: "82952d3" */
 
 
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -18669,16 +18669,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 	function getWhere(filters) {
-	    var attributeFilters = (0, _lodash.map)((0, _lodash.filter)(filters, function (_ref13) {
+	    var executableFilters = (0, _lodash.filter)(filters, function (_ref13) {
 	        var listAttributeFilter = _ref13.listAttributeFilter;
 	        return isAttributeFilterExecutable(listAttributeFilter);
-	    }), attributeFilterToWhere);
+	    });
+	    var attributeFilters = (0, _lodash.map)(executableFilters, attributeFilterToWhere);
 	    var dateFilters = (0, _lodash.map)((0, _lodash.filter)(filters, function (_ref14) {
 	        var dateFilter = _ref14.dateFilter;
 	        return isDateFilterExecutable(dateFilter);
 	    }), dateFilterToWhere);
 
-	    return [].concat(_toConsumableArray(attributeFilters), _toConsumableArray(dateFilters)).reduce(_lodash.assign, {});
+	    var resultDate = [].concat(_toConsumableArray(dateFilters)).reduce(_lodash.assign, {});
+	    var resultAttribute = {
+	        $and: attributeFilters
+	    };
+
+	    return _extends({}, resultDate, resultAttribute);
 	}
 
 	var sortToOrderBy = function sortToOrderBy(item) {
@@ -19090,26 +19096,22 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 13 */
 /***/ function(module, exports) {
 
-	/*!
-	 * Determine if an object is a Buffer
+	/**
+	 * Determine if an object is Buffer
 	 *
-	 * @author   Feross Aboukhadijeh <feross@feross.org> <http://feross.org>
-	 * @license  MIT
+	 * Author:   Feross Aboukhadijeh <feross@feross.org> <http://feross.org>
+	 * License:  MIT
+	 *
+	 * `npm install is-buffer`
 	 */
 
-	// The _isBuffer check is for Safari 5-7 support, because it's missing
-	// Object.prototype.constructor. Remove this eventually
 	module.exports = function (obj) {
-	  return obj != null && (isBuffer(obj) || isSlowBuffer(obj) || !!obj._isBuffer)
-	}
-
-	function isBuffer (obj) {
-	  return !!obj.constructor && typeof obj.constructor.isBuffer === 'function' && obj.constructor.isBuffer(obj)
-	}
-
-	// For Node v0.10 support. Remove this eventually.
-	function isSlowBuffer (obj) {
-	  return typeof obj.readFloatLE === 'function' && typeof obj.slice === 'function' && isBuffer(obj.slice(0, 0))
+	  return !!(obj != null &&
+	    (obj._isBuffer || // For Safari 5-7 (missing Object.prototype.constructor)
+	      (obj.constructor &&
+	      typeof obj.constructor.isBuffer === 'function' &&
+	      obj.constructor.isBuffer(obj))
+	    ))
 	}
 
 
