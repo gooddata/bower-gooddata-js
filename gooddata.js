@@ -1,7 +1,7 @@
 /* Copyright (C) 2007-2015, GoodData(R) Corporation. All rights reserved. */
-/* gooddata - v0.1.63 */
-/* 2016-11-10 14:47:35 */
-/* Latest git commit: "ec12489" */
+/* gooddata - v1.0.0 */
+/* 2016-11-10 15:15:51 */
+/* Latest git commit: "86ecb86" */
 
 
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -19139,7 +19139,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: true
 	});
 
-	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; // Copyright (C) 2007-2014, GoodData(R) Corporation. All rights reserved.
+	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; }; // Copyright (C) 2007-2014, GoodData(R) Corporation. All rights reserved.
 
 
 	exports.getObjects = getObjects;
@@ -19953,9 +19953,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var maxLength = MAX_TITLE_LENGTH - suffix.length;
 	    if (title && title.length > maxLength) {
 	        if (title[title.length - 1] === ')') {
-	            return title.substring(0, maxLength - 2) + '\u2026)' + suffix;
+	            return title.substring(0, maxLength - 2) + '…)' + suffix;
 	        }
-	        return title.substring(0, maxLength - 1) + '\u2026' + suffix;
+	        return title.substring(0, maxLength - 1) + '…' + suffix;
 	    }
 	    return '' + title + suffix;
 	};
