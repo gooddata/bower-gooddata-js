@@ -1,19 +1,19 @@
 /* Copyright (C) 2007-2015, GoodData(R) Corporation. All rights reserved. */
-/* gooddata - v0.1.62 */
-/* 2016-11-04 16:34:59 */
-/* Latest git commit: "82952d3" */
+/* gooddata - v0.1.63 */
+/* 2016-11-10 14:47:35 */
+/* Latest git commit: "ec12489" */
 
 
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
-		module.exports = factory(require("jquery"));
+		module.exports = factory();
 	else if(typeof define === 'function' && define.amd)
-		define(["jquery"], factory);
+		define([], factory);
 	else if(typeof exports === 'object')
-		exports["gooddata"] = factory(require("jquery"));
+		exports["gooddata"] = factory();
 	else
-		root["gooddata"] = factory(root["jQuery"]);
-})(this, function(__WEBPACK_EXTERNAL_MODULE_2__) {
+		root["gooddata"] = factory();
+})(this, function() {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -60,42 +60,41 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
-	// Copyright (C) 2007-2014, GoodData(R) Corporation. All rights reserved.
 	'use strict';
 
-	Object.defineProperty(exports, '__esModule', {
+	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-
-	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj['default'] = obj; return newObj; } }
 
 	var _xhr = __webpack_require__(1);
 
 	var xhr = _interopRequireWildcard(_xhr);
 
-	var _user = __webpack_require__(6);
+	var _user = __webpack_require__(12);
 
 	var user = _interopRequireWildcard(_user);
 
-	var _metadata = __webpack_require__(7);
+	var _metadata = __webpack_require__(13);
 
 	var md = _interopRequireWildcard(_metadata);
 
-	var _execution = __webpack_require__(9);
+	var _execution = __webpack_require__(15);
 
 	var execution = _interopRequireWildcard(_execution);
 
-	var _project = __webpack_require__(18);
+	var _project = __webpack_require__(23);
 
 	var project = _interopRequireWildcard(_project);
 
-	var _config = __webpack_require__(3);
+	var _config = __webpack_require__(9);
 
 	var config = _interopRequireWildcard(_config);
 
-	var _catalogue = __webpack_require__(19);
+	var _catalogue = __webpack_require__(24);
 
 	var catalogue = _interopRequireWildcard(_catalogue);
+
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 	/**
 	 * # JS SDK
@@ -103,10 +102,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Before calling any of those functions, you need to authenticate with a valid GoodData
 	 * user credentials. After that, every subsequent call in the current session is authenticated.
 	 * You can find more about the GD authentication mechanism here.
-	 *
-	 * ## Conventions and Dependencies
-	 * * Depends on [jQuery JavaScript library](http://jquery.com/) javascript library
-	 * * Each SDK function returns [jQuery Deferred promise](http://api.jquery.com/deferred.promise/)
 	 *
 	 * ## GD Authentication Mechansim
 	 * In this JS SDK library we provide you with a simple `login(username, passwd)` function
@@ -118,36 +113,33 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @module sdk
 	 * @class sdk
 	 */
-	exports['default'] = { config: config, xhr: xhr, user: user, md: md, execution: execution, project: project, catalogue: catalogue };
-	module.exports = exports['default'];
+	var gooddata = { config: config, xhr: xhr, user: user, md: md, execution: execution, project: project, catalogue: catalogue }; // Copyright (C) 2007-2014, GoodData(R) Corporation. All rights reserved.
+	exports.default = gooddata;
+
+	module.exports = gooddata;
 
 /***/ },
 /* 1 */
 /***/ function(module, exports, __webpack_require__) {
 
-	// Copyright (C) 2007-2013, GoodData(R) Corporation. All rights reserved.
-	/*eslint no-use-before-define: [2, "nofunc"]*/
-	'use strict';
+	/* WEBPACK VAR INJECTION */(function(fetch, Promise) {'use strict';
 
-	Object.defineProperty(exports, '__esModule', {
+	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
+	exports.put = exports.post = exports.get = exports.parseJSON = undefined;
 	exports.ajaxSetup = ajaxSetup;
 	exports.ajax = ajax;
 
-	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj['default'] = obj; return newObj; } }
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-
-	var _jquery = __webpack_require__(2);
-
-	var _jquery2 = _interopRequireDefault(_jquery);
-
-	var _config = __webpack_require__(3);
+	var _config = __webpack_require__(9);
 
 	var config = _interopRequireWildcard(_config);
 
-	var _lodash = __webpack_require__(4);
+	var _lodash = __webpack_require__(10);
+
+	__webpack_require__(11);
+
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 	/**
 	 * Ajax wrapper around GDC authentication mechanisms, SST and TT token handling and polling.
@@ -160,177 +152,202 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @module xhr
 	 * @class xhr
 	 */
-	var tokenRequest = undefined;
-	var xhrSettings = undefined; // TODO rename xhrSettings - "defaultXhrSettings?"
 
-	function enrichSettingWithCustomDomain(settings, domain) {
+	var DEFAULT_POLL_DELAY = 1000; // Copyright (C) 2007-2013, GoodData(R) Corporation. All rights reserved.
+	/*eslint block-scoped-var:0 no-use-before-define: [2, "nofunc"]*/ // TODO enable block-scoped-vars
+
+
+	var tokenRequest = void 0;
+	var commonXhrSettings = {};
+
+	/**
+	 * Back compatible method for setting common XHR settings
+	 *
+	 * Usually in our apps we used beforeSend ajax callback to set the X-GDC-REQUEST header with unique ID.
+	 *
+	 * @param settings object XHR settings as
+	 */
+	function ajaxSetup(settings) {
+	    commonXhrSettings = Object.assign({}, commonXhrSettings, settings);
+	}
+
+	function simulateBeforeSend(settings) {
+	    var xhr = {
+	        setRequestHeader: function setRequestHeader(key, value) {
+	            settings.headers.set(key, value);
+	        }
+	    };
+
+	    if ((0, _lodash.isFunction)(settings.beforeSend)) {
+	        settings.beforeSend(xhr);
+	    }
+	}
+
+	function enrichSettingWithCustomDomain(originalUrl, settings, domain) {
+	    var url = originalUrl;
 	    if (domain) {
 	        // protect url to be prepended with domain on retry
-	        if (settings.url.indexOf(domain) === -1) {
-	            settings.url = domain + settings.url;
+	        if (originalUrl.indexOf(domain) === -1) {
+	            url = domain + originalUrl;
 	        }
-	        settings.xhrFields = settings.xhrFields || {};
-	        settings.xhrFields.withCredentials = true;
+	        settings.mode = 'cors';
+	        settings.credentials = 'include';
+	    }
+
+	    return { url: url, settings: settings };
+	}
+
+	function continueAfterTokenRequest(url, settings) {
+	    return tokenRequest.then(function (response) {
+	        if (!response.ok) {
+	            var err = new Error('Unauthorized');
+	            err.response = response;
+	            throw err;
+	        }
+	        tokenRequest = null;
+
+	        return ajax(url, settings);
+	    }, function (reason) {
+	        tokenRequest = null;
+	        return reason;
+	    });
+	}
+
+	function handleUnauthorized(originalUrl, originalSettings) {
+	    if (!tokenRequest) {
+	        // Create only single token request for any number of waiting request.
+	        // If token request exist, just listen for it's end.
+	        var _enrichSettingWithCus = enrichSettingWithCustomDomain('/gdc/account/token', createSettings({}), config.domain),
+	            url = _enrichSettingWithCus.url,
+	            settings = _enrichSettingWithCus.settings;
+
+	        tokenRequest = fetch(url, settings).then(function (response) {
+	            // tokenRequest = null;
+	            // TODO jquery compat - allow to attach unauthorized callback and call it if attached
+	            // if ((xhrObj.status === 401) && (isFunction(req.unauthorized))) {
+	            //     req.unauthorized(xhrObj, textStatus, err, deferred);
+	            //     return;
+	            // }
+	            // unauthorized handler is not defined or not http 401
+	            // unauthorized when retrieving token -> not logged
+	            if (response.status === 401) {
+	                var err = new Error('Unauthorized');
+	                err.response = response;
+	                throw err;
+	            }
+
+	            return response;
+	        });
+	    }
+	    return continueAfterTokenRequest(originalUrl, originalSettings);
+	}
+
+	function isLoginRequest(url) {
+	    return url.indexOf('/gdc/account/login') !== -1;
+	}
+
+	/**
+	 * @param {Response} response
+	 * @return {Promise} promise which resolves to result JSON ()
+	 */
+	var parseJSON = exports.parseJSON = function parseJSON(response) {
+	    return response.json();
+	};
+
+	/**
+	 * @param {Response} response see https://developer.mozilla.org/en-US/docs/Web/API/Response
+	 * @return {Response} or {Error}
+	 */
+	var checkStatus = function checkStatus(response) {
+	    if (response.status >= 200 && response.status < 399) {
+	        return response;
+	    }
+
+	    if (response instanceof Error && (0, _lodash.has)(response, 'response')) {
+	        throw response;
+	    }
+
+	    var error = new Error(response.statusText);
+	    error.response = response;
+	    throw error;
+	};
+
+	function ajax(originalUrl) {
+	    var tempSettings = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+	    var firstSettings = createSettings(tempSettings);
+
+	    var _enrichSettingWithCus2 = enrichSettingWithCustomDomain(originalUrl, firstSettings, config.domain),
+	        url = _enrichSettingWithCus2.url,
+	        settings = _enrichSettingWithCus2.settings;
+
+	    simulateBeforeSend(settings);
+
+	    if (tokenRequest) {
+	        return continueAfterTokenRequest(url, settings);
+	    }
+
+	    return fetch(url, settings).then(function (response) {
+	        // If response.status id 401 and it was a login request there is no need
+	        // to cycle back for token - login does not need token and this meand you
+	        // are not authorized
+	        if (response.status === 401) {
+	            if (isLoginRequest(url)) {
+	                var err = new Error('Unauthorized');
+	                err.response = response;
+	                throw err;
+	            }
+
+	            return handleUnauthorized(url, settings);
+	        }
+
+	        if (response.status === 202 && !settings.dontPollOnResult) {
+	            // if the response is 202 and Location header is not empty, let's poll on the new Location
+	            var finalUrl = url;
+	            var finalSettings = settings;
+	            if (response.headers.has('Location')) {
+	                finalUrl = response.headers.get('Location');
+	            }
+	            finalSettings.method = 'GET';
+	            delete finalSettings.data;
+	            delete finalSettings.body;
+	            return handlePolling(finalUrl, finalSettings);
+	        }
+	        return response;
+	    }).then(checkStatus);
+	}
+
+	function createSettings(customSettings) {
+	    var headers = new Headers({
+	        'Accept': 'application/json; charset=utf-8',
+	        'Content-Type': 'application/json'
+	    });
+
+	    var settings = Object.assign({}, commonXhrSettings, customSettings);
+
+	    settings.pollDelay = settings.pollDelay !== undefined ? settings.pollDelay : DEFAULT_POLL_DELAY;
+
+	    settings.headers = headers;
+
+	    // TODO jquery compat - add to warnings
+	    settings.body = settings.data ? settings.data : settings.body;
+	    settings.mode = 'same-origin';
+	    settings.credentials = 'same-origin';
+
+	    if ((0, _lodash.isPlainObject)(settings.body)) {
+	        settings.body = JSON.stringify(settings.body);
 	    }
 
 	    return settings;
 	}
 
-	function retryAjaxRequest(req, deferred) {
-	    // still use our extended ajax, because is still possible to fail recoverably in again
-	    // e.g. request -> 401 -> token renewal -> retry request -> 202 (polling) -> retry again after delay
-	    /*eslint-disable block-scoped-var*/ // we don't want to declare all functions inside ajax's fn scope
-	    ajax(req).done(function ajaxDone(data, textStatus, xhrObj) {
-	        deferred.resolve(data, textStatus, xhrObj);
-	    }).fail(function ajaxFail(xhrObj, textStatus, err) {
-	        deferred.reject(xhrObj, textStatus, err);
-	    });
-	    /*eslint-enable block-scoped-var*/
-	}
-
-	function continueAfterTokenRequest(req, deferred) {
-	    tokenRequest.done(function tokenRequestDone() {
-	        retryAjaxRequest(req, deferred);
-	    }).fail(function tokenRequestFail(xhrObj, textStatus, err) {
-	        if (xhrObj.status !== 401) {
-	            deferred.reject(xhrObj, textStatus, err);
-	        }
+	function handlePolling(url, settings) {
+	    return new Promise(function (resolve, reject) {
+	        setTimeout(function poller() {
+	            ajax(url, settings).then(resolve, reject);
+	        }, settings.pollDelay);
 	    });
 	}
-
-	function handleUnauthorized(req, deferred) {
-	    if (!tokenRequest) {
-	        // Create only single token request for any number of waiting request.
-	        // If token request exist, just listen for it's end.
-	        tokenRequest = _jquery2['default'].ajax(enrichSettingWithCustomDomain({ url: '/gdc/account/token/' }, config.domain)).always(function alwayCb() {
-	            tokenRequest = null;
-	        }).fail(function failTokenRequest(xhrObj, textStatus, err) {
-	            // unauthorized when retrieving token -> not logged
-	            if (xhrObj.status === 401 && (0, _lodash.isFunction)(req.unauthorized)) {
-	                req.unauthorized(xhrObj, textStatus, err, deferred);
-	                return;
-	            }
-	            // unauthorized handler is not defined or not http 401
-	            deferred.reject(xhrObj, textStatus, err);
-	        });
-	    }
-	    continueAfterTokenRequest(req, deferred);
-	}
-
-	function handlePolling(req, deferred) {
-	    var pollingDelay = (0, _lodash.result)(req, 'pollDelay');
-
-	    setTimeout(function poller() {
-	        retryAjaxRequest(req, deferred);
-	    }, pollingDelay);
-	}
-
-	// helper to coverts traditional ajax callbacks to deferred
-	function reattachCallbackOnDeferred(settings, property, defferAttach) {
-	    var callback = settings[property];
-	    delete settings[property];
-	    if ((0, _lodash.isFunction)(callback)) {
-	        defferAttach(callback);
-	    }
-	    if ((0, _lodash.isArray)(callback)) {
-	        callback.forEach(function loopCallbacks(fn) {
-	            if ((0, _lodash.isFunction)(callback)) {
-	                defferAttach(fn);
-	            }
-	        });
-	    }
-	}
-
-	/**
-	 * additional ajax configuration specific for xhr module, keys
-	 *   unauthorized: function(xhr) - called when user is unauthorized and token renewal failed
-	 *   pollDelay: int - polling interval in milliseconds, default 1000 - or generator function
-
-	 * method also accepts any option from original $.ajaxSetup. Options will be applied to all call of xhr.ajax().
-
-	 * xhrSetup behave similar tp $.ajaxSetup, each call replaces settings completely.
-	 * Options can be also passed to particular xhr.ajax calls (same as optios for $.ajax and $.ajaxSetup)
-	 * @method ajaxSetup
-	 */
-
-	function ajaxSetup(settings) {
-	    xhrSettings = (0, _lodash.merge)({
-	        contentType: 'application/json',
-	        dataType: 'json',
-	        pollDelay: 1000,
-	        headers: {
-	            'Accept': 'application/json; charset=utf-8'
-	        }
-	    }, settings);
-	}
-
-	/**
-	 * Same api as jQuery.ajax - arguments (url, settings) or (settings) with url inside
-	 * Additionally content type is automatically json, and object in settings.data is converted to string
-	 * to be consumed by GDC backend.
-
-	 * settings additionally accepts keys: unauthorized, pollDelay (see xhrSetup for more details)
-	 * @method ajax
-	 * @param url request url
-	 * @param settings settings object
-	 */
-
-	function ajax(url, settings) {
-	    var finalSettings = undefined;
-	    var finalUrl = undefined;
-	    if ((0, _lodash.isPlainObject)(url)) {
-	        finalSettings = url;
-	        finalUrl = undefined;
-	    } else {
-	        finalUrl = url;
-	        finalSettings = settings;
-	    }
-	    // copy settings to not modify passed object
-	    // settings can be undefined, doesn't matter, $.extend handle it
-	    finalSettings = (0, _lodash.merge)({}, xhrSettings, finalSettings);
-	    if (finalUrl) {
-	        finalSettings.url = finalUrl;
-	    }
-
-	    if ((0, _lodash.isPlainObject)(finalSettings.data)) {
-	        finalSettings.data = JSON.stringify(finalSettings.data);
-	    }
-
-	    /*eslint-disable new-cap*/
-	    var d = _jquery2['default'].Deferred();
-	    /*eslint-enable new-cap*/
-	    reattachCallbackOnDeferred(finalSettings, 'success', d.done);
-	    reattachCallbackOnDeferred(finalSettings, 'error', d.fail);
-	    reattachCallbackOnDeferred(finalSettings, 'complete', d.always);
-
-	    if (tokenRequest) {
-	        continueAfterTokenRequest(finalSettings, d);
-	        return d;
-	    }
-
-	    _jquery2['default'].ajax(enrichSettingWithCustomDomain(finalSettings, config.domain)).fail(function jqAjaxFail(xhrObj, textStatus, err) {
-	        if (xhrObj.status === 401) {
-	            handleUnauthorized(finalSettings, d);
-	        } else {
-	            d.reject(xhrObj, textStatus, err);
-	        }
-	    }).done(function jqAjaxDone(data, textStatus, xhrObj) {
-	        if (xhrObj.status === 202 && !finalSettings.dontPollOnResult) {
-	            // if the response is 202 and Location header is not empty, let's poll on the new Location
-	            var _location = xhrObj.getResponseHeader('Location');
-	            if (_location) {
-	                finalSettings.url = _location;
-	            }
-	            finalSettings.method = 'GET';
-	            delete finalSettings.data;
-	            handlePolling(finalSettings, d);
-	        } else {
-	            d.resolve(data, textStatus, xhrObj);
-	        }
-	    });
-	    return d;
-	}
-
 	function xhrMethod(method) {
 	    return function methodFn(url, settings) {
 	        var opts = (0, _lodash.merge)({ method: method }, settings);
@@ -343,36 +360,1691 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Wrapper for xhr.ajax method GET
 	 * @method get
 	 */
-	var get = xhrMethod('GET');
+	var get = exports.get = function get(url, settings) {
+	    var opts = (0, _lodash.merge)({ method: 'GET' }, settings);
 
-	exports.get = get;
+	    return ajax(url, opts).then(parseJSON);
+	};
+
 	/**
 	 * Wrapper for xhr.ajax method POST
 	 * @method post
 	 */
-	var post = xhrMethod('POST');
+	var post = exports.post = xhrMethod('POST');
 
-	exports.post = post;
 	/**
 	 * Wrapper for xhr.ajax method PUT
 	 * @method put
 	 */
-	var put = xhrMethod('PUT');
-
-	exports.put = put;
-	// setup default settings
-	ajaxSetup({});
+	var put = exports.put = xhrMethod('PUT');
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2), __webpack_require__(4)))
 
 /***/ },
 /* 2 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
-	module.exports = __WEBPACK_EXTERNAL_MODULE_2__;
+	/* WEBPACK VAR INJECTION */(function(global) {/*** IMPORTS FROM imports-loader ***/
+	(function() {
+
+	// the whatwg-fetch polyfill installs the fetch() function
+	// on the global object (window or self)
+	//
+	// Return that as the export for use in Webpack, Browserify etc.
+	__webpack_require__(3);
+	module.exports = self.fetch.bind(self);
+
+
+	/*** EXPORTS FROM exports-loader ***/
+	module.exports = global.fetch
+	}.call(global));
+	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
 /* 3 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(Promise) {(function(self) {
+	  'use strict';
+
+	  if (self.fetch) {
+	    return
+	  }
+
+	  var support = {
+	    searchParams: 'URLSearchParams' in self,
+	    iterable: 'Symbol' in self && 'iterator' in Symbol,
+	    blob: 'FileReader' in self && 'Blob' in self && (function() {
+	      try {
+	        new Blob()
+	        return true
+	      } catch(e) {
+	        return false
+	      }
+	    })(),
+	    formData: 'FormData' in self,
+	    arrayBuffer: 'ArrayBuffer' in self
+	  }
+
+	  function normalizeName(name) {
+	    if (typeof name !== 'string') {
+	      name = String(name)
+	    }
+	    if (/[^a-z0-9\-#$%&'*+.\^_`|~]/i.test(name)) {
+	      throw new TypeError('Invalid character in header field name')
+	    }
+	    return name.toLowerCase()
+	  }
+
+	  function normalizeValue(value) {
+	    if (typeof value !== 'string') {
+	      value = String(value)
+	    }
+	    return value
+	  }
+
+	  // Build a destructive iterator for the value list
+	  function iteratorFor(items) {
+	    var iterator = {
+	      next: function() {
+	        var value = items.shift()
+	        return {done: value === undefined, value: value}
+	      }
+	    }
+
+	    if (support.iterable) {
+	      iterator[Symbol.iterator] = function() {
+	        return iterator
+	      }
+	    }
+
+	    return iterator
+	  }
+
+	  function Headers(headers) {
+	    this.map = {}
+
+	    if (headers instanceof Headers) {
+	      headers.forEach(function(value, name) {
+	        this.append(name, value)
+	      }, this)
+
+	    } else if (headers) {
+	      Object.getOwnPropertyNames(headers).forEach(function(name) {
+	        this.append(name, headers[name])
+	      }, this)
+	    }
+	  }
+
+	  Headers.prototype.append = function(name, value) {
+	    name = normalizeName(name)
+	    value = normalizeValue(value)
+	    var list = this.map[name]
+	    if (!list) {
+	      list = []
+	      this.map[name] = list
+	    }
+	    list.push(value)
+	  }
+
+	  Headers.prototype['delete'] = function(name) {
+	    delete this.map[normalizeName(name)]
+	  }
+
+	  Headers.prototype.get = function(name) {
+	    var values = this.map[normalizeName(name)]
+	    return values ? values[0] : null
+	  }
+
+	  Headers.prototype.getAll = function(name) {
+	    return this.map[normalizeName(name)] || []
+	  }
+
+	  Headers.prototype.has = function(name) {
+	    return this.map.hasOwnProperty(normalizeName(name))
+	  }
+
+	  Headers.prototype.set = function(name, value) {
+	    this.map[normalizeName(name)] = [normalizeValue(value)]
+	  }
+
+	  Headers.prototype.forEach = function(callback, thisArg) {
+	    Object.getOwnPropertyNames(this.map).forEach(function(name) {
+	      this.map[name].forEach(function(value) {
+	        callback.call(thisArg, value, name, this)
+	      }, this)
+	    }, this)
+	  }
+
+	  Headers.prototype.keys = function() {
+	    var items = []
+	    this.forEach(function(value, name) { items.push(name) })
+	    return iteratorFor(items)
+	  }
+
+	  Headers.prototype.values = function() {
+	    var items = []
+	    this.forEach(function(value) { items.push(value) })
+	    return iteratorFor(items)
+	  }
+
+	  Headers.prototype.entries = function() {
+	    var items = []
+	    this.forEach(function(value, name) { items.push([name, value]) })
+	    return iteratorFor(items)
+	  }
+
+	  if (support.iterable) {
+	    Headers.prototype[Symbol.iterator] = Headers.prototype.entries
+	  }
+
+	  function consumed(body) {
+	    if (body.bodyUsed) {
+	      return Promise.reject(new TypeError('Already read'))
+	    }
+	    body.bodyUsed = true
+	  }
+
+	  function fileReaderReady(reader) {
+	    return new Promise(function(resolve, reject) {
+	      reader.onload = function() {
+	        resolve(reader.result)
+	      }
+	      reader.onerror = function() {
+	        reject(reader.error)
+	      }
+	    })
+	  }
+
+	  function readBlobAsArrayBuffer(blob) {
+	    var reader = new FileReader()
+	    reader.readAsArrayBuffer(blob)
+	    return fileReaderReady(reader)
+	  }
+
+	  function readBlobAsText(blob) {
+	    var reader = new FileReader()
+	    reader.readAsText(blob)
+	    return fileReaderReady(reader)
+	  }
+
+	  function Body() {
+	    this.bodyUsed = false
+
+	    this._initBody = function(body) {
+	      this._bodyInit = body
+	      if (typeof body === 'string') {
+	        this._bodyText = body
+	      } else if (support.blob && Blob.prototype.isPrototypeOf(body)) {
+	        this._bodyBlob = body
+	      } else if (support.formData && FormData.prototype.isPrototypeOf(body)) {
+	        this._bodyFormData = body
+	      } else if (support.searchParams && URLSearchParams.prototype.isPrototypeOf(body)) {
+	        this._bodyText = body.toString()
+	      } else if (!body) {
+	        this._bodyText = ''
+	      } else if (support.arrayBuffer && ArrayBuffer.prototype.isPrototypeOf(body)) {
+	        // Only support ArrayBuffers for POST method.
+	        // Receiving ArrayBuffers happens via Blobs, instead.
+	      } else {
+	        throw new Error('unsupported BodyInit type')
+	      }
+
+	      if (!this.headers.get('content-type')) {
+	        if (typeof body === 'string') {
+	          this.headers.set('content-type', 'text/plain;charset=UTF-8')
+	        } else if (this._bodyBlob && this._bodyBlob.type) {
+	          this.headers.set('content-type', this._bodyBlob.type)
+	        } else if (support.searchParams && URLSearchParams.prototype.isPrototypeOf(body)) {
+	          this.headers.set('content-type', 'application/x-www-form-urlencoded;charset=UTF-8')
+	        }
+	      }
+	    }
+
+	    if (support.blob) {
+	      this.blob = function() {
+	        var rejected = consumed(this)
+	        if (rejected) {
+	          return rejected
+	        }
+
+	        if (this._bodyBlob) {
+	          return Promise.resolve(this._bodyBlob)
+	        } else if (this._bodyFormData) {
+	          throw new Error('could not read FormData body as blob')
+	        } else {
+	          return Promise.resolve(new Blob([this._bodyText]))
+	        }
+	      }
+
+	      this.arrayBuffer = function() {
+	        return this.blob().then(readBlobAsArrayBuffer)
+	      }
+
+	      this.text = function() {
+	        var rejected = consumed(this)
+	        if (rejected) {
+	          return rejected
+	        }
+
+	        if (this._bodyBlob) {
+	          return readBlobAsText(this._bodyBlob)
+	        } else if (this._bodyFormData) {
+	          throw new Error('could not read FormData body as text')
+	        } else {
+	          return Promise.resolve(this._bodyText)
+	        }
+	      }
+	    } else {
+	      this.text = function() {
+	        var rejected = consumed(this)
+	        return rejected ? rejected : Promise.resolve(this._bodyText)
+	      }
+	    }
+
+	    if (support.formData) {
+	      this.formData = function() {
+	        return this.text().then(decode)
+	      }
+	    }
+
+	    this.json = function() {
+	      return this.text().then(JSON.parse)
+	    }
+
+	    return this
+	  }
+
+	  // HTTP methods whose capitalization should be normalized
+	  var methods = ['DELETE', 'GET', 'HEAD', 'OPTIONS', 'POST', 'PUT']
+
+	  function normalizeMethod(method) {
+	    var upcased = method.toUpperCase()
+	    return (methods.indexOf(upcased) > -1) ? upcased : method
+	  }
+
+	  function Request(input, options) {
+	    options = options || {}
+	    var body = options.body
+	    if (Request.prototype.isPrototypeOf(input)) {
+	      if (input.bodyUsed) {
+	        throw new TypeError('Already read')
+	      }
+	      this.url = input.url
+	      this.credentials = input.credentials
+	      if (!options.headers) {
+	        this.headers = new Headers(input.headers)
+	      }
+	      this.method = input.method
+	      this.mode = input.mode
+	      if (!body) {
+	        body = input._bodyInit
+	        input.bodyUsed = true
+	      }
+	    } else {
+	      this.url = input
+	    }
+
+	    this.credentials = options.credentials || this.credentials || 'omit'
+	    if (options.headers || !this.headers) {
+	      this.headers = new Headers(options.headers)
+	    }
+	    this.method = normalizeMethod(options.method || this.method || 'GET')
+	    this.mode = options.mode || this.mode || null
+	    this.referrer = null
+
+	    if ((this.method === 'GET' || this.method === 'HEAD') && body) {
+	      throw new TypeError('Body not allowed for GET or HEAD requests')
+	    }
+	    this._initBody(body)
+	  }
+
+	  Request.prototype.clone = function() {
+	    return new Request(this)
+	  }
+
+	  function decode(body) {
+	    var form = new FormData()
+	    body.trim().split('&').forEach(function(bytes) {
+	      if (bytes) {
+	        var split = bytes.split('=')
+	        var name = split.shift().replace(/\+/g, ' ')
+	        var value = split.join('=').replace(/\+/g, ' ')
+	        form.append(decodeURIComponent(name), decodeURIComponent(value))
+	      }
+	    })
+	    return form
+	  }
+
+	  function headers(xhr) {
+	    var head = new Headers()
+	    var pairs = (xhr.getAllResponseHeaders() || '').trim().split('\n')
+	    pairs.forEach(function(header) {
+	      var split = header.trim().split(':')
+	      var key = split.shift().trim()
+	      var value = split.join(':').trim()
+	      head.append(key, value)
+	    })
+	    return head
+	  }
+
+	  Body.call(Request.prototype)
+
+	  function Response(bodyInit, options) {
+	    if (!options) {
+	      options = {}
+	    }
+
+	    this.type = 'default'
+	    this.status = options.status
+	    this.ok = this.status >= 200 && this.status < 300
+	    this.statusText = options.statusText
+	    this.headers = options.headers instanceof Headers ? options.headers : new Headers(options.headers)
+	    this.url = options.url || ''
+	    this._initBody(bodyInit)
+	  }
+
+	  Body.call(Response.prototype)
+
+	  Response.prototype.clone = function() {
+	    return new Response(this._bodyInit, {
+	      status: this.status,
+	      statusText: this.statusText,
+	      headers: new Headers(this.headers),
+	      url: this.url
+	    })
+	  }
+
+	  Response.error = function() {
+	    var response = new Response(null, {status: 0, statusText: ''})
+	    response.type = 'error'
+	    return response
+	  }
+
+	  var redirectStatuses = [301, 302, 303, 307, 308]
+
+	  Response.redirect = function(url, status) {
+	    if (redirectStatuses.indexOf(status) === -1) {
+	      throw new RangeError('Invalid status code')
+	    }
+
+	    return new Response(null, {status: status, headers: {location: url}})
+	  }
+
+	  self.Headers = Headers
+	  self.Request = Request
+	  self.Response = Response
+
+	  self.fetch = function(input, init) {
+	    return new Promise(function(resolve, reject) {
+	      var request
+	      if (Request.prototype.isPrototypeOf(input) && !init) {
+	        request = input
+	      } else {
+	        request = new Request(input, init)
+	      }
+
+	      var xhr = new XMLHttpRequest()
+
+	      function responseURL() {
+	        if ('responseURL' in xhr) {
+	          return xhr.responseURL
+	        }
+
+	        // Avoid security warnings on getResponseHeader when not allowed by CORS
+	        if (/^X-Request-URL:/m.test(xhr.getAllResponseHeaders())) {
+	          return xhr.getResponseHeader('X-Request-URL')
+	        }
+
+	        return
+	      }
+
+	      xhr.onload = function() {
+	        var options = {
+	          status: xhr.status,
+	          statusText: xhr.statusText,
+	          headers: headers(xhr),
+	          url: responseURL()
+	        }
+	        var body = 'response' in xhr ? xhr.response : xhr.responseText
+	        resolve(new Response(body, options))
+	      }
+
+	      xhr.onerror = function() {
+	        reject(new TypeError('Network request failed'))
+	      }
+
+	      xhr.ontimeout = function() {
+	        reject(new TypeError('Network request failed'))
+	      }
+
+	      xhr.open(request.method, request.url, true)
+
+	      if (request.credentials === 'include') {
+	        xhr.withCredentials = true
+	      }
+
+	      if ('responseType' in xhr && support.blob) {
+	        xhr.responseType = 'blob'
+	      }
+
+	      request.headers.forEach(function(value, name) {
+	        xhr.setRequestHeader(name, value)
+	      })
+
+	      xhr.send(typeof request._bodyInit === 'undefined' ? null : request._bodyInit)
+	    })
+	  }
+	  self.fetch.polyfill = true
+	})(typeof self !== 'undefined' ? self : this);
+
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)))
+
+/***/ },
+/* 4 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var require;var __WEBPACK_AMD_DEFINE_RESULT__;/* WEBPACK VAR INJECTION */(function(process, global, module) {/*** IMPORTS FROM imports-loader ***/
+	(function() {
+
+	/*!
+	 * @overview es6-promise - a tiny implementation of Promises/A+.
+	 * @copyright Copyright (c) 2014 Yehuda Katz, Tom Dale, Stefan Penner and contributors (Conversion to ES6 API by Jake Archibald)
+	 * @license   Licensed under MIT license
+	 *            See https://raw.githubusercontent.com/jakearchibald/es6-promise/master/LICENSE
+	 * @version   3.0.2
+	 */
+
+	(function() {
+	    "use strict";
+	    function lib$es6$promise$utils$$objectOrFunction(x) {
+	      return typeof x === 'function' || (typeof x === 'object' && x !== null);
+	    }
+
+	    function lib$es6$promise$utils$$isFunction(x) {
+	      return typeof x === 'function';
+	    }
+
+	    function lib$es6$promise$utils$$isMaybeThenable(x) {
+	      return typeof x === 'object' && x !== null;
+	    }
+
+	    var lib$es6$promise$utils$$_isArray;
+	    if (!Array.isArray) {
+	      lib$es6$promise$utils$$_isArray = function (x) {
+	        return Object.prototype.toString.call(x) === '[object Array]';
+	      };
+	    } else {
+	      lib$es6$promise$utils$$_isArray = Array.isArray;
+	    }
+
+	    var lib$es6$promise$utils$$isArray = lib$es6$promise$utils$$_isArray;
+	    var lib$es6$promise$asap$$len = 0;
+	    var lib$es6$promise$asap$$toString = {}.toString;
+	    var lib$es6$promise$asap$$vertxNext;
+	    var lib$es6$promise$asap$$customSchedulerFn;
+
+	    var lib$es6$promise$asap$$asap = function asap(callback, arg) {
+	      lib$es6$promise$asap$$queue[lib$es6$promise$asap$$len] = callback;
+	      lib$es6$promise$asap$$queue[lib$es6$promise$asap$$len + 1] = arg;
+	      lib$es6$promise$asap$$len += 2;
+	      if (lib$es6$promise$asap$$len === 2) {
+	        // If len is 2, that means that we need to schedule an async flush.
+	        // If additional callbacks are queued before the queue is flushed, they
+	        // will be processed by this flush that we are scheduling.
+	        if (lib$es6$promise$asap$$customSchedulerFn) {
+	          lib$es6$promise$asap$$customSchedulerFn(lib$es6$promise$asap$$flush);
+	        } else {
+	          lib$es6$promise$asap$$scheduleFlush();
+	        }
+	      }
+	    }
+
+	    function lib$es6$promise$asap$$setScheduler(scheduleFn) {
+	      lib$es6$promise$asap$$customSchedulerFn = scheduleFn;
+	    }
+
+	    function lib$es6$promise$asap$$setAsap(asapFn) {
+	      lib$es6$promise$asap$$asap = asapFn;
+	    }
+
+	    var lib$es6$promise$asap$$browserWindow = (typeof window !== 'undefined') ? window : undefined;
+	    var lib$es6$promise$asap$$browserGlobal = lib$es6$promise$asap$$browserWindow || {};
+	    var lib$es6$promise$asap$$BrowserMutationObserver = lib$es6$promise$asap$$browserGlobal.MutationObserver || lib$es6$promise$asap$$browserGlobal.WebKitMutationObserver;
+	    var lib$es6$promise$asap$$isNode = typeof process !== 'undefined' && {}.toString.call(process) === '[object process]';
+
+	    // test for web worker but not in IE10
+	    var lib$es6$promise$asap$$isWorker = typeof Uint8ClampedArray !== 'undefined' &&
+	      typeof importScripts !== 'undefined' &&
+	      typeof MessageChannel !== 'undefined';
+
+	    // node
+	    function lib$es6$promise$asap$$useNextTick() {
+	      // node version 0.10.x displays a deprecation warning when nextTick is used recursively
+	      // see https://github.com/cujojs/when/issues/410 for details
+	      return function() {
+	        process.nextTick(lib$es6$promise$asap$$flush);
+	      };
+	    }
+
+	    // vertx
+	    function lib$es6$promise$asap$$useVertxTimer() {
+	      return function() {
+	        lib$es6$promise$asap$$vertxNext(lib$es6$promise$asap$$flush);
+	      };
+	    }
+
+	    function lib$es6$promise$asap$$useMutationObserver() {
+	      var iterations = 0;
+	      var observer = new lib$es6$promise$asap$$BrowserMutationObserver(lib$es6$promise$asap$$flush);
+	      var node = document.createTextNode('');
+	      observer.observe(node, { characterData: true });
+
+	      return function() {
+	        node.data = (iterations = ++iterations % 2);
+	      };
+	    }
+
+	    // web worker
+	    function lib$es6$promise$asap$$useMessageChannel() {
+	      var channel = new MessageChannel();
+	      channel.port1.onmessage = lib$es6$promise$asap$$flush;
+	      return function () {
+	        channel.port2.postMessage(0);
+	      };
+	    }
+
+	    function lib$es6$promise$asap$$useSetTimeout() {
+	      return function() {
+	        setTimeout(lib$es6$promise$asap$$flush, 1);
+	      };
+	    }
+
+	    var lib$es6$promise$asap$$queue = new Array(1000);
+	    function lib$es6$promise$asap$$flush() {
+	      for (var i = 0; i < lib$es6$promise$asap$$len; i+=2) {
+	        var callback = lib$es6$promise$asap$$queue[i];
+	        var arg = lib$es6$promise$asap$$queue[i+1];
+
+	        callback(arg);
+
+	        lib$es6$promise$asap$$queue[i] = undefined;
+	        lib$es6$promise$asap$$queue[i+1] = undefined;
+	      }
+
+	      lib$es6$promise$asap$$len = 0;
+	    }
+
+	    function lib$es6$promise$asap$$attemptVertx() {
+	      try {
+	        var r = require;
+	        var vertx = __webpack_require__(7);
+	        lib$es6$promise$asap$$vertxNext = vertx.runOnLoop || vertx.runOnContext;
+	        return lib$es6$promise$asap$$useVertxTimer();
+	      } catch(e) {
+	        return lib$es6$promise$asap$$useSetTimeout();
+	      }
+	    }
+
+	    var lib$es6$promise$asap$$scheduleFlush;
+	    // Decide what async method to use to triggering processing of queued callbacks:
+	    if (lib$es6$promise$asap$$isNode) {
+	      lib$es6$promise$asap$$scheduleFlush = lib$es6$promise$asap$$useNextTick();
+	    } else if (lib$es6$promise$asap$$BrowserMutationObserver) {
+	      lib$es6$promise$asap$$scheduleFlush = lib$es6$promise$asap$$useMutationObserver();
+	    } else if (lib$es6$promise$asap$$isWorker) {
+	      lib$es6$promise$asap$$scheduleFlush = lib$es6$promise$asap$$useMessageChannel();
+	    } else if (lib$es6$promise$asap$$browserWindow === undefined && "function" === 'function') {
+	      lib$es6$promise$asap$$scheduleFlush = lib$es6$promise$asap$$attemptVertx();
+	    } else {
+	      lib$es6$promise$asap$$scheduleFlush = lib$es6$promise$asap$$useSetTimeout();
+	    }
+
+	    function lib$es6$promise$$internal$$noop() {}
+
+	    var lib$es6$promise$$internal$$PENDING   = void 0;
+	    var lib$es6$promise$$internal$$FULFILLED = 1;
+	    var lib$es6$promise$$internal$$REJECTED  = 2;
+
+	    var lib$es6$promise$$internal$$GET_THEN_ERROR = new lib$es6$promise$$internal$$ErrorObject();
+
+	    function lib$es6$promise$$internal$$selfFulfillment() {
+	      return new TypeError("You cannot resolve a promise with itself");
+	    }
+
+	    function lib$es6$promise$$internal$$cannotReturnOwn() {
+	      return new TypeError('A promises callback cannot return that same promise.');
+	    }
+
+	    function lib$es6$promise$$internal$$getThen(promise) {
+	      try {
+	        return promise.then;
+	      } catch(error) {
+	        lib$es6$promise$$internal$$GET_THEN_ERROR.error = error;
+	        return lib$es6$promise$$internal$$GET_THEN_ERROR;
+	      }
+	    }
+
+	    function lib$es6$promise$$internal$$tryThen(then, value, fulfillmentHandler, rejectionHandler) {
+	      try {
+	        then.call(value, fulfillmentHandler, rejectionHandler);
+	      } catch(e) {
+	        return e;
+	      }
+	    }
+
+	    function lib$es6$promise$$internal$$handleForeignThenable(promise, thenable, then) {
+	       lib$es6$promise$asap$$asap(function(promise) {
+	        var sealed = false;
+	        var error = lib$es6$promise$$internal$$tryThen(then, thenable, function(value) {
+	          if (sealed) { return; }
+	          sealed = true;
+	          if (thenable !== value) {
+	            lib$es6$promise$$internal$$resolve(promise, value);
+	          } else {
+	            lib$es6$promise$$internal$$fulfill(promise, value);
+	          }
+	        }, function(reason) {
+	          if (sealed) { return; }
+	          sealed = true;
+
+	          lib$es6$promise$$internal$$reject(promise, reason);
+	        }, 'Settle: ' + (promise._label || ' unknown promise'));
+
+	        if (!sealed && error) {
+	          sealed = true;
+	          lib$es6$promise$$internal$$reject(promise, error);
+	        }
+	      }, promise);
+	    }
+
+	    function lib$es6$promise$$internal$$handleOwnThenable(promise, thenable) {
+	      if (thenable._state === lib$es6$promise$$internal$$FULFILLED) {
+	        lib$es6$promise$$internal$$fulfill(promise, thenable._result);
+	      } else if (thenable._state === lib$es6$promise$$internal$$REJECTED) {
+	        lib$es6$promise$$internal$$reject(promise, thenable._result);
+	      } else {
+	        lib$es6$promise$$internal$$subscribe(thenable, undefined, function(value) {
+	          lib$es6$promise$$internal$$resolve(promise, value);
+	        }, function(reason) {
+	          lib$es6$promise$$internal$$reject(promise, reason);
+	        });
+	      }
+	    }
+
+	    function lib$es6$promise$$internal$$handleMaybeThenable(promise, maybeThenable) {
+	      if (maybeThenable.constructor === promise.constructor) {
+	        lib$es6$promise$$internal$$handleOwnThenable(promise, maybeThenable);
+	      } else {
+	        var then = lib$es6$promise$$internal$$getThen(maybeThenable);
+
+	        if (then === lib$es6$promise$$internal$$GET_THEN_ERROR) {
+	          lib$es6$promise$$internal$$reject(promise, lib$es6$promise$$internal$$GET_THEN_ERROR.error);
+	        } else if (then === undefined) {
+	          lib$es6$promise$$internal$$fulfill(promise, maybeThenable);
+	        } else if (lib$es6$promise$utils$$isFunction(then)) {
+	          lib$es6$promise$$internal$$handleForeignThenable(promise, maybeThenable, then);
+	        } else {
+	          lib$es6$promise$$internal$$fulfill(promise, maybeThenable);
+	        }
+	      }
+	    }
+
+	    function lib$es6$promise$$internal$$resolve(promise, value) {
+	      if (promise === value) {
+	        lib$es6$promise$$internal$$reject(promise, lib$es6$promise$$internal$$selfFulfillment());
+	      } else if (lib$es6$promise$utils$$objectOrFunction(value)) {
+	        lib$es6$promise$$internal$$handleMaybeThenable(promise, value);
+	      } else {
+	        lib$es6$promise$$internal$$fulfill(promise, value);
+	      }
+	    }
+
+	    function lib$es6$promise$$internal$$publishRejection(promise) {
+	      if (promise._onerror) {
+	        promise._onerror(promise._result);
+	      }
+
+	      lib$es6$promise$$internal$$publish(promise);
+	    }
+
+	    function lib$es6$promise$$internal$$fulfill(promise, value) {
+	      if (promise._state !== lib$es6$promise$$internal$$PENDING) { return; }
+
+	      promise._result = value;
+	      promise._state = lib$es6$promise$$internal$$FULFILLED;
+
+	      if (promise._subscribers.length !== 0) {
+	        lib$es6$promise$asap$$asap(lib$es6$promise$$internal$$publish, promise);
+	      }
+	    }
+
+	    function lib$es6$promise$$internal$$reject(promise, reason) {
+	      if (promise._state !== lib$es6$promise$$internal$$PENDING) { return; }
+	      promise._state = lib$es6$promise$$internal$$REJECTED;
+	      promise._result = reason;
+
+	      lib$es6$promise$asap$$asap(lib$es6$promise$$internal$$publishRejection, promise);
+	    }
+
+	    function lib$es6$promise$$internal$$subscribe(parent, child, onFulfillment, onRejection) {
+	      var subscribers = parent._subscribers;
+	      var length = subscribers.length;
+
+	      parent._onerror = null;
+
+	      subscribers[length] = child;
+	      subscribers[length + lib$es6$promise$$internal$$FULFILLED] = onFulfillment;
+	      subscribers[length + lib$es6$promise$$internal$$REJECTED]  = onRejection;
+
+	      if (length === 0 && parent._state) {
+	        lib$es6$promise$asap$$asap(lib$es6$promise$$internal$$publish, parent);
+	      }
+	    }
+
+	    function lib$es6$promise$$internal$$publish(promise) {
+	      var subscribers = promise._subscribers;
+	      var settled = promise._state;
+
+	      if (subscribers.length === 0) { return; }
+
+	      var child, callback, detail = promise._result;
+
+	      for (var i = 0; i < subscribers.length; i += 3) {
+	        child = subscribers[i];
+	        callback = subscribers[i + settled];
+
+	        if (child) {
+	          lib$es6$promise$$internal$$invokeCallback(settled, child, callback, detail);
+	        } else {
+	          callback(detail);
+	        }
+	      }
+
+	      promise._subscribers.length = 0;
+	    }
+
+	    function lib$es6$promise$$internal$$ErrorObject() {
+	      this.error = null;
+	    }
+
+	    var lib$es6$promise$$internal$$TRY_CATCH_ERROR = new lib$es6$promise$$internal$$ErrorObject();
+
+	    function lib$es6$promise$$internal$$tryCatch(callback, detail) {
+	      try {
+	        return callback(detail);
+	      } catch(e) {
+	        lib$es6$promise$$internal$$TRY_CATCH_ERROR.error = e;
+	        return lib$es6$promise$$internal$$TRY_CATCH_ERROR;
+	      }
+	    }
+
+	    function lib$es6$promise$$internal$$invokeCallback(settled, promise, callback, detail) {
+	      var hasCallback = lib$es6$promise$utils$$isFunction(callback),
+	          value, error, succeeded, failed;
+
+	      if (hasCallback) {
+	        value = lib$es6$promise$$internal$$tryCatch(callback, detail);
+
+	        if (value === lib$es6$promise$$internal$$TRY_CATCH_ERROR) {
+	          failed = true;
+	          error = value.error;
+	          value = null;
+	        } else {
+	          succeeded = true;
+	        }
+
+	        if (promise === value) {
+	          lib$es6$promise$$internal$$reject(promise, lib$es6$promise$$internal$$cannotReturnOwn());
+	          return;
+	        }
+
+	      } else {
+	        value = detail;
+	        succeeded = true;
+	      }
+
+	      if (promise._state !== lib$es6$promise$$internal$$PENDING) {
+	        // noop
+	      } else if (hasCallback && succeeded) {
+	        lib$es6$promise$$internal$$resolve(promise, value);
+	      } else if (failed) {
+	        lib$es6$promise$$internal$$reject(promise, error);
+	      } else if (settled === lib$es6$promise$$internal$$FULFILLED) {
+	        lib$es6$promise$$internal$$fulfill(promise, value);
+	      } else if (settled === lib$es6$promise$$internal$$REJECTED) {
+	        lib$es6$promise$$internal$$reject(promise, value);
+	      }
+	    }
+
+	    function lib$es6$promise$$internal$$initializePromise(promise, resolver) {
+	      try {
+	        resolver(function resolvePromise(value){
+	          lib$es6$promise$$internal$$resolve(promise, value);
+	        }, function rejectPromise(reason) {
+	          lib$es6$promise$$internal$$reject(promise, reason);
+	        });
+	      } catch(e) {
+	        lib$es6$promise$$internal$$reject(promise, e);
+	      }
+	    }
+
+	    function lib$es6$promise$enumerator$$Enumerator(Constructor, input) {
+	      var enumerator = this;
+
+	      enumerator._instanceConstructor = Constructor;
+	      enumerator.promise = new Constructor(lib$es6$promise$$internal$$noop);
+
+	      if (enumerator._validateInput(input)) {
+	        enumerator._input     = input;
+	        enumerator.length     = input.length;
+	        enumerator._remaining = input.length;
+
+	        enumerator._init();
+
+	        if (enumerator.length === 0) {
+	          lib$es6$promise$$internal$$fulfill(enumerator.promise, enumerator._result);
+	        } else {
+	          enumerator.length = enumerator.length || 0;
+	          enumerator._enumerate();
+	          if (enumerator._remaining === 0) {
+	            lib$es6$promise$$internal$$fulfill(enumerator.promise, enumerator._result);
+	          }
+	        }
+	      } else {
+	        lib$es6$promise$$internal$$reject(enumerator.promise, enumerator._validationError());
+	      }
+	    }
+
+	    lib$es6$promise$enumerator$$Enumerator.prototype._validateInput = function(input) {
+	      return lib$es6$promise$utils$$isArray(input);
+	    };
+
+	    lib$es6$promise$enumerator$$Enumerator.prototype._validationError = function() {
+	      return new Error('Array Methods must be provided an Array');
+	    };
+
+	    lib$es6$promise$enumerator$$Enumerator.prototype._init = function() {
+	      this._result = new Array(this.length);
+	    };
+
+	    var lib$es6$promise$enumerator$$default = lib$es6$promise$enumerator$$Enumerator;
+
+	    lib$es6$promise$enumerator$$Enumerator.prototype._enumerate = function() {
+	      var enumerator = this;
+
+	      var length  = enumerator.length;
+	      var promise = enumerator.promise;
+	      var input   = enumerator._input;
+
+	      for (var i = 0; promise._state === lib$es6$promise$$internal$$PENDING && i < length; i++) {
+	        enumerator._eachEntry(input[i], i);
+	      }
+	    };
+
+	    lib$es6$promise$enumerator$$Enumerator.prototype._eachEntry = function(entry, i) {
+	      var enumerator = this;
+	      var c = enumerator._instanceConstructor;
+
+	      if (lib$es6$promise$utils$$isMaybeThenable(entry)) {
+	        if (entry.constructor === c && entry._state !== lib$es6$promise$$internal$$PENDING) {
+	          entry._onerror = null;
+	          enumerator._settledAt(entry._state, i, entry._result);
+	        } else {
+	          enumerator._willSettleAt(c.resolve(entry), i);
+	        }
+	      } else {
+	        enumerator._remaining--;
+	        enumerator._result[i] = entry;
+	      }
+	    };
+
+	    lib$es6$promise$enumerator$$Enumerator.prototype._settledAt = function(state, i, value) {
+	      var enumerator = this;
+	      var promise = enumerator.promise;
+
+	      if (promise._state === lib$es6$promise$$internal$$PENDING) {
+	        enumerator._remaining--;
+
+	        if (state === lib$es6$promise$$internal$$REJECTED) {
+	          lib$es6$promise$$internal$$reject(promise, value);
+	        } else {
+	          enumerator._result[i] = value;
+	        }
+	      }
+
+	      if (enumerator._remaining === 0) {
+	        lib$es6$promise$$internal$$fulfill(promise, enumerator._result);
+	      }
+	    };
+
+	    lib$es6$promise$enumerator$$Enumerator.prototype._willSettleAt = function(promise, i) {
+	      var enumerator = this;
+
+	      lib$es6$promise$$internal$$subscribe(promise, undefined, function(value) {
+	        enumerator._settledAt(lib$es6$promise$$internal$$FULFILLED, i, value);
+	      }, function(reason) {
+	        enumerator._settledAt(lib$es6$promise$$internal$$REJECTED, i, reason);
+	      });
+	    };
+	    function lib$es6$promise$promise$all$$all(entries) {
+	      return new lib$es6$promise$enumerator$$default(this, entries).promise;
+	    }
+	    var lib$es6$promise$promise$all$$default = lib$es6$promise$promise$all$$all;
+	    function lib$es6$promise$promise$race$$race(entries) {
+	      /*jshint validthis:true */
+	      var Constructor = this;
+
+	      var promise = new Constructor(lib$es6$promise$$internal$$noop);
+
+	      if (!lib$es6$promise$utils$$isArray(entries)) {
+	        lib$es6$promise$$internal$$reject(promise, new TypeError('You must pass an array to race.'));
+	        return promise;
+	      }
+
+	      var length = entries.length;
+
+	      function onFulfillment(value) {
+	        lib$es6$promise$$internal$$resolve(promise, value);
+	      }
+
+	      function onRejection(reason) {
+	        lib$es6$promise$$internal$$reject(promise, reason);
+	      }
+
+	      for (var i = 0; promise._state === lib$es6$promise$$internal$$PENDING && i < length; i++) {
+	        lib$es6$promise$$internal$$subscribe(Constructor.resolve(entries[i]), undefined, onFulfillment, onRejection);
+	      }
+
+	      return promise;
+	    }
+	    var lib$es6$promise$promise$race$$default = lib$es6$promise$promise$race$$race;
+	    function lib$es6$promise$promise$resolve$$resolve(object) {
+	      /*jshint validthis:true */
+	      var Constructor = this;
+
+	      if (object && typeof object === 'object' && object.constructor === Constructor) {
+	        return object;
+	      }
+
+	      var promise = new Constructor(lib$es6$promise$$internal$$noop);
+	      lib$es6$promise$$internal$$resolve(promise, object);
+	      return promise;
+	    }
+	    var lib$es6$promise$promise$resolve$$default = lib$es6$promise$promise$resolve$$resolve;
+	    function lib$es6$promise$promise$reject$$reject(reason) {
+	      /*jshint validthis:true */
+	      var Constructor = this;
+	      var promise = new Constructor(lib$es6$promise$$internal$$noop);
+	      lib$es6$promise$$internal$$reject(promise, reason);
+	      return promise;
+	    }
+	    var lib$es6$promise$promise$reject$$default = lib$es6$promise$promise$reject$$reject;
+
+	    var lib$es6$promise$promise$$counter = 0;
+
+	    function lib$es6$promise$promise$$needsResolver() {
+	      throw new TypeError('You must pass a resolver function as the first argument to the promise constructor');
+	    }
+
+	    function lib$es6$promise$promise$$needsNew() {
+	      throw new TypeError("Failed to construct 'Promise': Please use the 'new' operator, this object constructor cannot be called as a function.");
+	    }
+
+	    var lib$es6$promise$promise$$default = lib$es6$promise$promise$$Promise;
+	    /**
+	      Promise objects represent the eventual result of an asynchronous operation. The
+	      primary way of interacting with a promise is through its `then` method, which
+	      registers callbacks to receive either a promise's eventual value or the reason
+	      why the promise cannot be fulfilled.
+
+	      Terminology
+	      -----------
+
+	      - `promise` is an object or function with a `then` method whose behavior conforms to this specification.
+	      - `thenable` is an object or function that defines a `then` method.
+	      - `value` is any legal JavaScript value (including undefined, a thenable, or a promise).
+	      - `exception` is a value that is thrown using the throw statement.
+	      - `reason` is a value that indicates why a promise was rejected.
+	      - `settled` the final resting state of a promise, fulfilled or rejected.
+
+	      A promise can be in one of three states: pending, fulfilled, or rejected.
+
+	      Promises that are fulfilled have a fulfillment value and are in the fulfilled
+	      state.  Promises that are rejected have a rejection reason and are in the
+	      rejected state.  A fulfillment value is never a thenable.
+
+	      Promises can also be said to *resolve* a value.  If this value is also a
+	      promise, then the original promise's settled state will match the value's
+	      settled state.  So a promise that *resolves* a promise that rejects will
+	      itself reject, and a promise that *resolves* a promise that fulfills will
+	      itself fulfill.
+
+
+	      Basic Usage:
+	      ------------
+
+	      ```js
+	      var promise = new Promise(function(resolve, reject) {
+	        // on success
+	        resolve(value);
+
+	        // on failure
+	        reject(reason);
+	      });
+
+	      promise.then(function(value) {
+	        // on fulfillment
+	      }, function(reason) {
+	        // on rejection
+	      });
+	      ```
+
+	      Advanced Usage:
+	      ---------------
+
+	      Promises shine when abstracting away asynchronous interactions such as
+	      `XMLHttpRequest`s.
+
+	      ```js
+	      function getJSON(url) {
+	        return new Promise(function(resolve, reject){
+	          var xhr = new XMLHttpRequest();
+
+	          xhr.open('GET', url);
+	          xhr.onreadystatechange = handler;
+	          xhr.responseType = 'json';
+	          xhr.setRequestHeader('Accept', 'application/json');
+	          xhr.send();
+
+	          function handler() {
+	            if (this.readyState === this.DONE) {
+	              if (this.status === 200) {
+	                resolve(this.response);
+	              } else {
+	                reject(new Error('getJSON: `' + url + '` failed with status: [' + this.status + ']'));
+	              }
+	            }
+	          };
+	        });
+	      }
+
+	      getJSON('/posts.json').then(function(json) {
+	        // on fulfillment
+	      }, function(reason) {
+	        // on rejection
+	      });
+	      ```
+
+	      Unlike callbacks, promises are great composable primitives.
+
+	      ```js
+	      Promise.all([
+	        getJSON('/posts'),
+	        getJSON('/comments')
+	      ]).then(function(values){
+	        values[0] // => postsJSON
+	        values[1] // => commentsJSON
+
+	        return values;
+	      });
+	      ```
+
+	      @class Promise
+	      @param {function} resolver
+	      Useful for tooling.
+	      @constructor
+	    */
+	    function lib$es6$promise$promise$$Promise(resolver) {
+	      this._id = lib$es6$promise$promise$$counter++;
+	      this._state = undefined;
+	      this._result = undefined;
+	      this._subscribers = [];
+
+	      if (lib$es6$promise$$internal$$noop !== resolver) {
+	        if (!lib$es6$promise$utils$$isFunction(resolver)) {
+	          lib$es6$promise$promise$$needsResolver();
+	        }
+
+	        if (!(this instanceof lib$es6$promise$promise$$Promise)) {
+	          lib$es6$promise$promise$$needsNew();
+	        }
+
+	        lib$es6$promise$$internal$$initializePromise(this, resolver);
+	      }
+	    }
+
+	    lib$es6$promise$promise$$Promise.all = lib$es6$promise$promise$all$$default;
+	    lib$es6$promise$promise$$Promise.race = lib$es6$promise$promise$race$$default;
+	    lib$es6$promise$promise$$Promise.resolve = lib$es6$promise$promise$resolve$$default;
+	    lib$es6$promise$promise$$Promise.reject = lib$es6$promise$promise$reject$$default;
+	    lib$es6$promise$promise$$Promise._setScheduler = lib$es6$promise$asap$$setScheduler;
+	    lib$es6$promise$promise$$Promise._setAsap = lib$es6$promise$asap$$setAsap;
+	    lib$es6$promise$promise$$Promise._asap = lib$es6$promise$asap$$asap;
+
+	    lib$es6$promise$promise$$Promise.prototype = {
+	      constructor: lib$es6$promise$promise$$Promise,
+
+	    /**
+	      The primary way of interacting with a promise is through its `then` method,
+	      which registers callbacks to receive either a promise's eventual value or the
+	      reason why the promise cannot be fulfilled.
+
+	      ```js
+	      findUser().then(function(user){
+	        // user is available
+	      }, function(reason){
+	        // user is unavailable, and you are given the reason why
+	      });
+	      ```
+
+	      Chaining
+	      --------
+
+	      The return value of `then` is itself a promise.  This second, 'downstream'
+	      promise is resolved with the return value of the first promise's fulfillment
+	      or rejection handler, or rejected if the handler throws an exception.
+
+	      ```js
+	      findUser().then(function (user) {
+	        return user.name;
+	      }, function (reason) {
+	        return 'default name';
+	      }).then(function (userName) {
+	        // If `findUser` fulfilled, `userName` will be the user's name, otherwise it
+	        // will be `'default name'`
+	      });
+
+	      findUser().then(function (user) {
+	        throw new Error('Found user, but still unhappy');
+	      }, function (reason) {
+	        throw new Error('`findUser` rejected and we're unhappy');
+	      }).then(function (value) {
+	        // never reached
+	      }, function (reason) {
+	        // if `findUser` fulfilled, `reason` will be 'Found user, but still unhappy'.
+	        // If `findUser` rejected, `reason` will be '`findUser` rejected and we're unhappy'.
+	      });
+	      ```
+	      If the downstream promise does not specify a rejection handler, rejection reasons will be propagated further downstream.
+
+	      ```js
+	      findUser().then(function (user) {
+	        throw new PedagogicalException('Upstream error');
+	      }).then(function (value) {
+	        // never reached
+	      }).then(function (value) {
+	        // never reached
+	      }, function (reason) {
+	        // The `PedgagocialException` is propagated all the way down to here
+	      });
+	      ```
+
+	      Assimilation
+	      ------------
+
+	      Sometimes the value you want to propagate to a downstream promise can only be
+	      retrieved asynchronously. This can be achieved by returning a promise in the
+	      fulfillment or rejection handler. The downstream promise will then be pending
+	      until the returned promise is settled. This is called *assimilation*.
+
+	      ```js
+	      findUser().then(function (user) {
+	        return findCommentsByAuthor(user);
+	      }).then(function (comments) {
+	        // The user's comments are now available
+	      });
+	      ```
+
+	      If the assimliated promise rejects, then the downstream promise will also reject.
+
+	      ```js
+	      findUser().then(function (user) {
+	        return findCommentsByAuthor(user);
+	      }).then(function (comments) {
+	        // If `findCommentsByAuthor` fulfills, we'll have the value here
+	      }, function (reason) {
+	        // If `findCommentsByAuthor` rejects, we'll have the reason here
+	      });
+	      ```
+
+	      Simple Example
+	      --------------
+
+	      Synchronous Example
+
+	      ```javascript
+	      var result;
+
+	      try {
+	        result = findResult();
+	        // success
+	      } catch(reason) {
+	        // failure
+	      }
+	      ```
+
+	      Errback Example
+
+	      ```js
+	      findResult(function(result, err){
+	        if (err) {
+	          // failure
+	        } else {
+	          // success
+	        }
+	      });
+	      ```
+
+	      Promise Example;
+
+	      ```javascript
+	      findResult().then(function(result){
+	        // success
+	      }, function(reason){
+	        // failure
+	      });
+	      ```
+
+	      Advanced Example
+	      --------------
+
+	      Synchronous Example
+
+	      ```javascript
+	      var author, books;
+
+	      try {
+	        author = findAuthor();
+	        books  = findBooksByAuthor(author);
+	        // success
+	      } catch(reason) {
+	        // failure
+	      }
+	      ```
+
+	      Errback Example
+
+	      ```js
+
+	      function foundBooks(books) {
+
+	      }
+
+	      function failure(reason) {
+
+	      }
+
+	      findAuthor(function(author, err){
+	        if (err) {
+	          failure(err);
+	          // failure
+	        } else {
+	          try {
+	            findBoooksByAuthor(author, function(books, err) {
+	              if (err) {
+	                failure(err);
+	              } else {
+	                try {
+	                  foundBooks(books);
+	                } catch(reason) {
+	                  failure(reason);
+	                }
+	              }
+	            });
+	          } catch(error) {
+	            failure(err);
+	          }
+	          // success
+	        }
+	      });
+	      ```
+
+	      Promise Example;
+
+	      ```javascript
+	      findAuthor().
+	        then(findBooksByAuthor).
+	        then(function(books){
+	          // found books
+	      }).catch(function(reason){
+	        // something went wrong
+	      });
+	      ```
+
+	      @method then
+	      @param {Function} onFulfilled
+	      @param {Function} onRejected
+	      Useful for tooling.
+	      @return {Promise}
+	    */
+	      then: function(onFulfillment, onRejection) {
+	        var parent = this;
+	        var state = parent._state;
+
+	        if (state === lib$es6$promise$$internal$$FULFILLED && !onFulfillment || state === lib$es6$promise$$internal$$REJECTED && !onRejection) {
+	          return this;
+	        }
+
+	        var child = new this.constructor(lib$es6$promise$$internal$$noop);
+	        var result = parent._result;
+
+	        if (state) {
+	          var callback = arguments[state - 1];
+	          lib$es6$promise$asap$$asap(function(){
+	            lib$es6$promise$$internal$$invokeCallback(state, child, callback, result);
+	          });
+	        } else {
+	          lib$es6$promise$$internal$$subscribe(parent, child, onFulfillment, onRejection);
+	        }
+
+	        return child;
+	      },
+
+	    /**
+	      `catch` is simply sugar for `then(undefined, onRejection)` which makes it the same
+	      as the catch block of a try/catch statement.
+
+	      ```js
+	      function findAuthor(){
+	        throw new Error('couldn't find that author');
+	      }
+
+	      // synchronous
+	      try {
+	        findAuthor();
+	      } catch(reason) {
+	        // something went wrong
+	      }
+
+	      // async with promises
+	      findAuthor().catch(function(reason){
+	        // something went wrong
+	      });
+	      ```
+
+	      @method catch
+	      @param {Function} onRejection
+	      Useful for tooling.
+	      @return {Promise}
+	    */
+	      'catch': function(onRejection) {
+	        return this.then(null, onRejection);
+	      }
+	    };
+	    function lib$es6$promise$polyfill$$polyfill() {
+	      var local;
+
+	      if (typeof global !== 'undefined') {
+	          local = global;
+	      } else if (typeof self !== 'undefined') {
+	          local = self;
+	      } else {
+	          try {
+	              local = Function('return this')();
+	          } catch (e) {
+	              throw new Error('polyfill failed because global object is unavailable in this environment');
+	          }
+	      }
+
+	      var P = local.Promise;
+
+	      if (P && Object.prototype.toString.call(P.resolve()) === '[object Promise]' && !P.cast) {
+	        return;
+	      }
+
+	      local.Promise = lib$es6$promise$promise$$default;
+	    }
+	    var lib$es6$promise$polyfill$$default = lib$es6$promise$polyfill$$polyfill;
+
+	    var lib$es6$promise$umd$$ES6Promise = {
+	      'Promise': lib$es6$promise$promise$$default,
+	      'polyfill': lib$es6$promise$polyfill$$default
+	    };
+
+	    /* global define:true module:true window: true */
+	    if ("function" === 'function' && __webpack_require__(8)['amd']) {
+	      !(__WEBPACK_AMD_DEFINE_RESULT__ = function() { return lib$es6$promise$umd$$ES6Promise; }.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+	    } else if (typeof module !== 'undefined' && module['exports']) {
+	      module['exports'] = lib$es6$promise$umd$$ES6Promise;
+	    } else if (typeof this !== 'undefined') {
+	      this['ES6Promise'] = lib$es6$promise$umd$$ES6Promise;
+	    }
+
+	    lib$es6$promise$polyfill$$default();
+	}).call(this);
+
+
+
+	/*** EXPORTS FROM exports-loader ***/
+	module.exports = global.Promise
+	}.call(global));
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(5), (function() { return this; }()), __webpack_require__(6)(module)))
+
+/***/ },
+/* 5 */
 /***/ function(module, exports) {
 
+	// shim for using process in browser
+	var process = module.exports = {};
+
+	// cached from whatever global is present so that test runners that stub it
+	// don't break things.  But we need to wrap it in a try catch in case it is
+	// wrapped in strict mode code which doesn't define any globals.  It's inside a
+	// function because try/catches deoptimize in certain engines.
+
+	var cachedSetTimeout;
+	var cachedClearTimeout;
+
+	function defaultSetTimout() {
+	    throw new Error('setTimeout has not been defined');
+	}
+	function defaultClearTimeout () {
+	    throw new Error('clearTimeout has not been defined');
+	}
+	(function () {
+	    try {
+	        if (typeof setTimeout === 'function') {
+	            cachedSetTimeout = setTimeout;
+	        } else {
+	            cachedSetTimeout = defaultSetTimout;
+	        }
+	    } catch (e) {
+	        cachedSetTimeout = defaultSetTimout;
+	    }
+	    try {
+	        if (typeof clearTimeout === 'function') {
+	            cachedClearTimeout = clearTimeout;
+	        } else {
+	            cachedClearTimeout = defaultClearTimeout;
+	        }
+	    } catch (e) {
+	        cachedClearTimeout = defaultClearTimeout;
+	    }
+	} ())
+	function runTimeout(fun) {
+	    if (cachedSetTimeout === setTimeout) {
+	        //normal enviroments in sane situations
+	        return setTimeout(fun, 0);
+	    }
+	    // if setTimeout wasn't available but was latter defined
+	    if ((cachedSetTimeout === defaultSetTimout || !cachedSetTimeout) && setTimeout) {
+	        cachedSetTimeout = setTimeout;
+	        return setTimeout(fun, 0);
+	    }
+	    try {
+	        // when when somebody has screwed with setTimeout but no I.E. maddness
+	        return cachedSetTimeout(fun, 0);
+	    } catch(e){
+	        try {
+	            // When we are in I.E. but the script has been evaled so I.E. doesn't trust the global object when called normally
+	            return cachedSetTimeout.call(null, fun, 0);
+	        } catch(e){
+	            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error
+	            return cachedSetTimeout.call(this, fun, 0);
+	        }
+	    }
+
+
+	}
+	function runClearTimeout(marker) {
+	    if (cachedClearTimeout === clearTimeout) {
+	        //normal enviroments in sane situations
+	        return clearTimeout(marker);
+	    }
+	    // if clearTimeout wasn't available but was latter defined
+	    if ((cachedClearTimeout === defaultClearTimeout || !cachedClearTimeout) && clearTimeout) {
+	        cachedClearTimeout = clearTimeout;
+	        return clearTimeout(marker);
+	    }
+	    try {
+	        // when when somebody has screwed with setTimeout but no I.E. maddness
+	        return cachedClearTimeout(marker);
+	    } catch (e){
+	        try {
+	            // When we are in I.E. but the script has been evaled so I.E. doesn't  trust the global object when called normally
+	            return cachedClearTimeout.call(null, marker);
+	        } catch (e){
+	            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error.
+	            // Some versions of I.E. have different rules for clearTimeout vs setTimeout
+	            return cachedClearTimeout.call(this, marker);
+	        }
+	    }
+
+
+
+	}
+	var queue = [];
+	var draining = false;
+	var currentQueue;
+	var queueIndex = -1;
+
+	function cleanUpNextTick() {
+	    if (!draining || !currentQueue) {
+	        return;
+	    }
+	    draining = false;
+	    if (currentQueue.length) {
+	        queue = currentQueue.concat(queue);
+	    } else {
+	        queueIndex = -1;
+	    }
+	    if (queue.length) {
+	        drainQueue();
+	    }
+	}
+
+	function drainQueue() {
+	    if (draining) {
+	        return;
+	    }
+	    var timeout = runTimeout(cleanUpNextTick);
+	    draining = true;
+
+	    var len = queue.length;
+	    while(len) {
+	        currentQueue = queue;
+	        queue = [];
+	        while (++queueIndex < len) {
+	            if (currentQueue) {
+	                currentQueue[queueIndex].run();
+	            }
+	        }
+	        queueIndex = -1;
+	        len = queue.length;
+	    }
+	    currentQueue = null;
+	    draining = false;
+	    runClearTimeout(timeout);
+	}
+
+	process.nextTick = function (fun) {
+	    var args = new Array(arguments.length - 1);
+	    if (arguments.length > 1) {
+	        for (var i = 1; i < arguments.length; i++) {
+	            args[i - 1] = arguments[i];
+	        }
+	    }
+	    queue.push(new Item(fun, args));
+	    if (queue.length === 1 && !draining) {
+	        runTimeout(drainQueue);
+	    }
+	};
+
+	// v8 likes predictible objects
+	function Item(fun, array) {
+	    this.fun = fun;
+	    this.array = array;
+	}
+	Item.prototype.run = function () {
+	    this.fun.apply(null, this.array);
+	};
+	process.title = 'browser';
+	process.browser = true;
+	process.env = {};
+	process.argv = [];
+	process.version = ''; // empty string to avoid regexp issues
+	process.versions = {};
+
+	function noop() {}
+
+	process.on = noop;
+	process.addListener = noop;
+	process.once = noop;
+	process.off = noop;
+	process.removeListener = noop;
+	process.removeAllListeners = noop;
+	process.emit = noop;
+
+	process.binding = function (name) {
+	    throw new Error('process.binding is not supported');
+	};
+
+	process.cwd = function () { return '/' };
+	process.chdir = function (dir) {
+	    throw new Error('process.chdir is not supported');
+	};
+	process.umask = function() { return 0; };
+
+
+/***/ },
+/* 6 */
+/***/ function(module, exports) {
+
+	module.exports = function(module) {
+		if(!module.webpackPolyfill) {
+			module.deprecate = function() {};
+			module.paths = [];
+			// module.parent = undefined by default
+			module.children = [];
+			module.webpackPolyfill = 1;
+		}
+		return module;
+	}
+
+
+/***/ },
+/* 7 */
+/***/ function(module, exports) {
+
+	/* (ignored) */
+
+/***/ },
+/* 8 */
+/***/ function(module, exports) {
+
+	module.exports = function() { throw new Error("define cannot be used indirect"); };
+
+
+/***/ },
+/* 9 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	exports.setCustomDomain = setCustomDomain;
 	// Copyright (C) 2007-2014, GoodData(R) Corporation. All rights reserved.
 	/**
 	 * Config module holds SDK configuration variables
@@ -386,42 +2058,39 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @class config
 	 */
 
-	'use strict';
-
-	Object.defineProperty(exports, '__esModule', {
-	  value: true
-	});
-	exports.setCustomDomain = setCustomDomain;
 	var URL_REGEXP = '(?:(https)://+|(www\\.)?)\\w[:;,\\.?\\[\\]\\w/~%&=+#-@!]*';
 
-	var domain = undefined;
+	var domain = exports.domain = void 0;
 
-	exports.domain = domain;
 	/**
 	 * Sets custom domain. Parameter is url which has always to be https://
 	 * (if you don't provide it, we will do it for you).
 	 *
 	 * RegExp inspired taken from
 	 * https://github.com/jarib/google-closure-library/blob/master/closure/goog/string/linkify.js
-	 *
+	 * @param {String|null} d valid domain starting with https:// or null for removing
 	 * @method setCustomDomain
 	 */
-
 	function setCustomDomain(d) {
-	  var sanitizedDomain = d || '';
-	  var link = sanitizedDomain.match(URL_REGEXP);
+	    var sanitizedDomain = d || '';
+	    var link = sanitizedDomain.match(URL_REGEXP);
 
-	  if (!link) {
-	    throw new Error(d + ' is not a valid url');
-	  }
+	    if (d === null) {
+	        exports.domain = domain = undefined;
+	        return;
+	    }
 
-	  // ensure https:// prefix
-	  // and strip possible trailing /
-	  exports.domain = domain = 'https://' + link[0].replace(/^https:\/\//, '').replace(/\/$/, '');
+	    if (!link) {
+	        throw new Error(d + ' is not a valid url');
+	    }
+
+	    // ensure https:// prefix
+	    // and strip possible trailing /
+	    exports.domain = domain = 'https://' + link[0].replace(/^https:\/\//, '').replace(/\/$/, '');
 	}
 
 /***/ },
-/* 4 */
+/* 10 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/* WEBPACK VAR INJECTION */(function(global, module) {/**
@@ -17320,32 +18989,27 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	}.call(this));
 
-	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }()), __webpack_require__(5)(module)))
+	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }()), __webpack_require__(6)(module)))
 
 /***/ },
-/* 5 */
-/***/ function(module, exports) {
-
-	module.exports = function(module) {
-		if(!module.webpackPolyfill) {
-			module.deprecate = function() {};
-			module.paths = [];
-			// module.parent = undefined by default
-			module.children = [];
-			module.webpackPolyfill = 1;
-		}
-		return module;
-	}
-
-
-/***/ },
-/* 6 */
+/* 11 */
 /***/ function(module, exports, __webpack_require__) {
 
-	// Copyright (C) 2007-2014, GoodData(R) Corporation. All rights reserved.
-	'use strict';
+	// the whatwg-fetch polyfill installs the fetch() function
+	// on the global object (window or self)
+	//
+	// Return that as the export for use in Webpack, Browserify etc.
+	__webpack_require__(3);
+	module.exports = self.fetch.bind(self);
 
-	Object.defineProperty(exports, '__esModule', {
+
+/***/ },
+/* 12 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(Promise) {'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
 	exports.isLoggedIn = isLoggedIn;
@@ -17353,12 +19017,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.logout = logout;
 	exports.updateProfileSettings = updateProfileSettings;
 	exports.getAccountInfo = getAccountInfo;
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-
-	var _jquery = __webpack_require__(2);
-
-	var _jquery2 = _interopRequireDefault(_jquery);
 
 	var _xhr = __webpack_require__(1);
 
@@ -17370,14 +19028,27 @@ return /******/ (function(modules) { // webpackBootstrap
 	/**
 	 * Find out whether a user is logged in
 	 *
-	 * Returns a promise which either:
-	 * **resolves** - which means user is logged in or
-	 * **rejects** - meaning is not logged in
+	 * @return {Promise} resolves with true if user logged in, false otherwise
 	 * @method isLoggedIn
 	 */
-
 	function isLoggedIn() {
-	    return _jquery2['default'].getJSON('/gdc/account/token');
+	    return new Promise(function (resolve, reject) {
+	        // cannot use get here directly - we need to access to response
+	        // not to responses JSON get returns
+	        (0, _xhr.ajax)('/gdc/account/token', { method: 'GET' }).then(function (r) {
+	            if (r.ok) {
+	                resolve(true);
+	            }
+
+	            resolve(false);
+	        }, function (err) {
+	            if (err.response.status === 401) {
+	                resolve(false);
+	            } else {
+	                reject(err);
+	            }
+	        });
+	    });
 	}
 
 	/**
@@ -17389,10 +19060,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @param {String} username
 	 * @param {String} password
 	 */
-
+	// Copyright (C) 2007-2014, GoodData(R) Corporation. All rights reserved.
 	function login(username, password) {
 	    return (0, _xhr.post)('/gdc/account/login', {
-	        data: JSON.stringify({
+	        body: JSON.stringify({
 	            postUserLogin: {
 	                login: username,
 	                password: password,
@@ -17401,32 +19072,28 @@ return /******/ (function(modules) { // webpackBootstrap
 	                verifyCaptcha: ''
 	            }
 	        })
-	    });
+	    }).then(_xhr.parseJSON);
 	}
 
 	/**
 	 * Logs out current user
 	 * @method logout
 	 */
-
 	function logout() {
-	    /* eslint new-cap: 0 */
-	    var d = _jquery2['default'].Deferred();
+	    return isLoggedIn().then(function (loggedIn) {
+	        if (loggedIn) {
+	            return (0, _xhr.get)('/gdc/app/account/bootstrap').then(function (result) {
+	                var userUri = result.bootstrapResource.accountSetting.links.self;
+	                var userId = userUri.match(/([^\/]+)\/?$/)[1];
 
-	    isLoggedIn().then(function resolve() {
-	        return (0, _xhr.get)('/gdc/app/account/bootstrap').then(function resolveGet(result) {
-	            var userUri = result.bootstrapResource.accountSetting.links.self;
-	            var userId = userUri.match(/([^\/]+)\/?$/)[1];
+	                return (0, _xhr.ajax)('/gdc/account/login/' + userId, {
+	                    method: 'delete'
+	                });
+	            });
+	        }
 
-	            return userId;
-	        }, d.reject);
-	    }, d.resolve).then(function resolveAll(userId) {
-	        return (0, _xhr.ajax)('/gdc/account/login/' + userId, {
-	            method: 'delete'
-	        });
-	    }).then(d.resolve, d.reject);
-
-	    return d.promise();
+	        return Promise.resolve();
+	    });
 	}
 
 	/**
@@ -17435,29 +19102,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @param {String} profileId - User profile identifier
 	 * @param {Object} profileSetting
 	*/
-
 	function updateProfileSettings(profileId, profileSetting) {
-	    /*eslint-disable new-cap*/
-	    var d = _jquery2['default'].Deferred();
-	    /*eslint-enable new-cap*/
-
-	    (0, _xhr.put)('/gdc/account/profile/' + profileId + '/settings', {
+	    return (0, _xhr.put)('/gdc/account/profile/' + profileId + '/settings', {
 	        data: profileSetting
-	    }).then(d.resolve, d.reject);
-
-	    return d.promise();
+	    });
 	}
 
 	/**
 	 * Returns info about currently logged in user from bootstrap resource
 	 * @method getAccountInfo
 	 */
-
 	function getAccountInfo() {
-	    /* eslint new-cap: 0 */
-	    var d = _jquery2['default'].Deferred();
-
-	    (0, _xhr.get)('/gdc/app/account/bootstrap').then(function resolveBootstrap(result) {
+	    return (0, _xhr.get)('/gdc/app/account/bootstrap').then(function resolveBootstrap(result) {
 	        var br = result.bootstrapResource;
 	        var accountInfo = {
 	            login: br.accountSetting.login,
@@ -17468,22 +19124,24 @@ return /******/ (function(modules) { // webpackBootstrap
 	            profileUri: br.accountSetting.links.self
 	        };
 
-	        d.resolve(accountInfo);
-	    }, d.reject);
-
-	    return d.promise();
+	        return accountInfo;
+	    });
 	}
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)))
 
 /***/ },
-/* 7 */
+/* 13 */
 /***/ function(module, exports, __webpack_require__) {
 
-	// Copyright (C) 2007-2014, GoodData(R) Corporation. All rights reserved.
-	'use strict';
+	/* WEBPACK VAR INJECTION */(function(Promise) {'use strict';
 
-	Object.defineProperty(exports, '__esModule', {
+	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
+
+	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; // Copyright (C) 2007-2014, GoodData(R) Corporation. All rights reserved.
+
+
 	exports.getObjects = getObjects;
 	exports.getObjectUsing = getObjectUsing;
 	exports.getObjectUsingMany = getObjectUsingMany;
@@ -17501,17 +19159,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.getObjectIdentifier = getObjectIdentifier;
 	exports.getObjectUri = getObjectUri;
 
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-
-	var _jquery = __webpack_require__(2);
-
-	var _jquery2 = _interopRequireDefault(_jquery);
+	var _lodash = __webpack_require__(10);
 
 	var _xhr = __webpack_require__(1);
 
-	var _util = __webpack_require__(8);
-
-	var _lodash = __webpack_require__(4);
+	var _util = __webpack_require__(14);
 
 	/**
 	 * Functions for working with metadata objects
@@ -17529,7 +19181,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @param {Array} objectUris array of uris for objects to be loaded
 	 * @return {Array} array of loaded elements
 	 */
-
 	function getObjects(projectId, objectUris) {
 	    var LIMIT = 50;
 	    var uri = '/gdc/md/' + projectId + '/objects/get';
@@ -17545,18 +19196,20 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        return (0, _xhr.post)(uri, {
 	            data: JSON.stringify(data)
+	        }).then(function (r) {
+	            if (!r.ok) {
+	                var err = new Error(r.statusText);
+	                err.response = r;
+	                throw err;
+	            }
+
+	            return r.json();
 	        }).then(function (result) {
 	            return (0, _lodash.get)(result, ['objects', 'items']);
 	        });
 	    });
 
-	    return _jquery2['default'].when.apply(this, promises).then(function () {
-	        for (var _len = arguments.length, resultingEntries = Array(_len), _key = 0; _key < _len; _key++) {
-	            resultingEntries[_key] = arguments[_key];
-	        }
-
-	        return (0, _lodash.flatten)(resultingEntries);
-	    });
+	    return Promise.all(promises).then(_lodash.flatten);
 	}
 
 	/**
@@ -17572,13 +19225,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @return {jQuery promise} promise promise once resolved returns an array of
 	 *         entries returned by using2 resource
 	 */
-
 	function getObjectUsing(projectId, uri) {
-	    var options = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
-	    var _options$types = options.types;
-	    var types = _options$types === undefined ? [] : _options$types;
-	    var _options$nearest = options.nearest;
-	    var nearest = _options$nearest === undefined ? false : _options$nearest;
+	    var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+	    var _options$types = options.types,
+	        types = _options$types === undefined ? [] : _options$types,
+	        _options$nearest = options.nearest,
+	        nearest = _options$nearest === undefined ? false : _options$nearest;
 
 	    var resourceUri = '/gdc/md/' + projectId + '/using2';
 
@@ -17592,6 +19244,14 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    return (0, _xhr.post)(resourceUri, {
 	        data: JSON.stringify(data)
+	    }).then(function (r) {
+	        if (!r.ok) {
+	            var err = new Error(r.statusText);
+	            err.response = r;
+	            throw err;
+	        }
+
+	        return r.json();
 	    }).then(function (result) {
 	        return result.entries;
 	    });
@@ -17610,13 +19270,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @return {jQuery promise} promise promise once resolved returns an array of
 	 *         entries returned by using2 resource
 	 */
-
 	function getObjectUsingMany(projectId, uris) {
-	    var options = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
-	    var _options$types2 = options.types;
-	    var types = _options$types2 === undefined ? [] : _options$types2;
-	    var _options$nearest2 = options.nearest;
-	    var nearest = _options$nearest2 === undefined ? false : _options$nearest2;
+	    var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+	    var _options$types2 = options.types,
+	        types = _options$types2 === undefined ? [] : _options$types2,
+	        _options$nearest2 = options.nearest,
+	        nearest = _options$nearest2 === undefined ? false : _options$nearest2;
 
 	    var resourceUri = '/gdc/md/' + projectId + '/using2';
 
@@ -17630,6 +19289,14 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    return (0, _xhr.post)(resourceUri, {
 	        data: JSON.stringify(data)
+	    }).then(function (r) {
+	        if (!r.ok) {
+	            var err = new Error(r.statusText);
+	            err.response = r;
+	            throw err;
+	        }
+
+	        return r.json();
 	    }).then(function (result) {
 	        return result.useMany;
 	    });
@@ -17645,21 +19312,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @param {Array} array of element uri strings
 	 * @private
 	 */
-
 	function getElementDetails(elementUris) {
-	    /*eslint-disable new-cap*/
-	    var d = _jquery2['default'].Deferred();
-	    /*eslint-enable new-cap*/
-
-	    var fns = elementUris.map(function mapUrisToRequests(uri) {
-	        return (0, _xhr.ajax)(uri);
+	    var fns = elementUris.map(function (uri) {
+	        return (0, _xhr.get)(uri);
 	    });
 
-	    _jquery2['default'].when.apply(this, fns).done(function requestsDone() {
-	        // arguments is the array of resolved
-	        var args = Array.prototype.slice.call(arguments);
+	    return Promise.all(fns).then(function () {
+	        for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+	            args[_key] = arguments[_key];
+	        }
 
-	        var enriched = args.map(function mapArgumentsToObjects(element) {
+	        var enriched = args.map(function (element) {
 	            var root = element[0];
 	            if (root.attributeDisplayForm) {
 	                return {
@@ -17683,19 +19346,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var i = 0;
 	        var formOfFns = [];
 
-	        enriched.forEach(function loopEnrichedObjects(el, idx) {
+	        enriched.forEach(function (el, idx) {
 	            if (el.formOf) {
-	                formOfFns.push((0, _xhr.ajax)(el.formOf));
+	                formOfFns.push((0, _xhr.get)(el.formOf));
 	                ids[el.uri] = idx;
 	                indi[i++] = idx;
 	            }
 	        });
 
 	        // all formOf are executed
-	        _jquery2['default'].when.apply(this, formOfFns).done(function formOfRequestsDone() {
-	            var formOfArgs = Array.prototype.slice.call(arguments);
+	        return Promise.all(formOfFns).then(function () {
+	            for (var _len2 = arguments.length, formOfArgs = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+	                formOfArgs[_key2] = arguments[_key2];
+	            }
 
-	            formOfArgs.forEach(function loopFormOfRequests(arg, idx) {
+	            formOfArgs.forEach(function (arg, idx) {
 	                // get element to owerwrite
 	                var which = indi[idx];
 	                var update = enriched[which];
@@ -17703,11 +19368,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	                update.name = arg[0].attribute.meta.title;
 	            });
 
-	            d.resolve(enriched);
+	            return enriched;
 	        });
 	    });
-
-	    return d.promise();
 	}
 
 	/**
@@ -17717,9 +19380,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	* @param projectId Project identifier
 	* @return {Array} An array of attribute objects
 	*/
-
 	function getAttributes(projectId) {
-	    return (0, _xhr.get)('/gdc/md/' + projectId + '/query/attributes').then((0, _util.getIn)('query.entries'));
+	    return (0, _xhr.get)('/gdc/md/' + projectId + '/query/attributes').then(function (r) {
+	        return r.ok ? r.json() : r;
+	    }).then((0, _util.getIn)('query.entries'));
 	}
 
 	/**
@@ -17730,9 +19394,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @return {Array} An array of dimension objects
 	 * @see getFolders
 	 */
-
 	function getDimensions(projectId) {
-	    return (0, _xhr.get)('/gdc/md/' + projectId + '/query/dimensions').then((0, _util.getIn)('query.entries'));
+	    return (0, _xhr.get)('/gdc/md/' + projectId + '/query/dimensions').then(function (r) {
+	        return r.ok ? r.json() : r;
+	    }).then((0, _util.getIn)('query.entries'));
 	}
 
 	/**
@@ -17744,7 +19409,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @param {String} type - Optional, possible values are `metric`, `fact`, `attribute`
 	 * @return {Array} An array of dimension objects
 	 */
-
 	function getFolders(projectId, type) {
 	    function _getFolders(pId, t) {
 	        var typeURL = t ? '?type=' + t : '';
@@ -17759,13 +19423,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	        case 'attribute':
 	            return getDimensions(projectId);
 	        default:
-	            /*eslint-disable new-cap*/
-	            var d = _jquery2['default'].Deferred();
-	            /*eslint-enable new-cap*/
-	            _jquery2['default'].when(_getFolders(projectId, 'fact'), _getFolders(projectId, 'metric'), getDimensions(projectId)).done(function requestsDone(facts, metrics, attributes) {
-	                d.resolve({ fact: facts, metric: metrics, attribute: attributes });
+	            return Promise.all([_getFolders(projectId, 'fact'), _getFolders(projectId, 'metric'), getDimensions(projectId)]).then(function (facts, metrics, attributes) {
+	                return { fact: facts, metric: metrics, attribute: attributes };
 	            });
-	            return d.promise();
 	    }
 	}
 
@@ -17781,28 +19441,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * corresponding items.
 	 */
 	/*eslint-disable*/
-
 	function getFoldersWithItems(projectId, type) {
-	    /*eslint-disable new-cap*/
-	    var result = _jquery2['default'].Deferred();
-	    /*eslint-enable new-cap*/
-
 	    // fetch all folders of given type and process them
-	    getFolders(projectId, type).then(function resolveGetForlders(folders) {
+	    return getFolders(projectId, type).then(function (folders) {
 	        // Helper function to get details for each metric in the given
 	        // array of links to the metadata objects representing the metrics.
 	        // @return the array of promises
 	        function getMetricItemsDetails(array) {
-	            /*eslint-disable new-cap*/
-	            var d = _jquery2['default'].Deferred();
-	            /*eslint-enable new-cap*/
-	            _jquery2['default'].when.apply(this, array.map(getObjectDetails)).then(function getObjectDetailsDone() {
-	                var metrics = Array.prototype.slice.call(arguments).map(function mapObjectsToMetricNames(item) {
+	            return Promise.all(array.map(getObjectDetails)).then(function () {
+	                for (var _len3 = arguments.length, metricArgs = Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
+	                    metricArgs[_key3] = arguments[_key3];
+	                }
+
+	                return metricArgs.map(function (item) {
 	                    return item.metric;
 	                });
-	                d.resolve(metrics);
-	            }, d.reject);
-	            return d.promise();
+	            });
 	        }
 
 	        // helper mapBy function
@@ -17814,7 +19468,6 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        // helper for sorting folder tree structure
 	        // sadly @returns void (sorting == mutating array in js)
-	        /*eslint-disable func-names*/
 	        var sortFolderTree = function sortFolderTree(structure) {
 	            structure.forEach(function (folder) {
 	                folder.items.sort(function (a, b) {
@@ -17837,14 +19490,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	                return 0;
 	            });
 	        };
-	        /*eslint-enable func-names*/
 
 	        var foldersLinks = mapBy(folders, 'link');
 	        var foldersTitles = mapBy(folders, 'title');
 
 	        // fetch details for each folder
-	        _jquery2['default'].when.apply(this, foldersLinks.map(getObjectDetails)).then(function () {
-	            var folderDetails = Array.prototype.slice.call(arguments);
+	        return Promise.all(foldersLinks.map(getObjectDetails)).then(function () {
+	            for (var _len4 = arguments.length, folderDetails = Array(_len4), _key4 = 0; _key4 < _len4; _key4++) {
+	                folderDetails[_key4] = arguments[_key4];
+	            }
 
 	            // if attribute, just parse everything from what we've received
 	            // and resolve. For metrics, lookup again each metric to get its
@@ -17866,9 +19520,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	                        return item.link;
 	                    });
 	                    // now get details of attributes in no folders
-	                    _jquery2['default'].when.apply(this, unsortedUris.map(getObjectDetails)).then(function () {
+	                    return Promise.all(unsortedUris.map(getObjectDetails)).then(function () {
+	                        for (var _len5 = arguments.length, unsortedAttributeArgs = Array(_len5), _key5 = 0; _key5 < _len5; _key5++) {
+	                            unsortedAttributeArgs[_key5] = arguments[_key5];
+	                        }
+
+	                        //TODO add map to r.json
 	                        // get unsorted attribute objects
-	                        var unsortedAttributes = Array.prototype.slice.call(arguments).map(function (attr) {
+	                        var unsortedAttributes = unsortedAttributeArgs.map(function (attr) {
 	                            return attr.attribute;
 	                        });
 	                        // create structure of folders with attributes
@@ -17884,59 +19543,66 @@ return /******/ (function(modules) { // webpackBootstrap
 	                            items: unsortedAttributes
 	                        });
 	                        sortFolderTree(structure);
-	                        result.resolve(structure);
+
+	                        return structure;
 	                    });
 	                });
 	            } else if (type === 'metric') {
-	                var entriesLinks = folderDetails.map(function (entry) {
-	                    return mapBy(entry.folder.content.entries, 'link');
-	                });
-	                // get all metrics, subtract what we have and add rest in unsorted folder
-	                getMetrics(projectId).then(function (metrics) {
-	                    // get uris of metrics which are in some dimension folders
-	                    var metricsInFolders = [];
-	                    folderDetails.forEach(function (fd) {
-	                        fd.folder.content.entries.forEach(function (metric) {
-	                            metricsInFolders.push(metric.link);
-	                        });
+	                var _ret = function () {
+	                    var entriesLinks = folderDetails.map(function (entry) {
+	                        return mapBy(entry.folder.content.entries, 'link');
 	                    });
-	                    // unsortedUris now contains uris of all metrics which aren't in a folder
-	                    var unsortedUris = metrics.filter(function (item) {
-	                        return metricsInFolders.indexOf(item.link) === -1;
-	                    }).map(function (item) {
-	                        return item.link;
-	                    });
+	                    // get all metrics, subtract what we have and add rest in unsorted folder
+	                    return {
+	                        v: getMetrics(projectId).then(function (metrics) {
+	                            // get uris of metrics which are in some dimension folders
+	                            var metricsInFolders = [];
+	                            folderDetails.forEach(function (fd) {
+	                                fd.folder.content.entries.forEach(function (metric) {
+	                                    metricsInFolders.push(metric.link);
+	                                });
+	                            });
+	                            // unsortedUris now contains uris of all metrics which aren't in a folder
+	                            var unsortedUris = metrics.filter(function (item) {
+	                                return metricsInFolders.indexOf(item.link) === -1;
+	                            }).map(function (item) {
+	                                return item.link;
+	                            });
 
-	                    // sadly order of parameters of concat matters! (we want unsorted last)
-	                    entriesLinks.push(unsortedUris);
+	                            // sadly order of parameters of concat matters! (we want unsorted last)
+	                            entriesLinks.push(unsortedUris);
 
-	                    // now get details of all metrics
-	                    _jquery2['default'].when.apply(this, entriesLinks.map(function (linkArray, idx) {
-	                        return getMetricItemsDetails(linkArray);
-	                    })).then(function () {
-	                        // all promises resolved, i.e. details for each metric are available
-	                        var tree = Array.prototype.slice.call(arguments);
-	                        var structure = tree.map(function (treeItems, idx) {
-	                            // if idx is not in foldes list than metric is in "Unsorted" folder
-	                            return {
-	                                title: foldersTitles[idx] || "Unsorted",
-	                                items: treeItems
-	                            };
-	                        });
-	                        sortFolderTree(structure);
-	                        result.resolve(structure);
-	                    }, result.reject);
-	                });
+	                            // now get details of all metrics
+	                            return Promise.all(entriesLinks.map(function (linkArray, idx) {
+	                                return getMetricItemsDetails(linkArray);
+	                            })).then(function () {
+	                                for (var _len6 = arguments.length, tree = Array(_len6), _key6 = 0; _key6 < _len6; _key6++) {
+	                                    tree[_key6] = arguments[_key6];
+	                                }
+
+	                                //TODO add map to r.json
+	                                // all promises resolved, i.e. details for each metric are available
+	                                var structure = tree.map(function (treeItems, idx) {
+	                                    // if idx is not in foldes list than metric is in "Unsorted" folder
+	                                    return {
+	                                        title: foldersTitles[idx] || "Unsorted",
+	                                        items: treeItems
+	                                    };
+	                                });
+	                                sortFolderTree(structure);
+	                                return structure;
+	                            });
+	                        })
+	                    };
+	                }();
+
+	                if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
 	            } else {
-	                result.reject();
+	                return Promise.reject();
 	            }
 	        });
-	    }, result.reject);
-
-	    return result.promise();
+	    });
 	}
-
-	/*eslint-enable*/
 
 	/**
 	 * Returns all facts in a project specified by the given projectId
@@ -17945,9 +19611,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @param projectId Project identifier
 	 * @return {Array} An array of fact objects
 	 */
-
 	function getFacts(projectId) {
-	    return (0, _xhr.get)('/gdc/md/' + projectId + '/query/facts').then((0, _util.getIn)('query.entries'));
+	    return (0, _xhr.get)('/gdc/md/' + projectId + '/query/facts').then(function (r) {
+	        return r.ok ? r.json() : r;
+	    }).then((0, _util.getIn)('query.entries'));
 	}
 
 	/**
@@ -17957,9 +19624,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @param projectId Project identifier
 	 * @return {Array} An array of metric objects
 	 */
-
 	function getMetrics(projectId) {
-	    return (0, _xhr.get)('/gdc/md/' + projectId + '/query/metrics').then((0, _util.getIn)('query.entries'));
+	    return (0, _xhr.get)('/gdc/md/' + projectId + '/query/metrics').then(function (r) {
+	        return r.ok ? r.json() : r;
+	    }).then((0, _util.getIn)('query.entries'));
 	}
 
 	/**
@@ -17974,19 +19642,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @see getAvailableAttributes
 	 * @see getAvailableFacts
 	 */
-
 	function getAvailableMetrics(projectId, attrs) {
-	    /*eslint-disable new-cap*/
-	    var d = _jquery2['default'].Deferred();
-	    /*eslint-enable new-cap*/
-
-	    (0, _xhr.post)('/gdc/md/' + projectId + '/availablemetrics', {
+	    return (0, _xhr.post)('/gdc/md/' + projectId + '/availablemetrics', {
 	        data: JSON.stringify(attrs)
-	    }).then(function resolveAvailableMetrics(result) {
-	        d.resolve(result.entries);
-	    }, d.reject);
-
-	    return d.promise();
+	    }).then(function (r) {
+	        return r.ok ? r.json() : r;
+	    }).then(function (r) {
+	        return r.entries;
+	    });
 	}
 
 	/**
@@ -18001,19 +19664,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @see getAvailableMetrics
 	 * @see getAvailableFacts
 	 */
-
 	function getAvailableAttributes(projectId, metrics) {
-	    /*eslint-disable new-cap*/
-	    var d = _jquery2['default'].Deferred();
-	    /*eslint-enable new-cap*/
-
-	    (0, _xhr.post)('/gdc/md/' + projectId + '/drillcrosspaths', {
-	        data: JSON.stringify(metrics)
-	    }).then(function resolveAvailableAttributes(result) {
-	        d.resolve(result.drillcrosspath.links);
-	    }, d.reject);
-
-	    return d.promise();
+	    return (0, _xhr.post)('/gdc/md/' + projectId + '/drillcrosspaths', {
+	        body: JSON.stringify(metrics)
+	    }).then(function (r) {
+	        return r.ok ? r.json() : r;
+	    }).then(function (r) {
+	        return r.drillcrosspath.links;
+	    });
 	}
 
 	/**
@@ -18028,19 +19686,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @see getAvailableAttributes
 	 * @see getAvailableMetrics
 	 */
-
 	function getAvailableFacts(projectId, items) {
-	    /*eslint-disable new-cap*/
-	    var d = _jquery2['default'].Deferred();
-	    /*eslint-enable new-cap*/
-
-	    (0, _xhr.post)('/gdc/md/' + projectId + '/availablefacts', {
+	    return (0, _xhr.post)('/gdc/md/' + projectId + '/availablefacts', {
 	        data: JSON.stringify(items)
-	    }).then(function resolveAvailableFacts(result) {
-	        d.resolve(result.entries);
-	    }, d.reject);
-
-	    return d.promise();
+	    }).then(function (r) {
+	        return r.ok ? r.json() : r;
+	    }).then(function (r) {
+	        return r.entries;
+	    });
 	}
 
 	/**
@@ -18050,21 +19703,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @param uri uri of the metadata object for which details are to be retrieved
 	 * @return {Object} object details
 	 */
-
 	function getObjectDetails(uri) {
-	    /*eslint-disable new-cap*/
-	    var d = _jquery2['default'].Deferred();
-	    /*eslint-enable new-cap*/
-
-	    (0, _xhr.get)(uri, {
-	        headers: { Accept: 'application/json' },
-	        dataType: 'json',
-	        contentType: 'application/json'
-	    }).then(function resolveGetObject(res) {
-	        d.resolve(res);
-	    }, d.reject);
-
-	    return d.promise();
+	    return (0, _xhr.get)(uri);
 	}
 
 	/**
@@ -18074,11 +19714,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @param uri uri of the metadata object for which the identifier is to be retrieved
 	 * @return {String} object identifier
 	 */
-
 	function getObjectIdentifier(uri) {
-	    /*eslint-disable new-cap*/
-	    var d = _jquery2['default'].Deferred();
-	    /*eslint-enable new-cap*/
 	    function idFinder(obj) {
 	        if (obj.attribute) {
 	            return obj.attribute.content.displayForms[0].meta.identifier;
@@ -18091,15 +19727,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	        throw Error('Unknown object!');
 	    }
 
-	    if (!_jquery2['default'].isPlainObject(uri)) {
-	        getObjectDetails(uri).then(function resolveGetObjectDetails(data) {
-	            d.resolve(idFinder(data));
-	        }, d.reject);
-	    } else {
-	        d.resolve(idFinder(uri));
+	    if (!(0, _lodash.isPlainObject)(uri)) {
+	        return getObjectDetails(uri).then(function (data) {
+	            return idFinder(data);
+	        });
 	    }
-
-	    return d.promise();
+	    return Promise.resolve(idFinder(uri));
 	}
 
 	/**
@@ -18110,59 +19743,49 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @param identifier identifier of the metadata object
 	 * @return {String} uri of the metadata object
 	 */
-
 	function getObjectUri(projectId, identifier) {
-	    /*eslint-disable new-cap*/
-	    var d = _jquery2['default'].Deferred();
-	    /*eslint-enable new-cap*/
 	    function uriFinder(obj) {
 	        var data = obj.attribute ? obj.attribute : obj.metric;
 	        return data.meta.uri;
 	    }
 
-	    (0, _xhr.ajax)('/gdc/md/' + projectId + '/identifiers', {
-	        type: 'POST',
-	        headers: { Accept: 'application/json' },
-	        data: {
+	    return (0, _xhr.ajax)('/gdc/md/' + projectId + '/identifiers', {
+	        method: 'POST',
+	        body: {
 	            identifierToUri: [identifier]
 	        }
-	    }).then(function resolveIdentifiers(data) {
-	        var found = data.identifiers.filter(function findObjectByIdentifier(i) {
+	    }).then(_xhr.parseJSON).then(function (data) {
+	        var found = data.identifiers.filter(function (i) {
 	            return i.identifier === identifier;
 	        });
 
 	        if (found[0]) {
 	            return getObjectDetails(found[0].uri);
 	        }
-
-	        /*eslint-disable new-cap*/
-	        return _jquery2['default'].Deferred().reject('identifier not found');
-	        /*eslint-enable new-cap*/
-	    }, d.reject).then(function resolveObjectDetails(objData) {
+	        throw new Error('Object with identifier ' + identifier + ' not found in project ' + projectId);
+	    }).then(function (objData) {
 	        if (!objData.attributeDisplayForm) {
-	            return d.resolve(uriFinder(objData));
+	            return uriFinder(objData);
 	        }
-	        return getObjectDetails(objData.attributeDisplayForm.content.formOf).then(function resolve(objectData) {
-	            d.resolve(uriFinder(objectData));
-	        }, d.reject);
-	    }, d.reject);
-
-	    return d.promise();
+	        return getObjectDetails(objData.attributeDisplayForm.content.formOf).then(function (objectData) {
+	            return uriFinder(objectData);
+	        });
+	    });
 	}
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)))
 
 /***/ },
-/* 8 */
+/* 14 */
 /***/ function(module, exports, __webpack_require__) {
-
-	// Copyright (C) 2007-2014, GoodData(R) Corporation. All rights reserved.
 
 	'use strict';
 
-	Object.defineProperty(exports, '__esModule', {
+	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
+	exports.getIn = undefined;
 
-	var _lodash = __webpack_require__(4);
+	var _lodash = __webpack_require__(10);
 
 	/**
 	 * Utility methods. Mostly private
@@ -18179,59 +19802,55 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @method getIn
 	 * @private
 	 */
-	var getIn = function getIn(path) {
+	var getIn = exports.getIn = function getIn(path) {
 	  return function (object) {
 	    return (0, _lodash.get)(object, path);
 	  };
-	};
-	exports.getIn = getIn;
+	}; // Copyright (C) 2007-2014, GoodData(R) Corporation. All rights reserved.
 
 /***/ },
-/* 9 */
+/* 15 */
 /***/ function(module, exports, __webpack_require__) {
 
-	// Copyright (C) 2008-2016, GoodData(R) Corporation. All rights reserved.
-	'use strict';
+	/* WEBPACK VAR INJECTION */(function(Promise) {'use strict';
 
-	Object.defineProperty(exports, '__esModule', {
+	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
-
-	var _slicedToArray = (function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i['return']) _i['return'](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError('Invalid attempt to destructure non-iterable instance'); } }; })();
+	exports.getDataForVis = exports.mdToExecutionConfiguration = undefined;
 
 	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
+	var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }(); // Copyright (C) 2007-2014, GoodData(R) Corporation. All rights reserved.
+
+
 	exports.getData = getData;
 
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	var _md = __webpack_require__(16);
 
-	function _objectWithoutProperties(obj, keys) { var target = {}; for (var i in obj) { if (keys.indexOf(i) >= 0) continue; if (!Object.prototype.hasOwnProperty.call(obj, i)) continue; target[i] = obj[i]; } return target; }
-
-	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) arr2[i] = arr[i]; return arr2; } else { return Array.from(arr); } }
-
-	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
-	var _jquery = __webpack_require__(2);
-
-	var _jquery2 = _interopRequireDefault(_jquery);
-
-	var _md5 = __webpack_require__(10);
-
-	var _md52 = _interopRequireDefault(_md5);
+	var _md2 = _interopRequireDefault(_md);
 
 	var _xhr = __webpack_require__(1);
 
-	var _utilsRules = __webpack_require__(14);
+	var _rules = __webpack_require__(20);
 
-	var _utilsRules2 = _interopRequireDefault(_utilsRules);
+	var _rules2 = _interopRequireDefault(_rules);
 
-	var _utilsDefinitions = __webpack_require__(17);
+	var _definitions = __webpack_require__(22);
 
-	var _invariant = __webpack_require__(15);
+	var _invariant = __webpack_require__(21);
 
 	var _invariant2 = _interopRequireDefault(_invariant);
 
-	var _lodash = __webpack_require__(4);
+	var _lodash = __webpack_require__(10);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _objectWithoutProperties(obj, keys) { var target = {}; for (var i in obj) { if (keys.indexOf(i) >= 0) continue; if (!Object.prototype.hasOwnProperty.call(obj, i)) continue; target[i] = obj[i]; } return target; }
+
+	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
+	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 	var notEmpty = (0, _lodash.negate)(_lodash.isEmpty);
 
@@ -18275,10 +19894,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	 *
 	 * @return {Object} Structure with `headers` and `rawData` keys filled with values from execution.
 	 */
-
 	function getData(projectId, columns) {
-	    var executionConfiguration = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
-	    var settings = arguments.length <= 3 || arguments[3] === undefined ? {} : arguments[3];
+	    var executionConfiguration = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+	    var settings = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
 
 	    var executedReport = {
 	        isLoaded: false
@@ -18296,27 +19914,38 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	    });
 
-	    /*eslint-disable new-cap*/
-	    var d = _jquery2['default'].Deferred();
-	    /*eslint-enable new-cap*/
-
 	    // Execute request
-	    (0, _xhr.post)('/gdc/internal/projects/' + projectId + '/experimental/executions', _extends({}, settings, {
-	        data: JSON.stringify(request)
-	    }), d.reject).then(function (result) {
+	    return (0, _xhr.post)('/gdc/internal/projects/' + projectId + '/experimental/executions', {
+	        body: JSON.stringify(request)
+	    }).then(_xhr.parseJSON).then(function resolveSimpleExecution(result) {
 	        executedReport.headers = wrapMeasureIndexesFromMappings((0, _lodash.get)(executionConfiguration, 'metricMappings'), result.executionResult.headers);
 
 	        // Start polling on url returned in the executionResult for tabularData
 	        return (0, _xhr.ajax)(result.executionResult.tabularDataResult, settings);
-	    }, d.reject).then(function (result, message, response) {
+	    }).then(function (r) {
+	        if (r.status === 204) {
+	            return {
+	                status: r.status,
+	                result: ''
+	            };
+	        }
+
+	        return r.json().then(function (result) {
+	            return {
+	                status: r.status,
+	                result: result
+	            };
+	        });
+	    }).then(function (r) {
+	        var result = r.result,
+	            status = r.status;
 	        // After the retrieving computed tabularData, resolve the promise
+
 	        executedReport.rawData = result && result.tabularDataResult ? result.tabularDataResult.values : [];
 	        executedReport.isLoaded = true;
-	        executedReport.isEmpty = response.status === 204;
-	        d.resolve(executedReport);
-	    }, d.reject);
-
-	    return d.promise();
+	        executedReport.isEmpty = status === 204;
+	        return executedReport;
+	    });
 	}
 
 	var MAX_TITLE_LENGTH = 255;
@@ -18324,9 +19953,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var maxLength = MAX_TITLE_LENGTH - suffix.length;
 	    if (title && title.length > maxLength) {
 	        if (title[title.length - 1] === ')') {
-	            return title.substring(0, maxLength - 2) + '…)' + suffix;
+	            return title.substring(0, maxLength - 2) + '\u2026)' + suffix;
 	        }
-	        return title.substring(0, maxLength - 1) + '…' + suffix;
+	        return title.substring(0, maxLength - 1) + '\u2026' + suffix;
 	    }
 	    return '' + title + suffix;
 	};
@@ -18373,8 +20002,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return 'SELECT ' + (aggregation ? aggregation + '([' + objectUri + '])' : '[' + objectUri + ']') + (notEmpty(where) ? ' WHERE ' + where.join(' AND ') : '');
 	};
 
-	var getPercentMetricExpression = function getPercentMetricExpression(_ref4, measure) {
-	    var category = _ref4.category;
+	var getPercentMetricExpression = function getPercentMetricExpression(_ref, measure) {
+	    var category = _ref.category;
 
 	    var metricExpressionWithoutFilters = 'SELECT [' + (0, _lodash.get)(measure, 'objectUri') + ']';
 
@@ -18398,16 +20027,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 	var getGeneratedMetricHash = function getGeneratedMetricHash(title, format, expression) {
-	    return (0, _md52['default'])(expression + '#' + title + '#' + format);
+	    return (0, _md2.default)(expression + '#' + title + '#' + format);
 	};
 
 	var getGeneratedMetricIdentifier = function getGeneratedMetricIdentifier(item, aggregation, expressionCreator, hasher) {
-	    var _get$split = (0, _lodash.get)(item, 'objectUri').split('/');
-
-	    var _get$split2 = _slicedToArray(_get$split, 6);
-
-	    var prjId = _get$split2[3];
-	    var id = _get$split2[5];
+	    var _get$split = (0, _lodash.get)(item, 'objectUri').split('/'),
+	        _get$split2 = _slicedToArray(_get$split, 6),
+	        prjId = _get$split2[3],
+	        id = _get$split2[5];
 
 	    var identifier = prjId + '_' + id;
 	    var hash = hasher(expressionCreator(item));
@@ -18419,21 +20046,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return type + '_' + identifier + '.generated.' + prefix + aggregation + '.' + hash;
 	};
 
-	var isDateCategory = function isDateCategory(_ref5) {
-	    var category = _ref5.category;
+	var isDateCategory = function isDateCategory(_ref2) {
+	    var category = _ref2.category;
 	    return category.type === 'date';
 	};
-	var isDateFilter = function isDateFilter(_ref6) {
-	    var dateFilter = _ref6.dateFilter;
+	var isDateFilter = function isDateFilter(_ref3) {
+	    var dateFilter = _ref3.dateFilter;
 	    return dateFilter;
 	};
 
-	var getCategories = function getCategories(_ref7) {
-	    var categories = _ref7.categories;
+	var getCategories = function getCategories(_ref4) {
+	    var categories = _ref4.categories;
 	    return categories;
 	};
-	var getFilters = function getFilters(_ref8) {
-	    var filters = _ref8.filters;
+	var getFilters = function getFilters(_ref5) {
+	    var filters = _ref5.filters;
 	    return filters;
 	};
 
@@ -18475,8 +20102,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 	var createDerivedMetric = function createDerivedMetric(measure, mdObj, measureIndex) {
-	    var format = measure.format;
-	    var sort = measure.sort;
+	    var format = measure.format,
+	        sort = measure.sort;
 
 	    var title = getBaseMetricTitle(measure.title);
 
@@ -18531,7 +20158,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    var date = getDate(mdObj);
 
-	    var generated = undefined;
+	    var generated = void 0;
 	    var getMetricExpression = (0, _lodash.partial)(getPoPExpression, date, '[' + (0, _lodash.get)(measure, 'objectUri') + ']');
 
 	    if (isDerived(measure)) {
@@ -18602,8 +20229,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return result;
 	};
 
-	var categoryToElement = function categoryToElement(_ref9) {
-	    var category = _ref9.category;
+	var categoryToElement = function categoryToElement(_ref6) {
+	    var category = _ref6.category;
 	    return { element: (0, _lodash.get)(category, 'displayForm'), sort: (0, _lodash.get)(category, 'sort') };
 	};
 
@@ -18640,7 +20267,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return type === 'metric';
 	};
 
-	var rules = new _utilsRules2['default']();
+	var rules = new _rules2.default();
 
 	rules.addRule([isPoP, isContribution], createContributionPoPMetric);
 
@@ -18655,7 +20282,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	function getMetricFactory(measure) {
 	    var factory = rules.match(measure);
 
-	    (0, _invariant2['default'])(factory, 'Unknown factory for: ' + measure);
+	    (0, _invariant2.default)(factory, 'Unknown factory for: ' + measure);
 
 	    return factory;
 	}
@@ -18705,8 +20332,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }), sortToOrderBy);
 	};
 
-	var mdToExecutionConfiguration = function mdToExecutionConfiguration(mdObj) {
-	    var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+	var mdToExecutionConfiguration = exports.mdToExecutionConfiguration = function mdToExecutionConfiguration(mdObj) {
+	    var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
 	    var buckets = (0, _lodash.get)(mdObj, 'buckets');
 	    var measures = (0, _lodash.map)(buckets.measures, function (_ref15) {
@@ -18735,7 +20362,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return {
 	        columns: columns,
 	        orderBy: getOrderBy(metrics, categories, (0, _lodash.get)(mdObj, 'type')),
-	        definitions: (0, _utilsDefinitions.sortDefinitions)((0, _lodash.compact)((0, _lodash.map)(metrics, 'definition'))),
+	        definitions: (0, _definitions.sortDefinitions)((0, _lodash.compact)((0, _lodash.map)(metrics, 'definition'))),
 	        where: columns.length ? getWhere(filters) : {},
 	        metricMappings: (0, _lodash.map)(metrics, function (m) {
 	            return _extends({ element: m.element }, m.meta);
@@ -18743,10 +20370,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	};
 
-	exports.mdToExecutionConfiguration = mdToExecutionConfiguration;
 	var getOriginalMetricFormats = function getOriginalMetricFormats(mdObj) {
 	    // for metrics with showPoP or measureFilters.length > 0 roundtrip for original metric format
-	    return _jquery2['default'].when.apply(undefined, (0, _lodash.map)((0, _lodash.map)((0, _lodash.get)(mdObj, 'buckets.measures'), function (_ref17) {
+	    return Promise.all((0, _lodash.map)((0, _lodash.map)((0, _lodash.get)(mdObj, 'buckets.measures'), function (_ref17) {
 	        var measure = _ref17.measure;
 	        return measure;
 	    }), function (measure) {
@@ -18758,42 +20384,34 @@ return /******/ (function(modules) { // webpackBootstrap
 	            });
 	        }
 
-	        /* eslint-disable new-cap */
-	        return _jquery2['default'].Deferred().resolve(measure);
-	        /* eslint-enable new-cap */
+	        return Promise.resolve(measure);
 	    }));
 	};
 
-	var getDataForVis = function getDataForVis(projectId, mdObj, settings) {
-	    return getOriginalMetricFormats(mdObj).then(function () {
-	        for (var _len = arguments.length, measures = Array(_len), _key = 0; _key < _len; _key++) {
-	            measures[_key] = arguments[_key];
-	        }
-
-	        mdObj.buckets.measures = (0, _lodash.map)([].concat(measures), function (measure) {
+	var getDataForVis = exports.getDataForVis = function getDataForVis(projectId, mdObj, settings) {
+	    return getOriginalMetricFormats(mdObj).then(function (measures) {
+	        mdObj.buckets.measures = (0, _lodash.map)(measures, function (measure) {
 	            return { measure: measure };
 	        });
 
-	        var _mdToExecutionConfiguration = mdToExecutionConfiguration(mdObj);
-
-	        var columns = _mdToExecutionConfiguration.columns;
-
-	        var executionConfiguration = _objectWithoutProperties(_mdToExecutionConfiguration, ['columns']);
+	        var _mdToExecutionConfigu = mdToExecutionConfiguration(mdObj),
+	            columns = _mdToExecutionConfigu.columns,
+	            executionConfiguration = _objectWithoutProperties(_mdToExecutionConfigu, ['columns']);
 
 	        return getData(projectId, columns, executionConfiguration, settings);
 	    });
 	};
-	exports.getDataForVis = getDataForVis;
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)))
 
 /***/ },
-/* 10 */
+/* 16 */
 /***/ function(module, exports, __webpack_require__) {
 
 	(function(){
-	  var crypt = __webpack_require__(11),
-	      utf8 = __webpack_require__(12).utf8,
-	      isBuffer = __webpack_require__(13),
-	      bin = __webpack_require__(12).bin,
+	  var crypt = __webpack_require__(17),
+	      utf8 = __webpack_require__(18).utf8,
+	      isBuffer = __webpack_require__(19),
+	      bin = __webpack_require__(18).bin,
 
 	  // The core
 	  md5 = function (message, options) {
@@ -18952,7 +20570,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 11 */
+/* 17 */
 /***/ function(module, exports) {
 
 	(function() {
@@ -19054,7 +20672,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 12 */
+/* 18 */
 /***/ function(module, exports) {
 
 	var charenc = {
@@ -19093,53 +20711,57 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 13 */
+/* 19 */
 /***/ function(module, exports) {
 
-	/**
-	 * Determine if an object is Buffer
+	/*!
+	 * Determine if an object is a Buffer
 	 *
-	 * Author:   Feross Aboukhadijeh <feross@feross.org> <http://feross.org>
-	 * License:  MIT
-	 *
-	 * `npm install is-buffer`
+	 * @author   Feross Aboukhadijeh <feross@feross.org> <http://feross.org>
+	 * @license  MIT
 	 */
 
+	// The _isBuffer check is for Safari 5-7 support, because it's missing
+	// Object.prototype.constructor. Remove this eventually
 	module.exports = function (obj) {
-	  return !!(obj != null &&
-	    (obj._isBuffer || // For Safari 5-7 (missing Object.prototype.constructor)
-	      (obj.constructor &&
-	      typeof obj.constructor.isBuffer === 'function' &&
-	      obj.constructor.isBuffer(obj))
-	    ))
+	  return obj != null && (isBuffer(obj) || isSlowBuffer(obj) || !!obj._isBuffer)
+	}
+
+	function isBuffer (obj) {
+	  return !!obj.constructor && typeof obj.constructor.isBuffer === 'function' && obj.constructor.isBuffer(obj)
+	}
+
+	// For Node v0.10 support. Remove this eventually.
+	function isSlowBuffer (obj) {
+	  return typeof obj.readFloatLE === 'function' && typeof obj.slice === 'function' && isBuffer(obj.slice(0, 0))
 	}
 
 
 /***/ },
-/* 14 */
+/* 20 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	Object.defineProperty(exports, '__esModule', {
+	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
 
-	var _slicedToArray = (function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i['return']) _i['return'](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError('Invalid attempt to destructure non-iterable instance'); } }; })();
+	var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
 
-	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
-
-	var _invariant = __webpack_require__(15);
+	var _invariant = __webpack_require__(21);
 
 	var _invariant2 = _interopRequireDefault(_invariant);
 
-	var _lodash = __webpack_require__(4);
+	var _lodash = __webpack_require__(10);
 
-	var Rules = (function () {
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	var Rules = function () {
 	    function Rules() {
 	        _classCallCheck(this, Rules);
 
@@ -19155,32 +20777,29 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: 'match',
 	        value: function match(subject) {
 	            var _find = (0, _lodash.find)(this.rules, function (_ref) {
-	                var _ref2 = _slicedToArray(_ref, 1);
+	                var _ref2 = _slicedToArray(_ref, 1),
+	                    tests = _ref2[0];
 
-	                var tests = _ref2[0];
 	                return (0, _lodash.every)(tests, function (test) {
 	                    return test(subject);
 	                });
-	            });
+	            }),
+	                _find2 = _slicedToArray(_find, 2),
+	                callback = _find2[1];
 
-	            var _find2 = _slicedToArray(_find, 2);
-
-	            var callback = _find2[1];
-
-	            (0, _invariant2['default'])(callback, 'Callback not found :-(');
+	            (0, _invariant2.default)(callback, 'Callback not found :-(');
 
 	            return callback;
 	        }
 	    }]);
 
 	    return Rules;
-	})();
+	}();
 
-	exports['default'] = Rules;
-	module.exports = exports['default'];
+	exports.default = Rules;
 
 /***/ },
-/* 15 */
+/* 21 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -19235,206 +20854,20 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	module.exports = invariant;
 
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(16)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(5)))
 
 /***/ },
-/* 16 */
-/***/ function(module, exports) {
-
-	// shim for using process in browser
-	var process = module.exports = {};
-
-	// cached from whatever global is present so that test runners that stub it
-	// don't break things.  But we need to wrap it in a try catch in case it is
-	// wrapped in strict mode code which doesn't define any globals.  It's inside a
-	// function because try/catches deoptimize in certain engines.
-
-	var cachedSetTimeout;
-	var cachedClearTimeout;
-
-	function defaultSetTimout() {
-	    throw new Error('setTimeout has not been defined');
-	}
-	function defaultClearTimeout () {
-	    throw new Error('clearTimeout has not been defined');
-	}
-	(function () {
-	    try {
-	        if (typeof setTimeout === 'function') {
-	            cachedSetTimeout = setTimeout;
-	        } else {
-	            cachedSetTimeout = defaultSetTimout;
-	        }
-	    } catch (e) {
-	        cachedSetTimeout = defaultSetTimout;
-	    }
-	    try {
-	        if (typeof clearTimeout === 'function') {
-	            cachedClearTimeout = clearTimeout;
-	        } else {
-	            cachedClearTimeout = defaultClearTimeout;
-	        }
-	    } catch (e) {
-	        cachedClearTimeout = defaultClearTimeout;
-	    }
-	} ())
-	function runTimeout(fun) {
-	    if (cachedSetTimeout === setTimeout) {
-	        //normal enviroments in sane situations
-	        return setTimeout(fun, 0);
-	    }
-	    // if setTimeout wasn't available but was latter defined
-	    if ((cachedSetTimeout === defaultSetTimout || !cachedSetTimeout) && setTimeout) {
-	        cachedSetTimeout = setTimeout;
-	        return setTimeout(fun, 0);
-	    }
-	    try {
-	        // when when somebody has screwed with setTimeout but no I.E. maddness
-	        return cachedSetTimeout(fun, 0);
-	    } catch(e){
-	        try {
-	            // When we are in I.E. but the script has been evaled so I.E. doesn't trust the global object when called normally
-	            return cachedSetTimeout.call(null, fun, 0);
-	        } catch(e){
-	            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error
-	            return cachedSetTimeout.call(this, fun, 0);
-	        }
-	    }
-
-
-	}
-	function runClearTimeout(marker) {
-	    if (cachedClearTimeout === clearTimeout) {
-	        //normal enviroments in sane situations
-	        return clearTimeout(marker);
-	    }
-	    // if clearTimeout wasn't available but was latter defined
-	    if ((cachedClearTimeout === defaultClearTimeout || !cachedClearTimeout) && clearTimeout) {
-	        cachedClearTimeout = clearTimeout;
-	        return clearTimeout(marker);
-	    }
-	    try {
-	        // when when somebody has screwed with setTimeout but no I.E. maddness
-	        return cachedClearTimeout(marker);
-	    } catch (e){
-	        try {
-	            // When we are in I.E. but the script has been evaled so I.E. doesn't  trust the global object when called normally
-	            return cachedClearTimeout.call(null, marker);
-	        } catch (e){
-	            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error.
-	            // Some versions of I.E. have different rules for clearTimeout vs setTimeout
-	            return cachedClearTimeout.call(this, marker);
-	        }
-	    }
-
-
-
-	}
-	var queue = [];
-	var draining = false;
-	var currentQueue;
-	var queueIndex = -1;
-
-	function cleanUpNextTick() {
-	    if (!draining || !currentQueue) {
-	        return;
-	    }
-	    draining = false;
-	    if (currentQueue.length) {
-	        queue = currentQueue.concat(queue);
-	    } else {
-	        queueIndex = -1;
-	    }
-	    if (queue.length) {
-	        drainQueue();
-	    }
-	}
-
-	function drainQueue() {
-	    if (draining) {
-	        return;
-	    }
-	    var timeout = runTimeout(cleanUpNextTick);
-	    draining = true;
-
-	    var len = queue.length;
-	    while(len) {
-	        currentQueue = queue;
-	        queue = [];
-	        while (++queueIndex < len) {
-	            if (currentQueue) {
-	                currentQueue[queueIndex].run();
-	            }
-	        }
-	        queueIndex = -1;
-	        len = queue.length;
-	    }
-	    currentQueue = null;
-	    draining = false;
-	    runClearTimeout(timeout);
-	}
-
-	process.nextTick = function (fun) {
-	    var args = new Array(arguments.length - 1);
-	    if (arguments.length > 1) {
-	        for (var i = 1; i < arguments.length; i++) {
-	            args[i - 1] = arguments[i];
-	        }
-	    }
-	    queue.push(new Item(fun, args));
-	    if (queue.length === 1 && !draining) {
-	        runTimeout(drainQueue);
-	    }
-	};
-
-	// v8 likes predictible objects
-	function Item(fun, array) {
-	    this.fun = fun;
-	    this.array = array;
-	}
-	Item.prototype.run = function () {
-	    this.fun.apply(null, this.array);
-	};
-	process.title = 'browser';
-	process.browser = true;
-	process.env = {};
-	process.argv = [];
-	process.version = ''; // empty string to avoid regexp issues
-	process.versions = {};
-
-	function noop() {}
-
-	process.on = noop;
-	process.addListener = noop;
-	process.once = noop;
-	process.off = noop;
-	process.removeListener = noop;
-	process.removeAllListeners = noop;
-	process.emit = noop;
-
-	process.binding = function (name) {
-	    throw new Error('process.binding is not supported');
-	};
-
-	process.cwd = function () { return '/' };
-	process.chdir = function (dir) {
-	    throw new Error('process.chdir is not supported');
-	};
-	process.umask = function() { return 0; };
-
-
-/***/ },
-/* 17 */
+/* 22 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	Object.defineProperty(exports, '__esModule', {
+	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
 	exports.sortDefinitions = sortDefinitions;
 
-	var _lodash = __webpack_require__(4);
+	var _lodash = __webpack_require__(10);
 
 	var IDENTIFIER_REGEX = /{\S+}/g;
 
@@ -19473,7 +20906,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function sort(unresolved) {
 	    var resolved = [];
-	    var lastLength = undefined;
+	    var lastLength = void 0;
 
 	    while (unresolved.length > 0) {
 	        lastLength = unresolved.length;
@@ -19500,13 +20933,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 18 */
+/* 23 */
 /***/ function(module, exports, __webpack_require__) {
 
-	// Copyright (C) 2007-2014, GoodData(R) Corporation. All rights reserved.
 	'use strict';
 
-	Object.defineProperty(exports, '__esModule', {
+	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
 	exports.getCurrentProjectId = getCurrentProjectId;
@@ -19517,15 +20949,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.getTimezone = getTimezone;
 	exports.setTimezone = setTimezone;
 
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-
-	var _jquery = __webpack_require__(2);
-
-	var _jquery2 = _interopRequireDefault(_jquery);
-
 	var _xhr = __webpack_require__(1);
 
-	var _util = __webpack_require__(8);
+	var _util = __webpack_require__(14);
 
 	/**
 	 * Functions for working with projects
@@ -19540,9 +20966,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @method getCurrentProjectId
 	 * @return {String} current project identifier
 	 */
-
+	// Copyright (C) 2007-2014, GoodData(R) Corporation. All rights reserved.
 	function getCurrentProjectId() {
-	    return (0, _xhr.get)('/gdc/app/account/bootstrap').then(function resolveBootstrap(result) {
+	    return (0, _xhr.get)('/gdc/app/account/bootstrap').then(function (result) {
 	        var currentProject = result.bootstrapResource.current.project;
 	        // handle situation in which current project is missing (e.g. new user)
 	        if (!currentProject) {
@@ -19560,10 +20986,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @param {String} profileId - User profile identifier
 	 * @return {Array} An Array of projects
 	 */
-
 	function getProjects(profileId) {
-	    return (0, _xhr.get)('/gdc/account/profile/' + profileId + '/projects').then(function resolveProjects(result) {
-	        return result.projects.map(function getProject(p) {
+	    return (0, _xhr.get)('/gdc/account/profile/' + profileId + '/projects').then(function (r) {
+	        return r.projects.map(function (p) {
 	            return p.project;
 	        });
 	    });
@@ -19576,7 +21001,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @param {String} projectId - GD project identifier
 	 * @return {Array} An array of objects containing datasets metadata
 	 */
-
 	function getDatasets(projectId) {
 	    return (0, _xhr.get)('/gdc/md/' + projectId + '/query/datasets').then((0, _util.getIn)('query.entries'));
 	}
@@ -19592,28 +21016,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @return {Array} An array of objects with r, g, b fields representing a project's
 	 * color palette
 	 */
-
 	function getColorPalette(projectId) {
-	    /*eslint-disable new-cap*/
-	    var d = _jquery2['default'].Deferred();
-	    /*eslint-enable new-cap*/
-
-	    (0, _xhr.get)('/gdc/projects/' + projectId + '/styleSettings').then(function resolveStyleSetting(result) {
-	        d.resolve(result.styleSettings.chartPalette.map(function mapColorToObject(c) {
+	    return (0, _xhr.get)('/gdc/projects/' + projectId + '/styleSettings').then(function (result) {
+	        return result.styleSettings.chartPalette.map(function (c) {
 	            return {
 	                r: c.fill.r,
 	                g: c.fill.g,
 	                b: c.fill.b
 	            };
-	        }));
-	    }, function rejectStyleSetting(err) {
+	        });
+	    }, function (err) {
 	        if (err.status === 200) {
-	            d.resolve(DEFAULT_PALETTE);
+	            return DEFAULT_PALETTE;
 	        }
-	        d.reject(err);
-	    });
 
-	    return d.promise();
+	        throw new Error(err.statusText);
+	    });
 	}
 
 	/**
@@ -19624,26 +21042,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @param {Array} colors - An array of colors that we want to use within the project.
 	 * Each color should be an object with r, g, b fields.
 	 */
-
 	function setColorPalette(projectId, colors) {
-	    /*eslint-disable new-cap*/
-	    var d = _jquery2['default'].Deferred();
-	    /*eslint-enable new-cap*/
-
-	    (0, _xhr.put)('/gdc/projects/' + projectId + '/styleSettings', {
+	    return (0, _xhr.put)('/gdc/projects/' + projectId + '/styleSettings', {
 	        data: {
 	            styleSettings: {
-	                chartPalette: colors.map(function mapColorToObject(c, idx) {
-	                    return {
-	                        guid: 'guid' + idx,
-	                        fill: c
-	                    };
+	                chartPalette: colors.map(function (fill, idx) {
+	                    return { fill: fill, guid: 'guid' + idx };
 	                })
 	            }
 	        }
-	    }).then(d.resolve, d.reject);
-
-	    return d.promise();
+	    });
 	}
 
 	/**
@@ -19658,46 +21066,33 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @method getTimezone
 	 * @param {String} projectId - GD project identifier
 	 */
-
 	function getTimezone(projectId) {
-	    /*eslint-disable new-cap*/
-	    var d = _jquery2['default'].Deferred();
-	    /*eslint-enable new-cap*/
 	    var bootstrapUrl = '/gdc/app/account/bootstrap?projectId=' + projectId;
 
-	    (0, _xhr.get)(bootstrapUrl).then(function resolveGetTimezone(result) {
-	        var timezone = result.bootstrapResource.current.timezone;
-	        d.resolve(timezone);
-	    }, d.reject);
-
-	    return d.promise();
+	    return (0, _xhr.get)(bootstrapUrl).then(function (result) {
+	        return result.bootstrapResource.current.timezone;
+	    });
 	}
 
 	function setTimezone(projectId, timezone) {
-	    /*eslint-disable new-cap*/
-	    var d = _jquery2['default'].Deferred();
-	    /*eslint-enable new-cap*/
 	    var timezoneServiceUrl = '/gdc/md/' + projectId + '/service/timezone';
 	    var data = {
 	        service: { timezone: timezone }
 	    };
 
-	    (0, _xhr.ajax)(timezoneServiceUrl, {
-	        type: 'POST',
-	        headers: { Accept: 'application/json' },
-	        data: data
-	    }).then(d.resolve, d.reject);
-
-	    return d.promise();
+	    return (0, _xhr.ajax)(timezoneServiceUrl, {
+	        method: 'POST',
+	        body: data
+	    }).then(_xhr.parseJSON);
 	}
 
 /***/ },
-/* 19 */
+/* 24 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	Object.defineProperty(exports, '__esModule', {
+	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
 
@@ -19706,15 +21101,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.loadItems = loadItems;
 	exports.loadDateDataSets = loadDateDataSets;
 
-	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj['default'] = obj; return newObj; } }
-
-	var _lodash = __webpack_require__(4);
+	var _lodash = __webpack_require__(10);
 
 	var _xhr = __webpack_require__(1);
 
-	var xhr = _interopRequireWildcard(_xhr);
-
-	var _execution = __webpack_require__(9);
+	var _execution = __webpack_require__(15);
 
 	var REQUEST_DEFAULTS = {
 	    types: ['attribute', 'metric', 'fact'],
@@ -19740,7 +21131,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 	function bucketItemsToExecConfig(bucketItems) {
-	    var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+	    var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
 	    var categories = parseCategories(bucketItems);
 	    var executionConfig = (0, _execution.mdToExecutionConfiguration)({
@@ -19796,18 +21187,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return { requiredDataSets: { type: 'PRODUCTION' } };
 	};
 
-	function loadCatalog(projectId, request) {
+	function loadCatalog(projectId, catalogRequest) {
 	    var uri = '/gdc/internal/projects/' + projectId + '/loadCatalog';
-	    return xhr.ajax(uri, {
-	        type: 'POST',
-	        data: { catalogRequest: request }
-	    }).then(function (data) {
+
+	    return (0, _xhr.post)(uri, { data: { catalogRequest: catalogRequest } }).then(_xhr.parseJSON).then(function (data) {
 	        return data.catalogResponse;
 	    });
 	}
 
 	function loadItems(projectId) {
-	    var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+	    var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
 	    var request = (0, _lodash.omit)(_extends({}, REQUEST_DEFAULTS, options, getRequiredDataSets(options)), ['dataSetIdentifier', 'returnAllDateDataSets']);
 
@@ -19822,12 +21211,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return loadCatalog(projectId, request);
 	}
 
-	function requestDateDataSets(projectId, request) {
+	function requestDateDataSets(projectId, dateDataSetsRequest) {
 	    var uri = '/gdc/internal/projects/' + projectId + '/loadDateDataSets';
 
-	    return xhr.ajax(uri, {
-	        type: 'POST',
-	        data: { dateDataSetsRequest: request }
+	    return (0, _xhr.post)(uri, { data: { dateDataSetsRequest: dateDataSetsRequest } }).then(_xhr.parseJSON).then(function (data) {
+	        return data.dateDataSetsResponse;
 	    });
 	}
 
