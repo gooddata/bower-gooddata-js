@@ -1,7 +1,7 @@
 /* Copyright (C) 2007-2015, GoodData(R) Corporation. All rights reserved. */
-/* gooddata - v1.0.0 */
-/* 2016-11-10 15:15:51 */
-/* Latest git commit: "86ecb86" */
+/* gooddata - v1.0.1 */
+/* 2016-11-18 13:43:06 */
+/* Latest git commit: "c96f21f" */
 
 
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -86,7 +86,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var project = _interopRequireWildcard(_project);
 
-	var _config = __webpack_require__(9);
+	var _config = __webpack_require__(11);
 
 	var config = _interopRequireWildcard(_config);
 
@@ -131,13 +131,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.ajaxSetup = ajaxSetup;
 	exports.ajax = ajax;
 
-	var _config = __webpack_require__(9);
+	var _lodash = __webpack_require__(9);
+
+	__webpack_require__(10);
+
+	var _config = __webpack_require__(11);
 
 	var config = _interopRequireWildcard(_config);
-
-	var _lodash = __webpack_require__(10);
-
-	__webpack_require__(11);
 
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
@@ -154,7 +154,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 
 	var DEFAULT_POLL_DELAY = 1000; // Copyright (C) 2007-2013, GoodData(R) Corporation. All rights reserved.
-	/*eslint block-scoped-var:0 no-use-before-define: [2, "nofunc"]*/ // TODO enable block-scoped-vars
 
 
 	var tokenRequest = void 0;
@@ -183,8 +182,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	}
 
-	function enrichSettingWithCustomDomain(originalUrl, settings, domain) {
+	function enrichSettingWithCustomDomain(originalUrl, originalSettings, domain) {
 	    var url = originalUrl;
+	    var settings = originalSettings;
 	    if (domain) {
 	        // protect url to be prepended with domain on retry
 	        if (originalUrl.indexOf(domain) === -1) {
@@ -206,11 +206,35 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	        tokenRequest = null;
 
-	        return ajax(url, settings);
+	        return ajax(url, settings); // eslint-disable-line no-use-before-define
 	    }, function (reason) {
 	        tokenRequest = null;
 	        return reason;
 	    });
+	}
+
+	function createSettings(customSettings) {
+	    var headers = new Headers({
+	        Accept: 'application/json; charset=utf-8',
+	        'Content-Type': 'application/json'
+	    });
+
+	    var settings = Object.assign({}, commonXhrSettings, customSettings);
+
+	    settings.pollDelay = settings.pollDelay !== undefined ? settings.pollDelay : DEFAULT_POLL_DELAY;
+
+	    settings.headers = headers;
+
+	    // TODO jquery compat - add to warnings
+	    settings.body = settings.data ? settings.data : settings.body;
+	    settings.mode = 'same-origin';
+	    settings.credentials = 'same-origin';
+
+	    if ((0, _lodash.isPlainObject)(settings.body)) {
+	        settings.body = JSON.stringify(settings.body);
+	    }
+
+	    return settings;
 	}
 
 	function handleUnauthorized(originalUrl, originalSettings) {
@@ -272,6 +296,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	    throw error;
 	};
 
+	function handlePolling(url, settings) {
+	    return new Promise(function (resolve, reject) {
+	        setTimeout(function () {
+	            ajax(url, settings).then(resolve, reject); // eslint-disable-line no-use-before-define
+	        }, settings.pollDelay);
+	    });
+	}
+
 	function ajax(originalUrl) {
 	    var tempSettings = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
@@ -317,37 +349,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }).then(checkStatus);
 	}
 
-	function createSettings(customSettings) {
-	    var headers = new Headers({
-	        'Accept': 'application/json; charset=utf-8',
-	        'Content-Type': 'application/json'
-	    });
-
-	    var settings = Object.assign({}, commonXhrSettings, customSettings);
-
-	    settings.pollDelay = settings.pollDelay !== undefined ? settings.pollDelay : DEFAULT_POLL_DELAY;
-
-	    settings.headers = headers;
-
-	    // TODO jquery compat - add to warnings
-	    settings.body = settings.data ? settings.data : settings.body;
-	    settings.mode = 'same-origin';
-	    settings.credentials = 'same-origin';
-
-	    if ((0, _lodash.isPlainObject)(settings.body)) {
-	        settings.body = JSON.stringify(settings.body);
-	    }
-
-	    return settings;
-	}
-
-	function handlePolling(url, settings) {
-	    return new Promise(function (resolve, reject) {
-	        setTimeout(function poller() {
-	            ajax(url, settings).then(resolve, reject);
-	        }, settings.pollDelay);
-	    });
-	}
 	function xhrMethod(method) {
 	    return function methodFn(url, settings) {
 	        var opts = (0, _lodash.merge)({ method: method }, settings);
@@ -425,6 +426,28 @@ return /******/ (function(modules) { // webpackBootstrap
 	    arrayBuffer: 'ArrayBuffer' in self
 	  }
 
+	  if (support.arrayBuffer) {
+	    var viewClasses = [
+	      '[object Int8Array]',
+	      '[object Uint8Array]',
+	      '[object Uint8ClampedArray]',
+	      '[object Int16Array]',
+	      '[object Uint16Array]',
+	      '[object Int32Array]',
+	      '[object Uint32Array]',
+	      '[object Float32Array]',
+	      '[object Float64Array]'
+	    ]
+
+	    var isDataView = function(obj) {
+	      return obj && DataView.prototype.isPrototypeOf(obj)
+	    }
+
+	    var isArrayBufferView = ArrayBuffer.isView || function(obj) {
+	      return obj && viewClasses.indexOf(Object.prototype.toString.call(obj)) > -1
+	    }
+	  }
+
 	  function normalizeName(name) {
 	    if (typeof name !== 'string') {
 	      name = String(name)
@@ -478,12 +501,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	  Headers.prototype.append = function(name, value) {
 	    name = normalizeName(name)
 	    value = normalizeValue(value)
-	    var list = this.map[name]
-	    if (!list) {
-	      list = []
-	      this.map[name] = list
-	    }
-	    list.push(value)
+	    var oldValue = this.map[name]
+	    this.map[name] = oldValue ? oldValue+','+value : value
 	  }
 
 	  Headers.prototype['delete'] = function(name) {
@@ -491,12 +510,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 
 	  Headers.prototype.get = function(name) {
-	    var values = this.map[normalizeName(name)]
-	    return values ? values[0] : null
-	  }
-
-	  Headers.prototype.getAll = function(name) {
-	    return this.map[normalizeName(name)] || []
+	    name = normalizeName(name)
+	    return this.has(name) ? this.map[name] : null
 	  }
 
 	  Headers.prototype.has = function(name) {
@@ -504,15 +519,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 
 	  Headers.prototype.set = function(name, value) {
-	    this.map[normalizeName(name)] = [normalizeValue(value)]
+	    this.map[normalizeName(name)] = normalizeValue(value)
 	  }
 
 	  Headers.prototype.forEach = function(callback, thisArg) {
-	    Object.getOwnPropertyNames(this.map).forEach(function(name) {
-	      this.map[name].forEach(function(value) {
-	        callback.call(thisArg, value, name, this)
-	      }, this)
-	    }, this)
+	    for (var name in this.map) {
+	      if (this.map.hasOwnProperty(name)) {
+	        callback.call(thisArg, this.map[name], name, this)
+	      }
+	    }
 	  }
 
 	  Headers.prototype.keys = function() {
@@ -557,14 +572,36 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  function readBlobAsArrayBuffer(blob) {
 	    var reader = new FileReader()
+	    var promise = fileReaderReady(reader)
 	    reader.readAsArrayBuffer(blob)
-	    return fileReaderReady(reader)
+	    return promise
 	  }
 
 	  function readBlobAsText(blob) {
 	    var reader = new FileReader()
+	    var promise = fileReaderReady(reader)
 	    reader.readAsText(blob)
-	    return fileReaderReady(reader)
+	    return promise
+	  }
+
+	  function readArrayBufferAsText(buf) {
+	    var view = new Uint8Array(buf)
+	    var chars = new Array(view.length)
+
+	    for (var i = 0; i < view.length; i++) {
+	      chars[i] = String.fromCharCode(view[i])
+	    }
+	    return chars.join('')
+	  }
+
+	  function bufferClone(buf) {
+	    if (buf.slice) {
+	      return buf.slice(0)
+	    } else {
+	      var view = new Uint8Array(buf.byteLength)
+	      view.set(new Uint8Array(buf))
+	      return view.buffer
+	    }
 	  }
 
 	  function Body() {
@@ -572,7 +609,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    this._initBody = function(body) {
 	      this._bodyInit = body
-	      if (typeof body === 'string') {
+	      if (!body) {
+	        this._bodyText = ''
+	      } else if (typeof body === 'string') {
 	        this._bodyText = body
 	      } else if (support.blob && Blob.prototype.isPrototypeOf(body)) {
 	        this._bodyBlob = body
@@ -580,11 +619,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this._bodyFormData = body
 	      } else if (support.searchParams && URLSearchParams.prototype.isPrototypeOf(body)) {
 	        this._bodyText = body.toString()
-	      } else if (!body) {
-	        this._bodyText = ''
-	      } else if (support.arrayBuffer && ArrayBuffer.prototype.isPrototypeOf(body)) {
-	        // Only support ArrayBuffers for POST method.
-	        // Receiving ArrayBuffers happens via Blobs, instead.
+	      } else if (support.arrayBuffer && support.blob && isDataView(body)) {
+	        this._bodyArrayBuffer = bufferClone(body.buffer)
+	        // IE 10-11 can't handle a DataView body.
+	        this._bodyInit = new Blob([this._bodyArrayBuffer])
+	      } else if (support.arrayBuffer && (ArrayBuffer.prototype.isPrototypeOf(body) || isArrayBufferView(body))) {
+	        this._bodyArrayBuffer = bufferClone(body)
 	      } else {
 	        throw new Error('unsupported BodyInit type')
 	      }
@@ -609,6 +649,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        if (this._bodyBlob) {
 	          return Promise.resolve(this._bodyBlob)
+	        } else if (this._bodyArrayBuffer) {
+	          return Promise.resolve(new Blob([this._bodyArrayBuffer]))
 	        } else if (this._bodyFormData) {
 	          throw new Error('could not read FormData body as blob')
 	        } else {
@@ -617,27 +659,28 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }
 
 	      this.arrayBuffer = function() {
-	        return this.blob().then(readBlobAsArrayBuffer)
-	      }
-
-	      this.text = function() {
-	        var rejected = consumed(this)
-	        if (rejected) {
-	          return rejected
-	        }
-
-	        if (this._bodyBlob) {
-	          return readBlobAsText(this._bodyBlob)
-	        } else if (this._bodyFormData) {
-	          throw new Error('could not read FormData body as text')
+	        if (this._bodyArrayBuffer) {
+	          return consumed(this) || Promise.resolve(this._bodyArrayBuffer)
 	        } else {
-	          return Promise.resolve(this._bodyText)
+	          return this.blob().then(readBlobAsArrayBuffer)
 	        }
 	      }
-	    } else {
-	      this.text = function() {
-	        var rejected = consumed(this)
-	        return rejected ? rejected : Promise.resolve(this._bodyText)
+	    }
+
+	    this.text = function() {
+	      var rejected = consumed(this)
+	      if (rejected) {
+	        return rejected
+	      }
+
+	      if (this._bodyBlob) {
+	        return readBlobAsText(this._bodyBlob)
+	      } else if (this._bodyArrayBuffer) {
+	        return Promise.resolve(readArrayBufferAsText(this._bodyArrayBuffer))
+	      } else if (this._bodyFormData) {
+	        throw new Error('could not read FormData body as text')
+	      } else {
+	        return Promise.resolve(this._bodyText)
 	      }
 	    }
 
@@ -665,7 +708,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	  function Request(input, options) {
 	    options = options || {}
 	    var body = options.body
-	    if (Request.prototype.isPrototypeOf(input)) {
+
+	    if (typeof input === 'string') {
+	      this.url = input
+	    } else {
 	      if (input.bodyUsed) {
 	        throw new TypeError('Already read')
 	      }
@@ -676,12 +722,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }
 	      this.method = input.method
 	      this.mode = input.mode
-	      if (!body) {
+	      if (!body && input._bodyInit != null) {
 	        body = input._bodyInit
 	        input.bodyUsed = true
 	      }
-	    } else {
-	      this.url = input
 	    }
 
 	    this.credentials = options.credentials || this.credentials || 'omit'
@@ -699,7 +743,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 
 	  Request.prototype.clone = function() {
-	    return new Request(this)
+	    return new Request(this, { body: this._bodyInit })
 	  }
 
 	  function decode(body) {
@@ -715,16 +759,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return form
 	  }
 
-	  function headers(xhr) {
-	    var head = new Headers()
-	    var pairs = (xhr.getAllResponseHeaders() || '').trim().split('\n')
-	    pairs.forEach(function(header) {
-	      var split = header.trim().split(':')
-	      var key = split.shift().trim()
-	      var value = split.join(':').trim()
-	      head.append(key, value)
+	  function parseHeaders(rawHeaders) {
+	    var headers = new Headers()
+	    rawHeaders.split('\r\n').forEach(function(line) {
+	      var parts = line.split(':')
+	      var key = parts.shift().trim()
+	      if (key) {
+	        var value = parts.join(':').trim()
+	        headers.append(key, value)
+	      }
 	    })
-	    return head
+	    return headers
 	  }
 
 	  Body.call(Request.prototype)
@@ -735,10 +780,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 
 	    this.type = 'default'
-	    this.status = options.status
+	    this.status = 'status' in options ? options.status : 200
 	    this.ok = this.status >= 200 && this.status < 300
-	    this.statusText = options.statusText
-	    this.headers = options.headers instanceof Headers ? options.headers : new Headers(options.headers)
+	    this.statusText = 'statusText' in options ? options.statusText : 'OK'
+	    this.headers = new Headers(options.headers)
 	    this.url = options.url || ''
 	    this._initBody(bodyInit)
 	  }
@@ -776,35 +821,16 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  self.fetch = function(input, init) {
 	    return new Promise(function(resolve, reject) {
-	      var request
-	      if (Request.prototype.isPrototypeOf(input) && !init) {
-	        request = input
-	      } else {
-	        request = new Request(input, init)
-	      }
-
+	      var request = new Request(input, init)
 	      var xhr = new XMLHttpRequest()
-
-	      function responseURL() {
-	        if ('responseURL' in xhr) {
-	          return xhr.responseURL
-	        }
-
-	        // Avoid security warnings on getResponseHeader when not allowed by CORS
-	        if (/^X-Request-URL:/m.test(xhr.getAllResponseHeaders())) {
-	          return xhr.getResponseHeader('X-Request-URL')
-	        }
-
-	        return
-	      }
 
 	      xhr.onload = function() {
 	        var options = {
 	          status: xhr.status,
 	          statusText: xhr.statusText,
-	          headers: headers(xhr),
-	          url: responseURL()
+	          headers: parseHeaders(xhr.getAllResponseHeaders() || '')
 	        }
+	        options.url = 'responseURL' in xhr ? xhr.responseURL : options.headers.get('X-Request-URL')
 	        var body = 'response' in xhr ? xhr.response : xhr.responseText
 	        resolve(new Response(body, options))
 	      }
@@ -2037,60 +2063,6 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 9 */
-/***/ function(module, exports) {
-
-	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	exports.setCustomDomain = setCustomDomain;
-	// Copyright (C) 2007-2014, GoodData(R) Corporation. All rights reserved.
-	/**
-	 * Config module holds SDK configuration variables
-	 *
-	 * Currently its only custom domain - which enabled using
-	 * sdk from different domain (using CORS)
-	 *
-	 * Never set properties directly - always use setter methods
-	 *
-	 * @module config
-	 * @class config
-	 */
-
-	var URL_REGEXP = '(?:(https)://+|(www\\.)?)\\w[:;,\\.?\\[\\]\\w/~%&=+#-@!]*';
-
-	var domain = exports.domain = void 0;
-
-	/**
-	 * Sets custom domain. Parameter is url which has always to be https://
-	 * (if you don't provide it, we will do it for you).
-	 *
-	 * RegExp inspired taken from
-	 * https://github.com/jarib/google-closure-library/blob/master/closure/goog/string/linkify.js
-	 * @param {String|null} d valid domain starting with https:// or null for removing
-	 * @method setCustomDomain
-	 */
-	function setCustomDomain(d) {
-	    var sanitizedDomain = d || '';
-	    var link = sanitizedDomain.match(URL_REGEXP);
-
-	    if (d === null) {
-	        exports.domain = domain = undefined;
-	        return;
-	    }
-
-	    if (!link) {
-	        throw new Error(d + ' is not a valid url');
-	    }
-
-	    // ensure https:// prefix
-	    // and strip possible trailing /
-	    exports.domain = domain = 'https://' + link[0].replace(/^https:\/\//, '').replace(/\/$/, '');
-	}
-
-/***/ },
-/* 10 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/* WEBPACK VAR INJECTION */(function(global, module) {/**
@@ -18992,7 +18964,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }()), __webpack_require__(6)(module)))
 
 /***/ },
-/* 11 */
+/* 10 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// the whatwg-fetch polyfill installs the fetch() function
@@ -19002,6 +18974,61 @@ return /******/ (function(modules) { // webpackBootstrap
 	__webpack_require__(3);
 	module.exports = self.fetch.bind(self);
 
+
+/***/ },
+/* 11 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	exports.setCustomDomain = setCustomDomain;
+	// Copyright (C) 2007-2014, GoodData(R) Corporation. All rights reserved.
+	/**
+	 * Config module holds SDK configuration variables
+	 *
+	 * Currently its only custom domain - which enabled using
+	 * sdk from different domain (using CORS)
+	 *
+	 * Never set properties directly - always use setter methods
+	 *
+	 * @module config
+	 * @class config
+	 */
+
+	var URL_REGEXP = '(?:(https)://+|(www\\.)?)\\w[:;,\\.?\\[\\]\\w/~%&=+#-@!]*';
+
+	// TODO - fix this
+	var domain = exports.domain = void 0; // eslint-disable-line import/no-mutable-exports
+
+	/**
+	 * Sets custom domain. Parameter is url which has always to be https://
+	 * (if you don't provide it, we will do it for you).
+	 *
+	 * RegExp inspired taken from
+	 * https://github.com/jarib/google-closure-library/blob/master/closure/goog/string/linkify.js
+	 * @param {String|null} d valid domain starting with https:// or null for removing
+	 * @method setCustomDomain
+	 */
+	function setCustomDomain(d) {
+	    var sanitizedDomain = d || '';
+	    var link = sanitizedDomain.match(URL_REGEXP);
+
+	    if (d === null) {
+	        exports.domain = domain = undefined;
+	        return;
+	    }
+
+	    if (!link) {
+	        throw new Error(d + ' is not a valid url');
+	    }
+
+	    // ensure https:// prefix
+	    // and strip possible trailing /
+	    exports.domain = domain = 'https://' + link[0].replace(/^https:\/\//, '').replace(/\/$/, '');
+	}
 
 /***/ },
 /* 12 */
@@ -19084,7 +19111,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        if (loggedIn) {
 	            return (0, _xhr.get)('/gdc/app/account/bootstrap').then(function (result) {
 	                var userUri = result.bootstrapResource.accountSetting.links.self;
-	                var userId = userUri.match(/([^\/]+)\/?$/)[1];
+	                var userId = userUri.match(/([^\/]+)\/?$/)[1]; // eslint-disable-line no-useless-escape
 
 	                return (0, _xhr.ajax)('/gdc/account/login/' + userId, {
 	                    method: 'delete'
@@ -19113,7 +19140,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @method getAccountInfo
 	 */
 	function getAccountInfo() {
-	    return (0, _xhr.get)('/gdc/app/account/bootstrap').then(function resolveBootstrap(result) {
+	    return (0, _xhr.get)('/gdc/app/account/bootstrap').then(function (result) {
 	        var br = result.bootstrapResource;
 	        var accountInfo = {
 	            login: br.accountSetting.login,
@@ -19139,7 +19166,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: true
 	});
 
-	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; }; // Copyright (C) 2007-2014, GoodData(R) Corporation. All rights reserved.
+	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; // Copyright (C) 2007-2014, GoodData(R) Corporation. All rights reserved.
 
 
 	exports.getObjects = getObjects;
@@ -19149,17 +19176,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.getAttributes = getAttributes;
 	exports.getDimensions = getDimensions;
 	exports.getFolders = getFolders;
-	exports.getFoldersWithItems = getFoldersWithItems;
 	exports.getFacts = getFacts;
 	exports.getMetrics = getMetrics;
 	exports.getAvailableMetrics = getAvailableMetrics;
 	exports.getAvailableAttributes = getAvailableAttributes;
 	exports.getAvailableFacts = getAvailableFacts;
 	exports.getObjectDetails = getObjectDetails;
+	exports.getFoldersWithItems = getFoldersWithItems;
 	exports.getObjectIdentifier = getObjectIdentifier;
 	exports.getObjectUri = getObjectUri;
 
-	var _lodash = __webpack_require__(10);
+	var _lodash = __webpack_require__(9);
 
 	var _xhr = __webpack_require__(1);
 
@@ -19338,6 +19365,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    name: root.metric.meta.title
 	                };
 	            }
+
+	            return undefined;
 	        });
 
 	        // override titles with related attribute title
@@ -19350,7 +19379,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	            if (el.formOf) {
 	                formOfFns.push((0, _xhr.get)(el.formOf));
 	                ids[el.uri] = idx;
-	                indi[i++] = idx;
+	                indi[i] = idx;
+	                i += 1;
 	            }
 	        });
 
@@ -19410,7 +19440,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @return {Array} An array of dimension objects
 	 */
 	function getFolders(projectId, type) {
-	    function _getFolders(pId, t) {
+	    function getFolderEntries(pId, t) {
 	        var typeURL = t ? '?type=' + t : '';
 
 	        return (0, _xhr.get)('/gdc/md/' + pId + '/query/folders' + typeURL).then((0, _util.getIn)('query.entries'));
@@ -19419,189 +19449,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	    switch (type) {
 	        case 'fact':
 	        case 'metric':
-	            return _getFolders(projectId, type);
+	            return getFolderEntries(projectId, type);
 	        case 'attribute':
 	            return getDimensions(projectId);
 	        default:
-	            return Promise.all([_getFolders(projectId, 'fact'), _getFolders(projectId, 'metric'), getDimensions(projectId)]).then(function (facts, metrics, attributes) {
+	            return Promise.all([getFolderEntries(projectId, 'fact'), getFolderEntries(projectId, 'metric'), getDimensions(projectId)]).then(function (facts, metrics, attributes) {
 	                return { fact: facts, metric: metrics, attribute: attributes };
 	            });
 	    }
-	}
-
-	/**
-	 * Get folders with items.
-	 * Returns array of folders, each having a title and items property which is an array of
-	 * corresponding items. Each item is either a metric or attribute, keeping its original
-	 * verbose structure.
-	 *
-	 * @method getFoldersWithItems
-	 * @param {String} type type of folders to return
-	 * @return {Array} Array of folder object, each containing title and
-	 * corresponding items.
-	 */
-	/*eslint-disable*/
-	function getFoldersWithItems(projectId, type) {
-	    // fetch all folders of given type and process them
-	    return getFolders(projectId, type).then(function (folders) {
-	        // Helper function to get details for each metric in the given
-	        // array of links to the metadata objects representing the metrics.
-	        // @return the array of promises
-	        function getMetricItemsDetails(array) {
-	            return Promise.all(array.map(getObjectDetails)).then(function () {
-	                for (var _len3 = arguments.length, metricArgs = Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
-	                    metricArgs[_key3] = arguments[_key3];
-	                }
-
-	                return metricArgs.map(function (item) {
-	                    return item.metric;
-	                });
-	            });
-	        }
-
-	        // helper mapBy function
-	        function mapBy(array, key) {
-	            return array.map(function mapKeyToItem(item) {
-	                return item[key];
-	            });
-	        }
-
-	        // helper for sorting folder tree structure
-	        // sadly @returns void (sorting == mutating array in js)
-	        var sortFolderTree = function sortFolderTree(structure) {
-	            structure.forEach(function (folder) {
-	                folder.items.sort(function (a, b) {
-	                    if (a.meta.title < b.meta.title) {
-	                        return -1;
-	                    } else if (a.meta.title > b.meta.title) {
-	                        return 1;
-	                    }
-
-	                    return 0;
-	                });
-	            });
-	            structure.sort(function (a, b) {
-	                if (a.title < b.title) {
-	                    return -1;
-	                } else if (a.title > b.title) {
-	                    return 1;
-	                }
-
-	                return 0;
-	            });
-	        };
-
-	        var foldersLinks = mapBy(folders, 'link');
-	        var foldersTitles = mapBy(folders, 'title');
-
-	        // fetch details for each folder
-	        return Promise.all(foldersLinks.map(getObjectDetails)).then(function () {
-	            for (var _len4 = arguments.length, folderDetails = Array(_len4), _key4 = 0; _key4 < _len4; _key4++) {
-	                folderDetails[_key4] = arguments[_key4];
-	            }
-
-	            // if attribute, just parse everything from what we've received
-	            // and resolve. For metrics, lookup again each metric to get its
-	            // identifier. If passing unsupported type, reject immediately.
-	            if (type === 'attribute') {
-	                // get all attributes, subtract what we have and add rest in unsorted folder
-	                getAttributes(projectId).then(function (attributes) {
-	                    // get uris of attributes which are in some dimension folders
-	                    var attributesInFolders = [];
-	                    folderDetails.forEach(function (fd) {
-	                        fd.dimension.content.attributes.forEach(function (attr) {
-	                            attributesInFolders.push(attr.meta.uri);
-	                        });
-	                    });
-	                    // unsortedUris now contains uris of all attributes which aren't in a folder
-	                    var unsortedUris = attributes.filter(function (item) {
-	                        return attributesInFolders.indexOf(item.link) === -1;
-	                    }).map(function (item) {
-	                        return item.link;
-	                    });
-	                    // now get details of attributes in no folders
-	                    return Promise.all(unsortedUris.map(getObjectDetails)).then(function () {
-	                        for (var _len5 = arguments.length, unsortedAttributeArgs = Array(_len5), _key5 = 0; _key5 < _len5; _key5++) {
-	                            unsortedAttributeArgs[_key5] = arguments[_key5];
-	                        }
-
-	                        //TODO add map to r.json
-	                        // get unsorted attribute objects
-	                        var unsortedAttributes = unsortedAttributeArgs.map(function (attr) {
-	                            return attr.attribute;
-	                        });
-	                        // create structure of folders with attributes
-	                        var structure = folderDetails.map(function (folderDetail) {
-	                            return {
-	                                title: folderDetail.dimension.meta.title,
-	                                items: folderDetail.dimension.content.attributes
-	                            };
-	                        });
-	                        // and append "Unsorted" folder with attributes to the structure
-	                        structure.push({
-	                            title: "Unsorted",
-	                            items: unsortedAttributes
-	                        });
-	                        sortFolderTree(structure);
-
-	                        return structure;
-	                    });
-	                });
-	            } else if (type === 'metric') {
-	                var _ret = function () {
-	                    var entriesLinks = folderDetails.map(function (entry) {
-	                        return mapBy(entry.folder.content.entries, 'link');
-	                    });
-	                    // get all metrics, subtract what we have and add rest in unsorted folder
-	                    return {
-	                        v: getMetrics(projectId).then(function (metrics) {
-	                            // get uris of metrics which are in some dimension folders
-	                            var metricsInFolders = [];
-	                            folderDetails.forEach(function (fd) {
-	                                fd.folder.content.entries.forEach(function (metric) {
-	                                    metricsInFolders.push(metric.link);
-	                                });
-	                            });
-	                            // unsortedUris now contains uris of all metrics which aren't in a folder
-	                            var unsortedUris = metrics.filter(function (item) {
-	                                return metricsInFolders.indexOf(item.link) === -1;
-	                            }).map(function (item) {
-	                                return item.link;
-	                            });
-
-	                            // sadly order of parameters of concat matters! (we want unsorted last)
-	                            entriesLinks.push(unsortedUris);
-
-	                            // now get details of all metrics
-	                            return Promise.all(entriesLinks.map(function (linkArray, idx) {
-	                                return getMetricItemsDetails(linkArray);
-	                            })).then(function () {
-	                                for (var _len6 = arguments.length, tree = Array(_len6), _key6 = 0; _key6 < _len6; _key6++) {
-	                                    tree[_key6] = arguments[_key6];
-	                                }
-
-	                                //TODO add map to r.json
-	                                // all promises resolved, i.e. details for each metric are available
-	                                var structure = tree.map(function (treeItems, idx) {
-	                                    // if idx is not in foldes list than metric is in "Unsorted" folder
-	                                    return {
-	                                        title: foldersTitles[idx] || "Unsorted",
-	                                        items: treeItems
-	                                    };
-	                                });
-	                                sortFolderTree(structure);
-	                                return structure;
-	                            });
-	                        })
-	                    };
-	                }();
-
-	                if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
-	            } else {
-	                return Promise.reject();
-	            }
-	        });
-	    });
 	}
 
 	/**
@@ -19708,6 +19563,183 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 	/**
+	 * Get folders with items.
+	 * Returns array of folders, each having a title and items property which is an array of
+	 * corresponding items. Each item is either a metric or attribute, keeping its original
+	 * verbose structure.
+	 *
+	 * @method getFoldersWithItems
+	 * @param {String} type type of folders to return
+	 * @return {Array} Array of folder object, each containing title and
+	 * corresponding items.
+	 */
+
+	function getFoldersWithItems(projectId, type) {
+	    // fetch all folders of given type and process them
+	    return getFolders(projectId, type).then(function (folders) {
+	        // Helper function to get details for each metric in the given
+	        // array of links to the metadata objects representing the metrics.
+	        // @return the array of promises
+	        function getMetricItemsDetails(array) {
+	            return Promise.all(array.map(getObjectDetails)).then(function () {
+	                for (var _len3 = arguments.length, metricArgs = Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
+	                    metricArgs[_key3] = arguments[_key3];
+	                }
+
+	                return metricArgs.map(function (item) {
+	                    return item.metric;
+	                });
+	            });
+	        }
+
+	        // helper mapBy function
+	        function mapBy(array, key) {
+	            return array.map(function (item) {
+	                return item[key];
+	            });
+	        }
+
+	        // helper for sorting folder tree structure
+	        // sadly @returns void (sorting == mutating array in js)
+	        var sortFolderTree = function sortFolderTree(structure) {
+	            structure.forEach(function (folder) {
+	                folder.items.sort(function (a, b) {
+	                    if (a.meta.title < b.meta.title) {
+	                        return -1;
+	                    } else if (a.meta.title > b.meta.title) {
+	                        return 1;
+	                    }
+
+	                    return 0;
+	                });
+	            });
+	            structure.sort(function (a, b) {
+	                if (a.title < b.title) {
+	                    return -1;
+	                } else if (a.title > b.title) {
+	                    return 1;
+	                }
+
+	                return 0;
+	            });
+	        };
+
+	        var foldersLinks = mapBy(folders, 'link');
+	        var foldersTitles = mapBy(folders, 'title');
+
+	        // fetch details for each folder
+	        return Promise.all(foldersLinks.map(getObjectDetails)).then(function () {
+	            for (var _len4 = arguments.length, folderDetails = Array(_len4), _key4 = 0; _key4 < _len4; _key4++) {
+	                folderDetails[_key4] = arguments[_key4];
+	            }
+
+	            // if attribute, just parse everything from what we've received
+	            // and resolve. For metrics, lookup again each metric to get its
+	            // identifier. If passing unsupported type, reject immediately.
+	            if (type === 'attribute') {
+	                // get all attributes, subtract what we have and add rest in unsorted folder
+	                getAttributes(projectId).then(function (attributes) {
+	                    // get uris of attributes which are in some dimension folders
+	                    var attributesInFolders = [];
+	                    folderDetails.forEach(function (fd) {
+	                        fd.dimension.content.attributes.forEach(function (attr) {
+	                            attributesInFolders.push(attr.meta.uri);
+	                        });
+	                    });
+	                    // unsortedUris now contains uris of all attributes which aren't in a folder
+	                    var unsortedUris = attributes.filter(function (item) {
+	                        return attributesInFolders.indexOf(item.link) === -1;
+	                    }).map(function (item) {
+	                        return item.link;
+	                    });
+	                    // now get details of attributes in no folders
+	                    return Promise.all(unsortedUris.map(getObjectDetails)).then(function () {
+	                        for (var _len5 = arguments.length, unsortedAttributeArgs = Array(_len5), _key5 = 0; _key5 < _len5; _key5++) {
+	                            unsortedAttributeArgs[_key5] = arguments[_key5];
+	                        }
+
+	                        // TODO add map to r.json
+	                        // get unsorted attribute objects
+	                        var unsortedAttributes = unsortedAttributeArgs.map(function (attr) {
+	                            return attr.attribute;
+	                        });
+	                        // create structure of folders with attributes
+	                        var structure = folderDetails.map(function (folderDetail) {
+	                            return {
+	                                title: folderDetail.dimension.meta.title,
+	                                items: folderDetail.dimension.content.attributes
+	                            };
+	                        });
+	                        // and append "Unsorted" folder with attributes to the structure
+	                        structure.push({
+	                            title: 'Unsorted',
+	                            items: unsortedAttributes
+	                        });
+	                        sortFolderTree(structure);
+
+	                        return structure;
+	                    });
+	                });
+	            } else if (type === 'metric') {
+	                var _ret = function () {
+	                    var entriesLinks = folderDetails.map(function (entry) {
+	                        return mapBy(entry.folder.content.entries, 'link');
+	                    });
+	                    // get all metrics, subtract what we have and add rest in unsorted folder
+	                    return {
+	                        v: getMetrics(projectId).then(function (metrics) {
+	                            // get uris of metrics which are in some dimension folders
+	                            var metricsInFolders = [];
+	                            folderDetails.forEach(function (fd) {
+	                                fd.folder.content.entries.forEach(function (metric) {
+	                                    metricsInFolders.push(metric.link);
+	                                });
+	                            });
+	                            // unsortedUris now contains uris of all metrics which aren't in a folder
+	                            var unsortedUris = metrics.filter(function (item) {
+	                                return metricsInFolders.indexOf(item.link) === -1;
+	                            }).map(function (item) {
+	                                return item.link;
+	                            });
+
+	                            // sadly order of parameters of concat matters! (we want unsorted last)
+	                            entriesLinks.push(unsortedUris);
+
+	                            // now get details of all metrics
+	                            return Promise.all(entriesLinks.map(function (linkArray) {
+	                                return getMetricItemsDetails(linkArray);
+	                            })).then(function () {
+	                                for (var _len6 = arguments.length, tree = Array(_len6), _key6 = 0; _key6 < _len6; _key6++) {
+	                                    tree[_key6] = arguments[_key6];
+	                                }
+
+	                                // TODO add map to r.json
+	                                // all promises resolved, i.e. details for each metric are available
+	                                var structure = tree.map(function (treeItems, idx) {
+	                                    // if idx is not in foldes list than metric is in "Unsorted" folder
+	                                    return {
+	                                        title: foldersTitles[idx] || 'Unsorted',
+	                                        items: treeItems
+	                                    };
+	                                });
+	                                sortFolderTree(structure);
+	                                return structure;
+	                            });
+	                        })
+	                    };
+	                }();
+
+	                if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
+	            } else {
+	                return Promise.reject();
+	            }
+
+	            return undefined;
+	        });
+	    });
+	}
+
+	/**
 	 * Get identifier of a metadata object identified by its uri
 	 *
 	 * @method getObjectIdentifier
@@ -19785,7 +19817,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 	exports.getIn = undefined;
 
-	var _lodash = __webpack_require__(10);
+	var _lodash = __webpack_require__(9);
 
 	/**
 	 * Utility methods. Mostly private
@@ -19830,19 +19862,19 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _md2 = _interopRequireDefault(_md);
 
+	var _invariant = __webpack_require__(20);
+
+	var _invariant2 = _interopRequireDefault(_invariant);
+
+	var _lodash = __webpack_require__(9);
+
 	var _xhr = __webpack_require__(1);
 
-	var _rules = __webpack_require__(20);
+	var _rules = __webpack_require__(21);
 
 	var _rules2 = _interopRequireDefault(_rules);
 
 	var _definitions = __webpack_require__(22);
-
-	var _invariant = __webpack_require__(21);
-
-	var _invariant2 = _interopRequireDefault(_invariant);
-
-	var _lodash = __webpack_require__(10);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -19917,7 +19949,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    // Execute request
 	    return (0, _xhr.post)('/gdc/internal/projects/' + projectId + '/experimental/executions', {
 	        body: JSON.stringify(request)
-	    }).then(_xhr.parseJSON).then(function resolveSimpleExecution(result) {
+	    }).then(_xhr.parseJSON).then(function (result) {
 	        executedReport.headers = wrapMeasureIndexesFromMappings((0, _lodash.get)(executionConfiguration, 'metricMappings'), result.executionResult.headers);
 
 	        // Start polling on url returned in the executionResult for tabularData
@@ -19953,9 +19985,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var maxLength = MAX_TITLE_LENGTH - suffix.length;
 	    if (title && title.length > maxLength) {
 	        if (title[title.length - 1] === ')') {
-	            return title.substring(0, maxLength - 2) + '…)' + suffix;
+	            return title.substring(0, maxLength - 2) + '\u2026)' + suffix;
 	        }
-	        return title.substring(0, maxLength - 1) + '…' + suffix;
+	        return title.substring(0, maxLength - 1) + '\u2026' + suffix;
 	    }
 	    return '' + title + suffix;
 	};
@@ -20243,14 +20275,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var dfUri = (0, _lodash.get)(f, 'listAttributeFilter.displayForm');
 	    var negative = (0, _lodash.get)(f, 'listAttributeFilter.default.negativeSelection');
 
-	    return negative ? _defineProperty({}, dfUri, { '$not': { '$in': elementsForQuery } }) : _defineProperty({}, dfUri, { '$in': elementsForQuery });
+	    return negative ? _defineProperty({}, dfUri, { $not: { $in: elementsForQuery } }) : _defineProperty({}, dfUri, { $in: elementsForQuery });
 	};
 
 	var dateFilterToWhere = function dateFilterToWhere(f) {
 	    var dateUri = (0, _lodash.get)(f, 'dateFilter.dimension') || (0, _lodash.get)(f, 'dateFilter.dataSet') || (0, _lodash.get)(f, 'dateFilter.dataset'); // dataset with lowercase 's' is deprecated; kept here for backwards compatibility
 	    var granularity = (0, _lodash.get)(f, 'dateFilter.granularity');
 	    var between = [(0, _lodash.get)(f, 'dateFilter.from'), (0, _lodash.get)(f, 'dateFilter.to')];
-	    return _defineProperty({}, dateUri, { '$between': between, '$granularity': granularity });
+	    return _defineProperty({}, dateUri, { $between: between, $granularity: granularity });
 	};
 
 	var isPoP = function isPoP(_ref10) {
@@ -20390,7 +20422,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var getDataForVis = exports.getDataForVis = function getDataForVis(projectId, mdObj, settings) {
 	    return getOriginalMetricFormats(mdObj).then(function (measures) {
-	        mdObj.buckets.measures = (0, _lodash.map)(measures, function (measure) {
+	        var metadata = mdObj;
+	        metadata.buckets.measures = (0, _lodash.map)(measures, function (measure) {
 	            return { measure: measure };
 	        });
 
@@ -20741,67 +20774,6 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 20 */
 /***/ function(module, exports, __webpack_require__) {
 
-	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-
-	var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
-
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-	var _invariant = __webpack_require__(21);
-
-	var _invariant2 = _interopRequireDefault(_invariant);
-
-	var _lodash = __webpack_require__(10);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-	var Rules = function () {
-	    function Rules() {
-	        _classCallCheck(this, Rules);
-
-	        this.rules = [];
-	    }
-
-	    _createClass(Rules, [{
-	        key: 'addRule',
-	        value: function addRule(tests, callback) {
-	            this.rules.push([tests, callback]);
-	        }
-	    }, {
-	        key: 'match',
-	        value: function match(subject) {
-	            var _find = (0, _lodash.find)(this.rules, function (_ref) {
-	                var _ref2 = _slicedToArray(_ref, 1),
-	                    tests = _ref2[0];
-
-	                return (0, _lodash.every)(tests, function (test) {
-	                    return test(subject);
-	                });
-	            }),
-	                _find2 = _slicedToArray(_find, 2),
-	                callback = _find2[1];
-
-	            (0, _invariant2.default)(callback, 'Callback not found :-(');
-
-	            return callback;
-	        }
-	    }]);
-
-	    return Rules;
-	}();
-
-	exports.default = Rules;
-
-/***/ },
-/* 21 */
-/***/ function(module, exports, __webpack_require__) {
-
 	/* WEBPACK VAR INJECTION */(function(process) {/**
 	 * Copyright 2013-2015, Facebook, Inc.
 	 * All rights reserved.
@@ -20857,6 +20829,67 @@ return /******/ (function(modules) { // webpackBootstrap
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(5)))
 
 /***/ },
+/* 21 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+
+	var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _invariant = __webpack_require__(20);
+
+	var _invariant2 = _interopRequireDefault(_invariant);
+
+	var _lodash = __webpack_require__(9);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	var Rules = function () {
+	    function Rules() {
+	        _classCallCheck(this, Rules);
+
+	        this.rules = [];
+	    }
+
+	    _createClass(Rules, [{
+	        key: 'addRule',
+	        value: function addRule(tests, callback) {
+	            this.rules.push([tests, callback]);
+	        }
+	    }, {
+	        key: 'match',
+	        value: function match(subject) {
+	            var _find = (0, _lodash.find)(this.rules, function (_ref) {
+	                var _ref2 = _slicedToArray(_ref, 1),
+	                    tests = _ref2[0];
+
+	                return (0, _lodash.every)(tests, function (test) {
+	                    return test(subject);
+	                });
+	            }),
+	                _find2 = _slicedToArray(_find, 2),
+	                callback = _find2[1];
+
+	            (0, _invariant2.default)(callback, 'Callback not found :-(');
+
+	            return callback;
+	        }
+	    }]);
+
+	    return Rules;
+	}();
+
+	exports.default = Rules;
+
+/***/ },
 /* 22 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -20867,7 +20900,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 	exports.sortDefinitions = sortDefinitions;
 
-	var _lodash = __webpack_require__(10);
+	var _lodash = __webpack_require__(9);
 
 	var IDENTIFIER_REGEX = /{\S+}/g;
 
@@ -20894,12 +20927,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 	function scan(resolved, unresolved) {
-	    for (var i = 0; i < unresolved.length; i++) {
+	    for (var i = 0; i < unresolved.length; i += 1) {
 	        var tested = unresolved[i];
 
 	        if (resolvedDependencies(resolved, tested)) {
 	            resolved.push(tested);
-	            unresolved.splice(i--, 1);
+	            unresolved.splice(i, 1);
+	            i -= 1;
 	        }
 	    }
 	}
@@ -21101,7 +21135,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.loadItems = loadItems;
 	exports.loadDateDataSets = loadDateDataSets;
 
-	var _lodash = __webpack_require__(10);
+	var _lodash = __webpack_require__(9);
 
 	var _xhr = __webpack_require__(1);
 
