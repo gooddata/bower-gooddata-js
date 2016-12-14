@@ -1,7 +1,7 @@
 /* Copyright (C) 2007-2015, GoodData(R) Corporation. All rights reserved. */
-/* gooddata - v1.0.1 */
-/* 2016-11-18 13:43:06 */
-/* Latest git commit: "c96f21f" */
+/* gooddata - v1.0.2 */
+/* 2016-12-14 16:21:21 */
+/* Latest git commit: "f40f719" */
 
 
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -19971,12 +19971,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }).then(function (r) {
 	        var result = r.result,
 	            status = r.status;
-	        // After the retrieving computed tabularData, resolve the promise
 
-	        executedReport.rawData = result && result.tabularDataResult ? result.tabularDataResult.values : [];
-	        executedReport.isLoaded = true;
-	        executedReport.isEmpty = status === 204;
-	        return executedReport;
+
+	        return Object.assign({}, executedReport, {
+	            rawData: (0, _lodash.get)(result, 'tabularDataResult.values', []),
+	            warnings: (0, _lodash.get)(result, 'tabularDataResult.warnings', []),
+	            isLoaded: true,
+	            isEmpty: status === 204
+	        });
 	    });
 	}
 
