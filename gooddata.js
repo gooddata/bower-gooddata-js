@@ -1,7 +1,7 @@
 /* Copyright (C) 2007-2015, GoodData(R) Corporation. All rights reserved. */
-/* gooddata - v1.0.2 */
-/* 2016-12-14 16:21:21 */
-/* Latest git commit: "f40f719" */
+/* gooddata - v1.0.3 */
+/* 2017-01-02 09:14:03 */
+/* Latest git commit: "d569398" */
 
 
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -19922,7 +19922,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	 *                 property "where" containing query-like filters
 	 *                 property "orderBy" contains array of sorted properties to order in form
 	 *                      [{column: 'identifier', direction: 'asc|desc'}]
-	 * @param {Object} settings - AJAX settings
+	 * @param {Object} settings - Set "extended" to true to retrieve the result
+	 *                            including internal attribute IDs (useful to construct filters
+	 *                            for subsequent report execution requests).
+	 *                             Supports additional settings accepted by the underlying
+	 *                             xhr.ajax() calls
 	 *
 	 * @return {Object} Structure with `headers` and `rawData` keys filled with values from execution.
 	 */
@@ -19934,6 +19938,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	        isLoaded: false
 	    };
 
+	    // Extended result exposes internal attribute element IDs which can
+	    // be used when constructing executionConfiguration filters for
+	    // subsequent report execution requests
+	    var resultKey = settings.extended ? 'extendedTabularDataResult' : 'tabularDataResult';
 	    // Create request and result structures
 	    var request = {
 	        execution: { columns: columns }
@@ -19953,7 +19961,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        executedReport.headers = wrapMeasureIndexesFromMappings((0, _lodash.get)(executionConfiguration, 'metricMappings'), result.executionResult.headers);
 
 	        // Start polling on url returned in the executionResult for tabularData
-	        return (0, _xhr.ajax)(result.executionResult.tabularDataResult, settings);
+	        return (0, _xhr.ajax)(result.executionResult[resultKey], settings);
 	    }).then(function (r) {
 	        if (r.status === 204) {
 	            return {
@@ -19974,8 +19982,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 	        return Object.assign({}, executedReport, {
-	            rawData: (0, _lodash.get)(result, 'tabularDataResult.values', []),
-	            warnings: (0, _lodash.get)(result, 'tabularDataResult.warnings', []),
+	            rawData: (0, _lodash.get)(result, resultKey + '.values', []),
+	            warnings: (0, _lodash.get)(result, resultKey + '.warnings', []),
 	            isLoaded: true,
 	            isEmpty: status === 204
 	        });
