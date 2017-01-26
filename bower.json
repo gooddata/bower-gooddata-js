@@ -1,14 +1,14 @@
 {
   "name": "gooddata",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "homepage": "https://github.com/gooddata/gooddata-js",
   "license": "Copyright (c) 2014, GoodData Corporation (BSD License)",
   "authors": [
     "GoodData A-players <da@gooddata.com>"
   ],
   "repository": {
-      "type": "git",
-      "url": "git@github.com:gooddata/bower-gooddata-js.git"
+    "type": "git",
+    "url": "git@github.com:gooddata/bower-gooddata-js.git"
   },
   "description": "GoodData JS SDK",
   "main": "gooddata.min.js",
