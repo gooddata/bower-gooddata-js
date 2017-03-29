@@ -1,7 +1,7 @@
 /* Copyright (C) 2007-2015, GoodData(R) Corporation. All rights reserved. */
-/* gooddata - v1.3.0 */
-/* 2017-03-08 16:31:09 */
-/* Latest git commit: "72af91e" */
+/* gooddata - v1.4.0 */
+/* 2017-03-29 14:40:00 */
+/* Latest git commit: "c2df684" */
 
 
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -4566,9 +4566,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var hasNoFilters = (0, _isEmpty3.default)((0, _get3.default)(item, 'measureFilters', []));
 	    var type = (0, _get3.default)(item, 'type');
 
-	    var prefix = hasNoFilters || allFiltersEmpty(item) ? '' : 'filtered_';
+	    var prefix = hasNoFilters || allFiltersEmpty(item) ? '' : '_filtered';
 
-	    return type + '_' + identifier + '.generated.' + prefix + aggregation + '.' + hash;
+	    return type + '_' + identifier + '.generated.' + hash + prefix + '_' + aggregation;
 	};
 
 	var isDateCategory = function isDateCategory(_ref2) {
