@@ -1,7 +1,7 @@
 /* Copyright (C) 2007-2015, GoodData(R) Corporation. All rights reserved. */
-/* gooddata - v1.5.1 */
-/* 2017-05-25 10:33:38 */
-/* Latest git commit: "8b8e1c0" */
+/* gooddata - v1.6.0 */
+/* 2017-05-30 11:10:40 */
+/* Latest git commit: "ff93b1b" */
 
 
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -978,7 +978,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    commonXhrSettings = Object.assign({}, commonXhrSettings, settings);
 	}
 
-	function simulateBeforeSend(settings) {
+	function simulateBeforeSend(settings, url) {
 	    var xhr = {
 	        setRequestHeader: function setRequestHeader(key, value) {
 	            (0, _set3.default)(settings, ['headers', key], value);
@@ -986,7 +986,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 
 	    if ((0, _isFunction3.default)(settings.beforeSend)) {
-	        settings.beforeSend(xhr);
+	        settings.beforeSend(xhr, url);
 	    }
 	}
 
@@ -1121,7 +1121,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        url = _enrichSettingWithCus2.url,
 	        settings = _enrichSettingWithCus2.settings;
 
-	    simulateBeforeSend(settings);
+	    simulateBeforeSend(settings, url);
 
 	    if (tokenRequest) {
 	        return continueAfterTokenRequest(url, settings);
@@ -3487,6 +3487,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.getFoldersWithItems = getFoldersWithItems;
 	exports.getObjectIdentifier = getObjectIdentifier;
 	exports.getObjectUri = getObjectUri;
+	exports.getUrisFromIdentifiers = getUrisFromIdentifiers;
 	exports.getValidElements = getValidElements;
 	exports.deleteObject = deleteObject;
 
@@ -4101,6 +4102,24 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return getObjectDetails(objData.attributeDisplayForm.content.formOf).then(function (objectData) {
 	            return uriFinder(objectData);
 	        });
+	    });
+	}
+
+	/**
+	 * Get uris specified by identifiers
+	 *
+	 * @method getUrisFromIdentifiers
+	 * @param {String} projectId id of the project
+	 * @param {Array} identifiers identifiers of the metadata objects
+	 * @return {Array} array of identifier + uri pairs
+	 */
+	function getUrisFromIdentifiers(projectId, identifiers) {
+	    return (0, _xhr.post)('/gdc/md/' + projectId + '/identifiers', {
+	        body: {
+	            identifierToUri: identifiers
+	        }
+	    }).then(_xhr.parseJSON).then(function (data) {
+	        return data.identifiers;
 	    });
 	}
 
