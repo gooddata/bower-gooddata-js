@@ -1,7 +1,7 @@
 /* Copyright (C) 2007-2015, GoodData(R) Corporation. All rights reserved. */
-/* gooddata - v1.6.0 */
-/* 2017-05-30 11:10:40 */
-/* Latest git commit: "ff93b1b" */
+/* gooddata - v1.7.0 */
+/* 2017-05-31 14:07:40 */
+/* Latest git commit: "9413485" */
 
 
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -3471,10 +3471,12 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _isPlainObject3 = _interopRequireDefault(_isPlainObject2);
 
+	var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }(); // Copyright (C) 2007-2014, GoodData(R) Corporation. All rights reserved.
+
+
 	exports.getObjects = getObjects;
 	exports.getObjectUsing = getObjectUsing;
 	exports.getObjectUsingMany = getObjectUsingMany;
-	exports.getElementDetails = getElementDetails;
 	exports.getAttributes = getAttributes;
 	exports.getDimensions = getDimensions;
 	exports.getFolders = getFolders;
@@ -3513,7 +3515,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @param {Array} objectUris array of uris for objects to be loaded
 	 * @return {Array} array of loaded elements
 	 */
-	// Copyright (C) 2007-2014, GoodData(R) Corporation. All rights reserved.
 	function getObjects(projectId, objectUris) {
 	    var LIMIT = 50;
 	    var uri = '/gdc/md/' + projectId + '/objects/get';
@@ -3636,80 +3637,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 	/**
-	 * Get additional information about elements specified by their uris
-	 * `elementUris` is the array of uris of elements to be look-up
-	 * Currently makes a request for each object, should be encapsulated
-	 * to one call
-	 *
-	 * @method getElementDetails
-	 * @param {Array} array of element uri strings
-	 * @private
-	 */
-	function getElementDetails(elementUris) {
-	    var fns = elementUris.map(function (uri) {
-	        return (0, _xhr.get)(uri);
-	    });
-
-	    return Promise.all(fns).then(function () {
-	        for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
-	            args[_key] = arguments[_key];
-	        }
-
-	        var enriched = args.map(function (element) {
-	            var root = element[0];
-	            if (root.attributeDisplayForm) {
-	                return {
-	                    type: 'attribute',
-	                    uri: root.attributeDisplayForm.meta.uri,
-	                    formOf: root.attributeDisplayForm.content.formOf,
-	                    name: root.attributeDisplayForm.meta.title
-	                };
-	            } else if (root.metric) {
-	                return {
-	                    type: 'metric',
-	                    uri: root.metric.meta.uri,
-	                    name: root.metric.meta.title
-	                };
-	            }
-
-	            return undefined;
-	        });
-
-	        // override titles with related attribute title
-	        var ids = {};
-	        var indi = [];
-	        var i = 0;
-	        var formOfFns = [];
-
-	        enriched.forEach(function (el, idx) {
-	            if (el.formOf) {
-	                formOfFns.push((0, _xhr.get)(el.formOf));
-	                ids[el.uri] = idx;
-	                indi[i] = idx;
-	                i += 1;
-	            }
-	        });
-
-	        // all formOf are executed
-	        return Promise.all(formOfFns).then(function () {
-	            for (var _len2 = arguments.length, formOfArgs = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
-	                formOfArgs[_key2] = arguments[_key2];
-	            }
-
-	            formOfArgs.forEach(function (arg, idx) {
-	                // get element to owerwrite
-	                var which = indi[idx];
-	                var update = enriched[which];
-
-	                update.name = arg[0].attribute.meta.title;
-	            });
-
-	            return enriched;
-	        });
-	    });
-	}
-
-	/**
 	* Reutrns all attributes in a project specified by projectId param
 	*
 	* @method getAttributes
@@ -3759,7 +3686,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	        case 'attribute':
 	            return getDimensions(projectId);
 	        default:
-	            return Promise.all([getFolderEntries(projectId, 'fact'), getFolderEntries(projectId, 'metric'), getDimensions(projectId)]).then(function (facts, metrics, attributes) {
+	            return Promise.all([getFolderEntries(projectId, 'fact'), getFolderEntries(projectId, 'metric'), getDimensions(projectId)]).then(function (_ref) {
+	                var _ref2 = _slicedToArray(_ref, 3),
+	                    facts = _ref2[0],
+	                    metrics = _ref2[1],
+	                    attributes = _ref2[2];
+
 	                return { fact: facts, metric: metrics, attribute: attributes };
 	            });
 	    }
@@ -3887,11 +3819,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        // array of links to the metadata objects representing the metrics.
 	        // @return the array of promises
 	        function getMetricItemsDetails(array) {
-	            return Promise.all(array.map(getObjectDetails)).then(function () {
-	                for (var _len3 = arguments.length, metricArgs = Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
-	                    metricArgs[_key3] = arguments[_key3];
-	                }
-
+	            return Promise.all(array.map(getObjectDetails)).then(function (metricArgs) {
 	                return metricArgs.map(function (item) {
 	                    return item.metric;
 	                });
@@ -3934,17 +3862,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var foldersTitles = mapBy(folders, 'title');
 
 	        // fetch details for each folder
-	        return Promise.all(foldersLinks.map(getObjectDetails)).then(function () {
-	            for (var _len4 = arguments.length, folderDetails = Array(_len4), _key4 = 0; _key4 < _len4; _key4++) {
-	                folderDetails[_key4] = arguments[_key4];
-	            }
-
+	        return Promise.all(foldersLinks.map(getObjectDetails)).then(function (folderDetails) {
 	            // if attribute, just parse everything from what we've received
 	            // and resolve. For metrics, lookup again each metric to get its
 	            // identifier. If passing unsupported type, reject immediately.
 	            if (type === 'attribute') {
 	                // get all attributes, subtract what we have and add rest in unsorted folder
-	                getAttributes(projectId).then(function (attributes) {
+	                return getAttributes(projectId).then(function (attributes) {
 	                    // get uris of attributes which are in some dimension folders
 	                    var attributesInFolders = [];
 	                    folderDetails.forEach(function (fd) {
@@ -3959,11 +3883,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                        return item.link;
 	                    });
 	                    // now get details of attributes in no folders
-	                    return Promise.all(unsortedUris.map(getObjectDetails)).then(function () {
-	                        for (var _len5 = arguments.length, unsortedAttributeArgs = Array(_len5), _key5 = 0; _key5 < _len5; _key5++) {
-	                            unsortedAttributeArgs[_key5] = arguments[_key5];
-	                        }
-
+	                    return Promise.all(unsortedUris.map(getObjectDetails)).then(function (unsortedAttributeArgs) {
 	                        // TODO add map to r.json
 	                        // get unsorted attribute objects
 	                        var unsortedAttributes = unsortedAttributeArgs.map(function (attr) {
@@ -4012,11 +3932,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    // now get details of all metrics
 	                    return Promise.all(entriesLinks.map(function (linkArray) {
 	                        return getMetricItemsDetails(linkArray);
-	                    })).then(function () {
-	                        for (var _len6 = arguments.length, tree = Array(_len6), _key6 = 0; _key6 < _len6; _key6++) {
-	                            tree[_key6] = arguments[_key6];
-	                        }
-
+	                    })).then(function (tree) {
 	                        // TODO add map to r.json
 	                        // all promises resolved, i.e. details for each metric are available
 	                        var structure = tree.map(function (treeItems, idx) {
@@ -4030,11 +3946,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	                        return structure;
 	                    });
 	                });
-	            } else {
-	                return Promise.reject();
 	            }
 
-	            return undefined;
+	            return Promise.reject();
 	        });
 	    });
 	}
