@@ -1,7 +1,7 @@
 /* Copyright (C) 2007-2015, GoodData(R) Corporation. All rights reserved. */
-/* gooddata - v1.7.0 */
-/* 2017-05-31 14:07:40 */
-/* Latest git commit: "9413485" */
+/* gooddata - v1.7.1 */
+/* 2017-06-28 14:30:21 */
+/* Latest git commit: "b2fcad6" */
 
 
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -4876,7 +4876,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    });
 	}
 
-	var MAX_TITLE_LENGTH = 255;
+	var MAX_TITLE_LENGTH = 1000;
+
 	var getMetricTitle = function getMetricTitle(suffix, title) {
 	    var maxLength = MAX_TITLE_LENGTH - suffix.length;
 	    if (title && title.length > maxLength) {
