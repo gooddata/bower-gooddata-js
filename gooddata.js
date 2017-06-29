@@ -1,7 +1,7 @@
 /* Copyright (C) 2007-2015, GoodData(R) Corporation. All rights reserved. */
-/* gooddata - v1.7.1 */
-/* 2017-06-28 14:30:21 */
-/* Latest git commit: "b2fcad6" */
+/* gooddata - v2.0.0 */
+/* 2017-06-29 17:27:44 */
+/* Latest git commit: "43f5ff5" */
 
 
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -4719,6 +4719,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _every3 = _interopRequireDefault(_every2);
 
+	var _merge2 = __webpack_require__(20);
+
+	var _merge3 = _interopRequireDefault(_merge2);
+
 	var _map2 = __webpack_require__(126);
 
 	var _map3 = _interopRequireDefault(_map2);
@@ -4741,8 +4745,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
 
-	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; // Copyright (C) 2007-2014, GoodData(R) Corporation. All rights reserved.
-
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 	exports.getData = getData;
 
@@ -4766,9 +4769,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function _objectWithoutProperties(obj, keys) { var target = {}; for (var i in obj) { if (keys.indexOf(i) >= 0) continue; if (!Object.prototype.hasOwnProperty.call(obj, i)) continue; target[i] = obj[i]; } return target; }
 
-	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
-
 	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } } // Copyright (C) 2007-2014, GoodData(R) Corporation. All rights reserved.
+
 
 	var notEmpty = (0, _negate3.default)(_isEmpty3.default);
 
@@ -4789,6 +4793,56 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return headers;
 	};
 
+	var emptyResult = {
+	    extendedTabularDataResult: {
+	        values: [],
+	        warnings: []
+	    }
+	};
+
+	function loadExtendedDataResults(uri, settings) {
+	    var prevResult = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : emptyResult;
+
+	    return new Promise(function (resolve, reject) {
+	        (0, _xhr.ajax)(uri, settings).then(function (r) {
+	            if (r.status === 204) {
+	                return {
+	                    status: r.status,
+	                    result: ''
+	                };
+	            }
+
+	            return r.json().then(function (result) {
+	                return {
+	                    status: r.status,
+	                    result: result
+	                };
+	            });
+	        }).then(function (_ref) {
+	            var status = _ref.status,
+	                result = _ref.result;
+
+	            var values = [].concat(_toConsumableArray((0, _get3.default)(prevResult, 'extendedTabularDataResult.values', [])), _toConsumableArray((0, _get3.default)(result, 'extendedTabularDataResult.values', [])));
+
+	            var warnings = [].concat(_toConsumableArray((0, _get3.default)(prevResult, 'extendedTabularDataResult.warnings', [])), _toConsumableArray((0, _get3.default)(result, 'extendedTabularDataResult.warnings', [])));
+
+	            var updatedResult = (0, _merge3.default)({}, prevResult, {
+	                extendedTabularDataResult: {
+	                    values: values,
+	                    warnings: warnings
+	                }
+	            });
+
+	            var nextUri = (0, _get3.default)(result, 'extendedTabularDataResult.paging.next');
+	            if (nextUri) {
+	                resolve(loadExtendedDataResults(nextUri, settings, updatedResult));
+	            } else {
+	                resolve({ status: status, result: updatedResult });
+	            }
+	        }, reject);
+	    });
+	}
+
 	/**
 	 * Module for execution on experimental execution resource
 	 *
@@ -4808,10 +4862,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 *                 property "where" containing query-like filters
 	 *                 property "orderBy" contains array of sorted properties to order in form
 	 *                      [{column: 'identifier', direction: 'asc|desc'}]
-	 * @param {Object} settings - Set "extended" to true to retrieve the result
-	 *                            including internal attribute IDs (useful to construct filters
-	 *                            for subsequent report execution requests).
-	 *                             Supports additional settings accepted by the underlying
+	 * @param {Object} settings - Supports additional settings accepted by the underlying
 	 *                             xhr.ajax() calls
 	 *
 	 * @return {Object} Structure with `headers` and `rawData` keys filled with values from execution.
@@ -4824,10 +4875,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        isLoaded: false
 	    };
 
-	    // Extended result exposes internal attribute element IDs which can
-	    // be used when constructing executionConfiguration filters for
-	    // subsequent report execution requests
-	    var resultKey = settings.extended ? 'extendedTabularDataResult' : 'tabularDataResult';
 	    // Create request and result structures
 	    var request = {
 	        execution: { columns: columns }
@@ -4847,29 +4894,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	        executedReport.headers = wrapMeasureIndexesFromMappings((0, _get3.default)(executionConfiguration, 'metricMappings'), result.executionResult.headers);
 
 	        // Start polling on url returned in the executionResult for tabularData
-	        return (0, _xhr.ajax)(result.executionResult[resultKey], settings);
-	    }).then(function (r) {
-	        if (r.status === 204) {
-	            return {
-	                status: r.status,
-	                result: ''
-	            };
-	        }
-
-	        return r.json().then(function (result) {
-	            return {
-	                status: r.status,
-	                result: result
-	            };
-	        });
+	        return loadExtendedDataResults(result.executionResult.extendedTabularDataResult, settings);
 	    }).then(function (r) {
 	        var result = r.result,
 	            status = r.status;
 
 
 	        return Object.assign({}, executedReport, {
-	            rawData: (0, _get3.default)(result, resultKey + '.values', []),
-	            warnings: (0, _get3.default)(result, resultKey + '.warnings', []),
+	            rawData: (0, _get3.default)(result, 'extendedTabularDataResult.values', []),
+	            warnings: (0, _get3.default)(result, 'extendedTabularDataResult.warnings', []),
 	            isLoaded: true,
 	            isEmpty: status === 204
 	        });
@@ -4931,8 +4964,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return 'SELECT ' + (aggregation ? aggregation + '([' + objectUri + '])' : '[' + objectUri + ']') + (notEmpty(where) ? ' WHERE ' + where.join(' AND ') : '');
 	};
 
-	var getPercentMetricExpression = function getPercentMetricExpression(_ref, measure) {
-	    var category = _ref.category;
+	var getPercentMetricExpression = function getPercentMetricExpression(_ref2, measure) {
+	    var category = _ref2.category;
 
 	    var metricExpressionWithoutFilters = 'SELECT [' + (0, _get3.default)(measure, 'objectUri') + ']';
 
@@ -4975,21 +5008,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return type + '_' + identifier + '.generated.' + hash + prefix + '_' + aggregation;
 	};
 
-	var isDateCategory = function isDateCategory(_ref2) {
-	    var category = _ref2.category;
+	var isDateCategory = function isDateCategory(_ref3) {
+	    var category = _ref3.category;
 	    return category.type === 'date';
 	};
-	var isDateFilter = function isDateFilter(_ref3) {
-	    var dateFilter = _ref3.dateFilter;
+	var isDateFilter = function isDateFilter(_ref4) {
+	    var dateFilter = _ref4.dateFilter;
 	    return dateFilter;
 	};
 
-	var getCategories = function getCategories(_ref4) {
-	    var categories = _ref4.categories;
+	var getCategories = function getCategories(_ref5) {
+	    var categories = _ref5.categories;
 	    return categories;
 	};
-	var getFilters = function getFilters(_ref5) {
-	    var filters = _ref5.filters;
+	var getFilters = function getFilters(_ref6) {
+	    var filters = _ref6.filters;
 	    return filters;
 	};
 
@@ -5158,8 +5191,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return result;
 	};
 
-	var categoryToElement = function categoryToElement(_ref6) {
-	    var category = _ref6.category;
+	var categoryToElement = function categoryToElement(_ref7) {
+	    var category = _ref7.category;
 	    return { element: (0, _get3.default)(category, 'displayForm'), sort: (0, _get3.default)(category, 'sort') };
 	};
 
@@ -5182,17 +5215,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return _defineProperty({}, dateUri, { $between: between, $granularity: granularity });
 	};
 
-	var isPoP = function isPoP(_ref10) {
-	    var showPoP = _ref10.showPoP;
+	var isPoP = function isPoP(_ref11) {
+	    var showPoP = _ref11.showPoP;
 	    return showPoP;
 	};
-	var isContribution = function isContribution(_ref11) {
-	    var showInPercent = _ref11.showInPercent;
+	var isContribution = function isContribution(_ref12) {
+	    var showInPercent = _ref12.showInPercent;
 	    return showInPercent;
 	};
 
-	var isCalculatedMeasure = function isCalculatedMeasure(_ref12) {
-	    var type = _ref12.type;
+	var isCalculatedMeasure = function isCalculatedMeasure(_ref13) {
+	    var type = _ref13.type;
 	    return type === 'metric';
 	};
 
@@ -5225,13 +5258,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 	function getWhere(filters) {
-	    var executableFilters = (0, _filter3.default)(filters, function (_ref13) {
-	        var listAttributeFilter = _ref13.listAttributeFilter;
+	    var executableFilters = (0, _filter3.default)(filters, function (_ref14) {
+	        var listAttributeFilter = _ref14.listAttributeFilter;
 	        return isAttributeFilterExecutable(listAttributeFilter);
 	    });
 	    var attributeFilters = (0, _map3.default)(executableFilters, attributeFilterToWhere);
-	    var dateFilters = (0, _map3.default)((0, _filter3.default)(filters, function (_ref14) {
-	        var dateFilter = _ref14.dateFilter;
+	    var dateFilters = (0, _map3.default)((0, _filter3.default)(filters, function (_ref15) {
+	        var dateFilter = _ref15.dateFilter;
 	        return isDateFilterExecutable(dateFilter);
 	    }), dateFilterToWhere);
 
@@ -5265,8 +5298,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
 	    var buckets = (0, _get3.default)(mdObj, 'buckets');
-	    var measures = (0, _map3.default)(buckets.measures, function (_ref15) {
-	        var measure = _ref15.measure;
+	    var measures = (0, _map3.default)(buckets.measures, function (_ref16) {
+	        var measure = _ref16.measure;
 	        return measure;
 	    });
 	    var metrics = (0, _flatten3.default)((0, _map3.default)(measures, function (measure, index) {
@@ -5276,8 +5309,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var categories = getCategories(buckets);
 	    var filters = getFilters(buckets);
 	    if (options.removeDateItems) {
-	        categories = (0, _filter3.default)(categories, function (_ref16) {
-	            var category = _ref16.category;
+	        categories = (0, _filter3.default)(categories, function (_ref17) {
+	            var category = _ref17.category;
 	            return category.type !== 'date';
 	        });
 	        filters = (0, _filter3.default)(filters, function (item) {
@@ -5301,8 +5334,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var getOriginalMetricFormats = function getOriginalMetricFormats(mdObj) {
 	    // for metrics with showPoP or measureFilters.length > 0 roundtrip for original metric format
-	    return Promise.all((0, _map3.default)((0, _map3.default)((0, _get3.default)(mdObj, 'buckets.measures'), function (_ref17) {
-	        var measure = _ref17.measure;
+	    return Promise.all((0, _map3.default)((0, _map3.default)((0, _get3.default)(mdObj, 'buckets.measures'), function (_ref18) {
+	        var measure = _ref18.measure;
 	        return measure;
 	    }), function (measure) {
 	        if (measure.showPoP === true || measure.measureFilters.length > 0) {
