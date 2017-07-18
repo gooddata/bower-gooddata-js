@@ -1,7 +1,7 @@
 /* Copyright (C) 2007-2015, GoodData(R) Corporation. All rights reserved. */
-/* gooddata - v2.0.0 */
-/* 2017-06-29 17:27:44 */
-/* Latest git commit: "43f5ff5" */
+/* gooddata - v2.1.0 */
+/* 2017-07-18 16:24:06 */
+/* Latest git commit: "56d2fa5" */
 
 
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -3327,6 +3327,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 	exports.isLoggedIn = isLoggedIn;
 	exports.login = login;
+	exports.loginSso = loginSso;
 	exports.logout = logout;
 	exports.updateProfileSettings = updateProfileSettings;
 	exports.getAccountInfo = getAccountInfo;
@@ -3373,7 +3374,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @param {String} username
 	 * @param {String} password
 	 */
-	// Copyright (C) 2007-2014, GoodData(R) Corporation. All rights reserved.
+	// Copyright (C) 2007-2017, GoodData(R) Corporation. All rights reserved.
 	function login(username, password) {
 	    return (0, _xhr.post)('/gdc/account/login', {
 	        body: JSON.stringify({
@@ -3386,6 +3387,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 	        })
 	    }).then(_xhr.parseJSON);
+	}
+
+	/**
+	 * This function provides an authentication entry point to the GD API via SSO
+	 * https://help.gooddata.com/display/developer/GoodData+PGP+Single+Sign-On
+	 *
+	 * @method loginSso
+	 * @param {String} sessionId PGP message
+	 * @param {String} serverUrl
+	 * @param {String} targetUrl
+	 */
+	function loginSso(sessionId, serverUrl, targetUrl) {
+	    // cannot use xhr.get, server doesn't respond with JSON
+	    return (0, _xhr.ajax)('/gdc/account/customerlogin?sessionId=' + sessionId + '&serverURL=' + serverUrl + '&targetURL=' + targetUrl, { method: 'GET' });
 	}
 
 	/**
@@ -5208,10 +5223,26 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return negative ? _defineProperty({}, dfUri, { $not: { $in: elementsForQuery } }) : _defineProperty({}, dfUri, { $in: elementsForQuery });
 	};
 
+	var getFromFilter = function getFromFilter(f, property) {
+	    return (0, _get3.default)(f, 'dateFilter.' + property);
+	};
+	var toInteger = function toInteger(value) {
+	    return parseInt(value, 10);
+	};
+
 	var dateFilterToWhere = function dateFilterToWhere(f) {
-	    var dateUri = (0, _get3.default)(f, 'dateFilter.dimension') || (0, _get3.default)(f, 'dateFilter.dataSet') || (0, _get3.default)(f, 'dateFilter.dataset'); // dataset with lowercase 's' is deprecated; kept here for backwards compatibility
-	    var granularity = (0, _get3.default)(f, 'dateFilter.granularity');
-	    var between = [(0, _get3.default)(f, 'dateFilter.from'), (0, _get3.default)(f, 'dateFilter.to')];
+	    var dateUri = getFromFilter(f, 'dimension') || getFromFilter(f, 'dataSet') || getFromFilter(f, 'dataset'); // dataset with lowercase 's' is deprecated; kept here for backwards compatibility
+
+	    var granularity = getFromFilter(f, 'granularity');
+	    var isRelative = getFromFilter(f, 'type') === 'relative';
+
+	    var filterFrom = getFromFilter(f, 'from');
+	    var filterTo = getFromFilter(f, 'to');
+
+	    var from = isRelative ? toInteger(filterFrom) : filterFrom;
+	    var to = isRelative ? toInteger(filterTo) : filterTo;
+
+	    var between = [from, to];
 	    return _defineProperty({}, dateUri, { $between: between, $granularity: granularity });
 	};
 
@@ -7792,24 +7823,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	 *
 	 * @experimental
 	 * @method createProject
-	 * @param {Object} options for project creation (title, subtitle, authorizationToken, ...)
+	 * @param {String} title
+	 * @param {String} authorizationToken
+	 * @param {Object} options for project creation (summary, projectTemplate, ...)
 	 * @return {Object} created project object
 	 */
-	var createProject = exports.createProject = function createProject() {
-	    var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-	    var _options$title = options.title,
-	        title = _options$title === undefined ? 'Project' : _options$title,
-	        _options$summary = options.summary,
-	        summary = _options$summary === undefined ? 'Project' : _options$summary,
-	        _options$projectTempl = options.projectTemplate,
-	        projectTemplate = _options$projectTempl === undefined ? '/projectTemplates/GoodSalesDemo/2' : _options$projectTempl,
+	var createProject = exports.createProject = function createProject(title, authorizationToken) {
+	    var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+	    var summary = options.summary,
+	        projectTemplate = options.projectTemplate,
 	        _options$driver = options.driver,
 	        driver = _options$driver === undefined ? 'Pg' : _options$driver,
 	        _options$environment = options.environment,
 	        environment = _options$environment === undefined ? 'TESTING' : _options$environment,
 	        _options$guidedNaviga = options.guidedNavigation,
-	        guidedNavigation = _options$guidedNaviga === undefined ? 1 : _options$guidedNaviga,
-	        authorizationToken = options.authorizationToken;
+	        guidedNavigation = _options$guidedNaviga === undefined ? 1 : _options$guidedNaviga;
 
 
 	    return (0, _xhr.post)('/gdc/projects', {
