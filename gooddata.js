@@ -1,7 +1,7 @@
 /* Copyright (C) 2007-2015, GoodData(R) Corporation. All rights reserved. */
-/* gooddata - v2.1.1 */
-/* 2017-07-20 15:21:22 */
-/* Latest git commit: "8f9232b" */
+/* gooddata - v2.2.0 */
+/* 2017-08-02 15:52:53 */
+/* Latest git commit: "7999e50" */
 
 
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -3505,6 +3505,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.getObjectIdentifier = getObjectIdentifier;
 	exports.getObjectUri = getObjectUri;
 	exports.getUrisFromIdentifiers = getUrisFromIdentifiers;
+	exports.getIdentifiersFromUris = getIdentifiersFromUris;
 	exports.getValidElements = getValidElements;
 	exports.deleteObject = deleteObject;
 	exports.createObject = createObject;
@@ -4049,6 +4050,24 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return (0, _xhr.post)('/gdc/md/' + projectId + '/identifiers', {
 	        body: {
 	            identifierToUri: identifiers
+	        }
+	    }).then(_xhr.parseJSON).then(function (data) {
+	        return data.identifiers;
+	    });
+	}
+
+	/**
+	 * Get identifiers specified by uris
+	 *
+	 * @method getIdentifiersFromUris
+	 * @param {String} projectId id of the project
+	 * @param {Array} uris of the metadata objects
+	 * @return {Array} array of identifier + uri pairs
+	 */
+	function getIdentifiersFromUris(projectId, uris) {
+	    return (0, _xhr.post)('/gdc/md/' + projectId + '/identifiers', {
+	        body: {
+	            uriToIdentifier: uris
 	        }
 	    }).then(_xhr.parseJSON).then(function (data) {
 	        return data.identifiers;
