@@ -1,7 +1,7 @@
 /* Copyright (C) 2007-2015, GoodData(R) Corporation. All rights reserved. */
-/* gooddata - v2.2.0 */
-/* 2017-08-02 15:52:53 */
-/* Latest git commit: "7999e50" */
+/* gooddata - v2.3.0 */
+/* 2017-08-16 13:54:55 */
+/* Latest git commit: "b7b10c8" */
 
 
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -874,6 +874,12 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var catalogue = _interopRequireWildcard(_catalogue);
 
+	var _admin = __webpack_require__(154);
+
+	var _admin2 = _interopRequireDefault(_admin);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 	/**
@@ -893,7 +899,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @module sdk
 	 * @class sdk
 	 */
-	var gooddata = { config: config, xhr: xhr, user: user, md: md, execution: execution, project: project, catalogue: catalogue }; // Copyright (C) 2007-2014, GoodData(R) Corporation. All rights reserved.
+	// Copyright (C) 2007-2014, GoodData(R) Corporation. All rights reserved.
+	var gooddata = { config: config, xhr: xhr, user: user, md: md, execution: execution, project: project, catalogue: catalogue, admin: _admin2.default };
 	exports.default = gooddata;
 
 	module.exports = gooddata;
@@ -3331,6 +3338,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.logout = logout;
 	exports.updateProfileSettings = updateProfileSettings;
 	exports.getAccountInfo = getAccountInfo;
+	exports.getFeatureFlags = getFeatureFlags;
 
 	var _xhr = __webpack_require__(7);
 
@@ -3453,6 +3461,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	        };
 
 	        return accountInfo;
+	    });
+	}
+
+	/**
+	 * Returns the feature flags valid for the currently logged in user.
+	 * @method getFeatureFlags
+	 */
+	function getFeatureFlags() {
+	    return (0, _xhr.get)('/gdc/app/account/bootstrap').then(function (result) {
+	        return result.bootstrapResource.current.featureFlags;
 	    });
 	}
 
@@ -8186,6 +8204,692 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	module.exports = cloneDeep;
 
+
+/***/ },
+/* 154 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+
+	var _dataProducts = __webpack_require__(155);
+
+	var dataProducts = _interopRequireWildcard(_dataProducts);
+
+	var _domainDataProducts = __webpack_require__(159);
+
+	var domainDataProducts = _interopRequireWildcard(_domainDataProducts);
+
+	var _domains = __webpack_require__(160);
+
+	var domains = _interopRequireWildcard(_domains);
+
+	var _domainSegments = __webpack_require__(158);
+
+	var domainSegments = _interopRequireWildcard(_domainSegments);
+
+	var _clients = __webpack_require__(161);
+
+	var clients = _interopRequireWildcard(_clients);
+
+	var _segments = __webpack_require__(157);
+
+	var segments = _interopRequireWildcard(_segments);
+
+	var _logs = __webpack_require__(162);
+
+	var logs = _interopRequireWildcard(_logs);
+
+	var _contracts = __webpack_require__(163);
+
+	var contracts = _interopRequireWildcard(_contracts);
+
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+	/**
+	 * Network-UI support methods. Mostly private
+	 *
+	 * @module admin
+	 * @class admin
+	 *
+	 */
+
+	// Copyright (C) 2007-2014, GoodData(R) Corporation. All rights reserved.
+
+	exports.default = {
+	    dataProducts: dataProducts,
+	    domainDataProducts: domainDataProducts,
+	    domains: domains,
+	    domainSegments: domainSegments,
+	    clients: clients,
+	    logs: logs,
+	    contracts: contracts,
+	    segments: segments
+	};
+
+/***/ },
+/* 155 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	exports.deleteDataProduct = exports.renameDataProduct = exports.createDataProduct = exports.getDataProduct = exports.getDataProducts = exports.transformDataProduct = undefined;
+
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+	var _xhr = __webpack_require__(7);
+
+	var _routes = __webpack_require__(156);
+
+	var routes = _interopRequireWildcard(_routes);
+
+	var _segments = __webpack_require__(157);
+
+	var segments = _interopRequireWildcard(_segments);
+
+	var _domainDataProducts = __webpack_require__(159);
+
+	var domainDataProducts = _interopRequireWildcard(_domainDataProducts);
+
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+	var transformDataProduct = exports.transformDataProduct = function transformDataProduct(item) {
+	    var _routes$parse = routes.parse(item.dataProduct.links.self, routes.CONTRACT_DATA_PRODUCT),
+	        contractId = _routes$parse.contractId;
+
+	    var dataProduct = _extends({
+	        contractId: contractId
+	    }, item.dataProduct);
+
+	    if (dataProduct.domainDataProducts) {
+	        dataProduct.domainDataProducts = dataProduct.domainDataProducts.map(domainDataProducts.transformDomainDataProduct);
+	    }
+	    if (dataProduct.segments) {
+	        dataProduct.segments = dataProduct.segments.map(segments.transformSegment);
+	    }
+
+	    return dataProduct;
+	};
+
+	var getDataProducts = exports.getDataProducts = function getDataProducts(contractId, include) {
+	    return (0, _xhr.get)(routes.interpolate(routes.CONTRACT_DATA_PRODUCTS, { contractId: contractId }, include && { include: include })).then(function (data) {
+	        return {
+	            items: data.dataProducts.items.map(transformDataProduct)
+	        };
+	    });
+	};
+
+	var getDataProduct = exports.getDataProduct = function getDataProduct(contractId, dataProductId, include, stats, state) {
+	    return (0, _xhr.get)(routes.interpolate(routes.CONTRACT_DATA_PRODUCT, { contractId: contractId, dataProductId: dataProductId }, Object.assign(include && { include: include }, stats && { stats: stats }, state && { state: state }))).then(function (data) {
+	        return transformDataProduct(data);
+	    });
+	};
+
+	var createDataProduct = exports.createDataProduct = function createDataProduct(contractId, dataProductId, domainIds) {
+	    return (0, _xhr.post)(routes.interpolate(routes.CONTRACT_DATA_PRODUCTS, { contractId: contractId }), {
+	        data: JSON.stringify({
+	            dataProductCreate: {
+	                id: dataProductId,
+	                domains: domainIds.map(function (domainId) {
+	                    return routes.interpolate(routes.CONTRACT_DOMAIN, { contractId: contractId, domainId: domainId });
+	                })
+	            }
+	        })
+	    });
+	};
+
+	var renameDataProduct = exports.renameDataProduct = function renameDataProduct(contractId, dataProductId, newDataProductId) {
+	    return (0, _xhr.post)(routes.interpolate(routes.CONTRACT_DATA_PRODUCT_RENAME, { contractId: contractId, dataProductId: dataProductId }), {
+	        data: JSON.stringify({ dataProductRename: { id: newDataProductId } })
+	    });
+	};
+
+	var deleteDataProduct = exports.deleteDataProduct = function deleteDataProduct(contractId, dataProductId) {
+	    return (0, _xhr.del)(routes.interpolate(routes.CONTRACT_DATA_PRODUCT, { contractId: contractId, dataProductId: dataProductId }));
+	};
+
+/***/ },
+/* 156 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+	var ROOT = exports.ROOT = '/gdc/admin';
+
+	var CONTRACTS = exports.CONTRACTS = ROOT + '/contracts';
+	var CONTRACT = exports.CONTRACT = CONTRACTS + '/:contractId';
+
+	var CONTRACT_DATA_PRODUCTS = exports.CONTRACT_DATA_PRODUCTS = CONTRACT + '/dataproducts';
+	var CONTRACT_DATA_PRODUCT = exports.CONTRACT_DATA_PRODUCT = CONTRACT_DATA_PRODUCTS + '/:dataProductId';
+	var CONTRACT_DATA_PRODUCT_DOMAIN_DATA_PRODUCTS = exports.CONTRACT_DATA_PRODUCT_DOMAIN_DATA_PRODUCTS = CONTRACT_DATA_PRODUCT + '/domaindataproducts';
+	var CONTRACT_DATA_PRODUCT_DOMAIN_DATA_PRODUCT = exports.CONTRACT_DATA_PRODUCT_DOMAIN_DATA_PRODUCT = CONTRACT_DATA_PRODUCT_DOMAIN_DATA_PRODUCTS + '/:domainId';
+	var CONTRACT_DATA_PRODUCT_RENAME = exports.CONTRACT_DATA_PRODUCT_RENAME = CONTRACT_DATA_PRODUCT + '/rename';
+
+	var CONTRACT_DATA_PRODUCT_SEGMENTS = exports.CONTRACT_DATA_PRODUCT_SEGMENTS = CONTRACT_DATA_PRODUCT + '/segments';
+	var CONTRACT_DATA_PRODUCT_SEGMENT = exports.CONTRACT_DATA_PRODUCT_SEGMENT = CONTRACT_DATA_PRODUCT_SEGMENTS + '/:segmentId';
+	var CONTRACT_DATA_PRODUCT_SEGMENT_RENAME = exports.CONTRACT_DATA_PRODUCT_SEGMENT_RENAME = CONTRACT_DATA_PRODUCT_SEGMENT + '/rename';
+
+	var CONTRACT_DATA_PRODUCT_DOMAIN_SEGMENTS = exports.CONTRACT_DATA_PRODUCT_DOMAIN_SEGMENTS = CONTRACT_DATA_PRODUCT_SEGMENT + '/domainsegments';
+	var CONTRACT_DATA_PRODUCT_DOMAIN_SEGMENT = exports.CONTRACT_DATA_PRODUCT_DOMAIN_SEGMENT = CONTRACT_DATA_PRODUCT_DOMAIN_SEGMENTS + '/:domainId';
+	var CONTRACT_DATA_PRODUCT_DOMAIN_SEGMENT_CLONE = exports.CONTRACT_DATA_PRODUCT_DOMAIN_SEGMENT_CLONE = CONTRACT_DATA_PRODUCT_DOMAIN_SEGMENT + '/clone';
+	var CONTRACT_DATA_PRODUCT_DOMAIN_SEGMENT_RENAME = exports.CONTRACT_DATA_PRODUCT_DOMAIN_SEGMENT_RENAME = CONTRACT_DATA_PRODUCT_DOMAIN_SEGMENT + '/rename';
+	var CONTRACT_DATA_PRODUCT_DOMAIN_SEGMENT_SYNC = exports.CONTRACT_DATA_PRODUCT_DOMAIN_SEGMENT_SYNC = CONTRACT_DATA_PRODUCT_DOMAIN_SEGMENT + '/synchronizeClients';
+
+	var CONTRACT_DATA_PRODUCT_DOMAIN_SEGMENT_LOG = exports.CONTRACT_DATA_PRODUCT_DOMAIN_SEGMENT_LOG = CONTRACT_DATA_PRODUCT_DOMAIN_SEGMENT + '/activityLog';
+
+	var CONTRACT_DATA_PRODUCT_DOMAIN_SEGMENT_CLIENTS = exports.CONTRACT_DATA_PRODUCT_DOMAIN_SEGMENT_CLIENTS = CONTRACT_DATA_PRODUCT_DOMAIN_SEGMENT + '/clients';
+	var CONTRACT_DATA_PRODUCT_DOMAIN_SEGMENT_CLIENT = exports.CONTRACT_DATA_PRODUCT_DOMAIN_SEGMENT_CLIENT = CONTRACT_DATA_PRODUCT_DOMAIN_SEGMENT_CLIENTS + '/:clientId';
+	var CONTRACT_DATA_PRODUCT_DOMAIN_SEGMENT_CLIENT_USERS = exports.CONTRACT_DATA_PRODUCT_DOMAIN_SEGMENT_CLIENT_USERS = CONTRACT_DATA_PRODUCT_DOMAIN_SEGMENT_CLIENT + '/project/users';
+
+	var CONTRACT_DOMAINS = exports.CONTRACT_DOMAINS = CONTRACT + '/domains';
+	var CONTRACT_DOMAIN = exports.CONTRACT_DOMAIN = CONTRACT_DOMAINS + '/:domainId';
+	var CONTRACT_DOMAIN_USERS = exports.CONTRACT_DOMAIN_USERS = CONTRACT_DOMAIN + '/users';
+	var CONTRACT_DOMAIN_PROJECTS = exports.CONTRACT_DOMAIN_PROJECTS = CONTRACT_DOMAIN + '/projects';
+	var CONTRACT_DOMAIN_PROJECT = exports.CONTRACT_DOMAIN_PROJECT = CONTRACT_DOMAIN_PROJECTS + '/:projectId';
+
+	var CONTRACT_USERS = exports.CONTRACT_USERS = CONTRACT + '/users';
+
+	var USER_CONTRACTS = exports.USER_CONTRACTS = ROOT + '/users/:userId/contracts';
+
+	var DEPLOY_SEGMENT = exports.DEPLOY_SEGMENT = CONTRACT_DOMAIN + '/dataProducts/:dataProductId/segments/:segmentId/deploy';
+
+	// parse params in route string accoring to template
+	// returns params as plain object
+	var parse = exports.parse = function parse(route, template) {
+	    var parsedRoute = route.startsWith('http') ? route.match(/^(https?:)\/\/(([^:/?#]*)(?::([0-9]+))?)([/]{0,1}[^?#]*)(\?[^#]*|)(#.*|)$/)[5] : route;
+
+	    var values = parsedRoute.split('/');
+	    var views = template.split('/');
+
+	    return views.reduce(function (result, view, idx) {
+	        if (view[0] === ':') {
+	            return _extends({}, result, _defineProperty({}, view.substr(1), values[idx]));
+	        }
+	        return result;
+	    }, {});
+	};
+
+	var getSingleQueryString = exports.getSingleQueryString = function getSingleQueryString(key, value) {
+	    return Array.isArray(value) ? value.map(function (item) {
+	        return encodeURIComponent(key) + '=' + encodeURIComponent(item);
+	    }).join('&') : encodeURIComponent(key) + '=' + encodeURIComponent(value);
+	};
+
+	// creates a query string from a plain js object
+	var queryString = exports.queryString = function queryString(query) {
+	    return query ? '?' + Object.keys(query).map(function (k) {
+	        return getSingleQueryString(k, query[k]);
+	    }).join('&') : '';
+	};
+
+	// interpolates specified parameters from params into
+	// the specified route string and returns the result
+	var interpolate = exports.interpolate = function interpolate(route, params, query) {
+	    return route.split('/').map(function (view) {
+	        return view[0] === ':' ? params[view.substr(1)] : view;
+	    }).join('/') + queryString(query);
+	};
+
+/***/ },
+/* 157 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	exports.deleteSegment = exports.renameSegment = exports.createSegment = exports.getDataProductSegments = exports.transformSegment = undefined;
+
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+	var _xhr = __webpack_require__(7);
+
+	var _routes = __webpack_require__(156);
+
+	var routes = _interopRequireWildcard(_routes);
+
+	var _domainSegments = __webpack_require__(158);
+
+	var domainSegments = _interopRequireWildcard(_domainSegments);
+
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+	var transformSegment = exports.transformSegment = function transformSegment(item) {
+	    var _routes$parse = routes.parse(item.segment.links.self, routes.CONTRACT_DATA_PRODUCT_SEGMENT),
+	        contractId = _routes$parse.contractId,
+	        dataProductId = _routes$parse.dataProductId;
+
+	    var segment = _extends({
+	        contractId: contractId,
+	        dataProductId: dataProductId
+	    }, item.segment);
+
+	    if (segment.domainSegments) {
+	        segment.domainSegments = segment.domainSegments.map(domainSegments.transformDomainSegment);
+	    }
+
+	    return segment;
+	};
+
+	var getDataProductSegments = exports.getDataProductSegments = function getDataProductSegments(contractId, dataProductId) {
+	    return (0, _xhr.get)(routes.interpolate(routes.CONTRACT_DATA_PRODUCT_SEGMENTS, { contractId: contractId, dataProductId: dataProductId })).then(function (data) {
+	        return {
+	            items: data.segments.items.map(transformSegment),
+	            status: data.segments.status
+	        };
+	    });
+	};
+
+	var createSegment = exports.createSegment = function createSegment(contractId, dataProductId, segmentId, domainId) {
+	    return (0, _xhr.post)(routes.interpolate(routes.CONTRACT_DATA_PRODUCT_SEGMENTS, { contractId: contractId, dataProductId: dataProductId }), {
+	        data: JSON.stringify({
+	            segmentCreate: {
+	                id: segmentId,
+	                title: segmentId,
+	                domain: routes.interpolate(routes.CONTRACT_DOMAIN, { contractId: contractId, domainId: domainId })
+	            }
+	        })
+	    });
+	};
+
+	var renameSegment = exports.renameSegment = function renameSegment(contractId, dataProductId, segmentId, newSegmentId) {
+	    return (0, _xhr.post)(routes.interpolate(routes.CONTRACT_DATA_PRODUCT_SEGMENT_RENAME, { contractId: contractId, dataProductId: dataProductId, segmentId: segmentId }), { data: JSON.stringify({ segmentRename: { id: newSegmentId } }) });
+	};
+
+	var deleteSegment = exports.deleteSegment = function deleteSegment(contractId, dataProductId, segmentId) {
+	    return (0, _xhr.del)(routes.interpolate(routes.CONTRACT_DATA_PRODUCT_SEGMENT, { contractId: contractId, dataProductId: dataProductId, segmentId: segmentId }));
+	};
+
+/***/ },
+/* 158 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	exports.updateDomainSegment = exports.deployDomainSegment = exports.syncDomainSegment = exports.renameDomainSegment = exports.deleteDomainSegment = exports.cloneDomainSegment = exports.getDomainSegment = exports.getDomainSegments = exports.transformDomainSegment = undefined;
+
+	var _omit2 = __webpack_require__(96);
+
+	var _omit3 = _interopRequireDefault(_omit2);
+
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+	var _xhr = __webpack_require__(7);
+
+	var _routes = __webpack_require__(156);
+
+	var routes = _interopRequireWildcard(_routes);
+
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	var transformDomainSegment = exports.transformDomainSegment = function transformDomainSegment(item) {
+	    var _routes$parse = routes.parse(item.domainSegment.links.self, routes.CONTRACT_DATA_PRODUCT_DOMAIN_SEGMENT),
+	        contractId = _routes$parse.contractId,
+	        dataProductId = _routes$parse.dataProductId,
+	        segmentId = _routes$parse.segmentId,
+	        domainId = _routes$parse.domainId;
+
+	    return _extends({
+	        contractId: contractId,
+	        dataProductId: dataProductId,
+	        segmentId: segmentId,
+	        domainId: domainId
+	    }, item.domainSegment);
+	};
+
+	var getDomainSegments = exports.getDomainSegments = function getDomainSegments(contractId, dataProductId, segmentId, query) {
+	    return (0, _xhr.get)(routes.interpolate(routes.CONTRACT_DATA_PRODUCT_DOMAIN_SEGMENTS, { contractId: contractId, dataProductId: dataProductId, segmentId: segmentId }, query)).then(function (result) {
+	        return { items: result.domainSegments.items.map(transformDomainSegment) };
+	    });
+	};
+
+	var getDomainSegment = exports.getDomainSegment = function getDomainSegment(contractId, dataProductId, segmentId, domainId, query) {
+	    return (0, _xhr.get)(routes.interpolate(routes.CONTRACT_DATA_PRODUCT_DOMAIN_SEGMENT, { contractId: contractId, dataProductId: dataProductId, segmentId: segmentId, domainId: domainId }, query)).then(function (result) {
+	        return transformDomainSegment(result);
+	    });
+	};
+
+	var cloneDomainSegment = exports.cloneDomainSegment = function cloneDomainSegment(contractId, dataProductId, segmentId, domainId, newSegmentId, newDomainId) {
+	    return (0, _xhr.post)(routes.interpolate(routes.CONTRACT_DATA_PRODUCT_DOMAIN_SEGMENT_CLONE, { contractId: contractId, dataProductId: dataProductId, segmentId: segmentId, domainId: domainId }), {
+	        data: JSON.stringify({
+	            cloneSegmentRequest: {
+	                clonedSegmentId: newSegmentId,
+	                domain: newDomainId
+	            }
+	        })
+	    });
+	};
+
+	var deleteDomainSegment = exports.deleteDomainSegment = function deleteDomainSegment(contractId, dataProductId, segmentId, domainId) {
+	    return (0, _xhr.del)(routes.interpolate(routes.CONTRACT_DATA_PRODUCT_DOMAIN_SEGMENT, { contractId: contractId, dataProductId: dataProductId, segmentId: segmentId, domainId: domainId }));
+	};
+
+	var renameDomainSegment = exports.renameDomainSegment = function renameDomainSegment(contractId, dataProductId, segmentId, domainId, newSegmentId) {
+	    return (0, _xhr.post)(routes.interpolate(routes.CONTRACT_DATA_PRODUCT_DOMAIN_SEGMENT_RENAME, { contractId: contractId, dataProductId: dataProductId, segmentId: segmentId, domainId: domainId }), {
+	        data: JSON.stringify({
+	            domainSegmentRename: {
+	                id: newSegmentId
+	            }
+	        })
+	    });
+	};
+
+	var syncDomainSegment = exports.syncDomainSegment = function syncDomainSegment(contractId, dataProductId, segmentId, domainId) {
+	    return (0, _xhr.post)(routes.interpolate(routes.CONTRACT_DATA_PRODUCT_DOMAIN_SEGMENT_SYNC, { contractId: contractId, dataProductId: dataProductId, segmentId: segmentId, domainId: domainId }));
+	};
+
+	var deployDomainSegment = exports.deployDomainSegment = function deployDomainSegment(contractId, dataProductId, segmentId, domainId, targetDomainId, synchronize) {
+	    return (0, _xhr.post)(routes.interpolate(routes.DEPLOY_SEGMENT, { contractId: contractId, dataProductId: dataProductId, segmentId: segmentId, domainId: domainId }, synchronize && { synchronize: synchronize }), { data: JSON.stringify({ deploySegmentRequest: { domain: targetDomainId } }) });
+	};
+
+	var updateDomainSegment = exports.updateDomainSegment = function updateDomainSegment(domainSegment) {
+	    return (0, _xhr.put)(routes.interpolate(routes.CONTRACT_DATA_PRODUCT_DOMAIN_SEGMENT, domainSegment), {
+	        data: JSON.stringify({
+	            domainSegment: (0, _omit3.default)(domainSegment, ['contractId', 'dataProductId', 'segmentId', 'domainId'])
+	        })
+	    }).then(function (result) {
+	        return result.json();
+	    }).then(function (result) {
+	        return transformDomainSegment(result);
+	    });
+	};
+
+/***/ },
+/* 159 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	exports.getDomainDataProducts = exports.transformDomainDataProduct = undefined;
+
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+	var _xhr = __webpack_require__(7);
+
+	var _routes = __webpack_require__(156);
+
+	var routes = _interopRequireWildcard(_routes);
+
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+	var transformDomainDataProduct = exports.transformDomainDataProduct = function transformDomainDataProduct(_ref) {
+	    var domainDataProduct = _ref.domainDataProduct;
+
+	    var _routes$parse = routes.parse(domainDataProduct.links.self, routes.CONTRACT_DATA_PRODUCT_DOMAIN_DATA_PRODUCT),
+	        contractId = _routes$parse.contractId,
+	        domainId = _routes$parse.domainId,
+	        dataProductId = _routes$parse.dataProductId;
+
+	    return _extends({
+	        contractId: contractId,
+	        domainId: domainId,
+	        dataProductId: dataProductId
+	    }, domainDataProduct);
+	};
+
+	var getDomainDataProducts = exports.getDomainDataProducts = function getDomainDataProducts(contractId, dataProductId) {
+	    return (0, _xhr.get)(routes.interpolate(routes.CONTRACT_DATA_PRODUCT_DOMAIN_DATA_PRODUCTS, { contractId: contractId, dataProductId: dataProductId })).then(function (_ref2) {
+	        var items = _ref2.domainDataProducts.items,
+	            status = _ref2.status;
+	        return {
+	            items: items.map(transformDomainDataProduct),
+	            status: status
+	        };
+	    });
+	};
+
+/***/ },
+/* 160 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	exports.getDomainProjects = exports.getDomainUsers = exports.getDomains = exports.getDomain = undefined;
+
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+	var _xhr = __webpack_require__(7);
+
+	var _routes = __webpack_require__(156);
+
+	var routes = _interopRequireWildcard(_routes);
+
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+	var transformDomain = function transformDomain(item) {
+	    var _routes$parse = routes.parse(item.domain.links.self, routes.CONTRACT_DOMAIN),
+	        domainId = _routes$parse.domainId,
+	        contractId = _routes$parse.contractId;
+
+	    return _extends({
+	        id: domainId,
+	        contractId: contractId
+	    }, item.domain);
+	};
+
+	var getDomain = exports.getDomain = function getDomain(contractId, domainId, query) {
+	    var uri = routes.interpolate(routes.CONTRACT_DOMAIN, { contractId: contractId, domainId: domainId }, query);
+
+	    return (0, _xhr.get)(uri).then(transformDomain);
+	};
+
+	var getDomains = exports.getDomains = function getDomains(contractId, query) {
+	    return (0, _xhr.get)(routes.interpolate(routes.CONTRACT_DOMAINS, { contractId: contractId }, query)).then(function (result) {
+	        return { items: result.domains.items.map(transformDomain) };
+	    }); // TODO: paging?
+	};
+
+	var transformDomainUser = function transformDomainUser(_ref) {
+	    var user = _ref.user;
+
+	    var params = routes.parse(user.links.domain, routes.CONTRACT_DOMAIN);
+	    return _extends({
+	        id: user.login
+	    }, params, {
+	        fullName: user.firstName + ' ' + user.lastName
+	    }, user);
+	};
+
+	var getDomainUsers = exports.getDomainUsers = function getDomainUsers(contractId, domainId, query, paging) {
+	    if (paging && !paging.next) {
+	        return Promise.resolve({ items: [], paging: {} });
+	    }
+
+	    var uri = paging ? paging.next : routes.interpolate(routes.CONTRACT_DOMAIN_USERS, { contractId: contractId, domainId: domainId }, query);
+
+	    return (0, _xhr.get)(uri).then(function (result) {
+	        return _extends({}, result.domainUsers, {
+	            items: result.domainUsers.items.map(transformDomainUser)
+	        });
+	    });
+	};
+
+	var getDomainProjects = exports.getDomainProjects = function getDomainProjects(contractId, domainId, query, paging) {
+	    if (paging && !paging.next) {
+	        return Promise.resolve({ items: [], paging: {} });
+	    }
+
+	    var uri = paging ? paging.next : routes.interpolate(routes.CONTRACT_DOMAIN_PROJECTS, { contractId: contractId, domainId: domainId }, query && { prefixSearch: query });
+
+	    return (0, _xhr.get)(uri).then(function (result) {
+	        return _extends({}, result.domainProjects, {
+	            items: result.domainProjects.items.map(function (item) {
+	                return item.project;
+	            })
+	        });
+	    });
+	};
+
+/***/ },
+/* 161 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	exports.getClientUsers = exports.getClients = exports.getClient = undefined;
+
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+	var _xhr = __webpack_require__(7);
+
+	var _routes = __webpack_require__(156);
+
+	var routes = _interopRequireWildcard(_routes);
+
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+	var transformClient = function transformClient(item) {
+	    var _routes$parse = routes.parse(item.client.links.self, routes.CONTRACT_DATA_PRODUCT_DOMAIN_SEGMENT_CLIENT),
+	        contractId = _routes$parse.contractId,
+	        dataProductId = _routes$parse.dataProductId,
+	        domainId = _routes$parse.domainId,
+	        segmentId = _routes$parse.segmentId;
+
+	    return _extends({
+	        contractId: contractId,
+	        dataProductId: dataProductId,
+	        domainId: domainId,
+	        segmentId: segmentId
+	    }, item.client);
+	};
+
+	var getClient = exports.getClient = function getClient(contractId, dataProductId, segmentId, domainId, clientId) {
+	    var query = { stats: 'user' };
+	    var uri = routes.interpolate(routes.CONTRACT_DATA_PRODUCT_DOMAIN_SEGMENT_CLIENT, { contractId: contractId, dataProductId: dataProductId, segmentId: segmentId, domainId: domainId, clientId: clientId }, query);
+
+	    return (0, _xhr.get)(uri).then(function (result) {
+	        return transformClient(result);
+	    });
+	};
+
+	var getClients = exports.getClients = function getClients(contractId, dataProductId, segmentId, domainId, filter, paging) {
+	    var query = filter ? { clientPrefix: filter, stats: 'user' } : { stats: 'user' };
+	    var uri = paging ? paging.next : routes.interpolate(routes.CONTRACT_DATA_PRODUCT_DOMAIN_SEGMENT_CLIENTS, { contractId: contractId, dataProductId: dataProductId, segmentId: segmentId, domainId: domainId }, query);
+
+	    if (uri) {
+	        return (0, _xhr.get)(uri).then(function (result) {
+	            return {
+	                items: result.clients.items.map(transformClient),
+	                paging: result.clients.paging
+	            };
+	        });
+	    }
+
+	    return Promise.resolve({ items: [], paging: {} });
+	};
+
+	var transformClientUser = function transformClientUser(user) {
+	    return _extends({
+	        id: user.login,
+	        fullName: user.firstName + ' ' + user.lastName,
+	        role: user.roles[0]
+	    }, user);
+	};
+
+	var getClientUsers = exports.getClientUsers = function getClientUsers(contractId, dataProductId, domainId, segmentId, clientId, query, paging) {
+	    if (paging && !paging.next) {
+	        return Promise.resolve({ items: [], paging: {} });
+	    }
+
+	    var uri = paging ? paging.next : routes.interpolate(routes.CONTRACT_DATA_PRODUCT_DOMAIN_SEGMENT_CLIENT_USERS, { contractId: contractId, dataProductId: dataProductId, domainId: domainId, segmentId: segmentId, clientId: clientId }, query);
+
+	    return (0, _xhr.get)(uri).then(function (result) {
+	        return _extends({}, result.clientUsers, {
+	            items: result.clientUsers.items.map(transformClientUser)
+	        });
+	    });
+	};
+
+/***/ },
+/* 162 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	exports.getLogs = undefined;
+
+	var _xhr = __webpack_require__(7);
+
+	var _routes = __webpack_require__(156);
+
+	var routes = _interopRequireWildcard(_routes);
+
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+	var getLogs = exports.getLogs = function getLogs(contractId, dataProductId, domainId, segmentId) {
+	    return (0, _xhr.get)(routes.interpolate(routes.CONTRACT_DATA_PRODUCT_DOMAIN_SEGMENT_LOG, {
+	        contractId: contractId,
+	        dataProductId: dataProductId,
+	        domainId: domainId,
+	        segmentId: segmentId
+	    })).then(function (data) {
+	        return data.logs.map(function (item) {
+	            return item.log;
+	        });
+	    });
+	};
+
+/***/ },
+/* 163 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	exports.getUserContracts = undefined;
+
+	var _xhr = __webpack_require__(7);
+
+	var _routes = __webpack_require__(156);
+
+	var routes = _interopRequireWildcard(_routes);
+
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+	var getUserContracts = exports.getUserContracts = function getUserContracts() {
+	    return (0, _xhr.get)(routes.CONTRACTS).then(function (data) {
+	        return {
+	            items: data.contracts.items.map(function (item) {
+	                return item.contract;
+	            }),
+	            paging: data.contracts.paging
+	        };
+	    });
+	};
 
 /***/ }
 /******/ ])
