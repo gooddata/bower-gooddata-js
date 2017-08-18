@@ -1,7 +1,7 @@
 /* Copyright (C) 2007-2015, GoodData(R) Corporation. All rights reserved. */
-/* gooddata - v2.3.0 */
-/* 2017-08-16 13:54:55 */
-/* Latest git commit: "b7b10c8" */
+/* gooddata - v2.4.0 */
+/* 2017-08-18 13:15:24 */
+/* Latest git commit: "3367939" */
 
 
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -7802,7 +7802,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
-	exports.createProject = undefined;
 	exports.getCurrentProjectId = getCurrentProjectId;
 	exports.getProjects = getProjects;
 	exports.getDatasets = getDatasets;
@@ -7810,6 +7809,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.setColorPalette = setColorPalette;
 	exports.getTimezone = getTimezone;
 	exports.setTimezone = setTimezone;
+	exports.createProject = createProject;
+	exports.deleteProject = deleteProject;
 
 	var _xhr = __webpack_require__(7);
 
@@ -7965,7 +7966,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @param {Object} options for project creation (summary, projectTemplate, ...)
 	 * @return {Object} created project object
 	 */
-	var createProject = exports.createProject = function createProject(title, authorizationToken) {
+	function createProject(title, authorizationToken) {
 	    var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 	    var summary = options.summary,
 	        projectTemplate = options.projectTemplate,
@@ -7998,7 +7999,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	            return isProjectCreated(response.project);
 	        }, options);
 	    });
-	};
+	}
+
+	/**
+	 * Delete project
+	 *
+	 * @method deleteProject
+	 * @param {String} projectId
+	 */
+	function deleteProject(projectId) {
+	    return (0, _xhr.del)('/gdc/projects/' + projectId);
+	}
 
 /***/ },
 /* 152 */
