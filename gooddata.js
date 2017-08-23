@@ -1,7 +1,7 @@
 /* Copyright (C) 2007-2015, GoodData(R) Corporation. All rights reserved. */
-/* gooddata - v2.4.0 */
-/* 2017-08-18 13:15:24 */
-/* Latest git commit: "3367939" */
+/* gooddata - v3.0.0 */
+/* 2017-08-23 16:25:00 */
+/* Latest git commit: "aea8268" */
 
 
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -4027,32 +4027,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @return {String} uri of the metadata object
 	 */
 	function getObjectUri(projectId, identifier) {
-	    function uriFinder(obj) {
-	        var data = obj.attribute ? obj.attribute : obj.metric;
-	        return data.meta.uri;
-	    }
-
 	    return (0, _xhr.ajax)('/gdc/md/' + projectId + '/identifiers', {
 	        method: 'POST',
 	        body: {
 	            identifierToUri: [identifier]
 	        }
 	    }).then(_xhr.parseJSON).then(function (data) {
-	        var found = data.identifiers.filter(function (i) {
-	            return i.identifier === identifier;
+	        var found = data.identifiers.find(function (pair) {
+	            return pair.identifier === identifier;
 	        });
 
-	        if (found[0]) {
-	            return getObjectDetails(found[0].uri);
+	        if (found) {
+	            return found.uri;
 	        }
+
 	        throw new Error('Object with identifier ' + identifier + ' not found in project ' + projectId);
-	    }).then(function (objData) {
-	        if (!objData.attributeDisplayForm) {
-	            return uriFinder(objData);
-	        }
-	        return getObjectDetails(objData.attributeDisplayForm.content.formOf).then(function (objectData) {
-	            return uriFinder(objectData);
-	        });
 	    });
 	}
 
