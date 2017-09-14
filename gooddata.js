@@ -1,7 +1,7 @@
 /* Copyright (C) 2007-2015, GoodData(R) Corporation. All rights reserved. */
-/* gooddata - v3.0.1 */
-/* 2017-09-14 10:33:38 */
-/* Latest git commit: "db36380" */
+/* gooddata - v4.0.0 */
+/* 2017-09-14 13:24:01 */
+/* Latest git commit: "92d9097" */
 
 
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -19445,7 +19445,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @param {String} projectId - GD project identifier
 	 * @param {Array} columns - An array of attribute or metric identifiers.
 	 * @param {Object} executionConfiguration - Execution configuration - can contain for example
-	 *                 property "filters" containing execution context filters
 	 *                 property "where" containing query-like filters
 	 *                 property "orderBy" contains array of sorted properties to order in form
 	 *                      [{column: 'identifier', direction: 'asc|desc'}]
@@ -19467,8 +19466,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        execution: { columns: columns }
 	    };
 	    // enrich configuration with supported properties such as
-	    // where clause with query-like filters or execution context filters
-	    ['filters', 'where', 'orderBy', 'definitions'].forEach(function (property) {
+	    // where clause with query-like filters
+	    ['where', 'orderBy', 'definitions'].forEach(function (property) {
 	        if (executionConfiguration[property]) {
 	            request.execution[property] = executionConfiguration[property];
 	        }
@@ -21103,13 +21102,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	    });
 	};
 
-	var createSegment = exports.createSegment = function createSegment(contractId, dataProductId, segmentId, domainId) {
+	var createSegment = exports.createSegment = function createSegment(contractId, dataProductId, segmentId, domainIds) {
 	    return (0, _xhr.post)(routes.interpolate(routes.CONTRACT_DATA_PRODUCT_SEGMENTS, { contractId: contractId, dataProductId: dataProductId }), {
 	        data: JSON.stringify({
 	            segmentCreate: {
 	                id: segmentId,
 	                title: segmentId,
-	                domain: routes.interpolate(routes.CONTRACT_DOMAIN, { contractId: contractId, domainId: domainId })
+	                domains: domainIds.map(function (domainId) {
+	                    return routes.interpolate(routes.CONTRACT_DOMAIN, { contractId: contractId, domainId: domainId });
+	                })
 	            }
 	        })
 	    });
