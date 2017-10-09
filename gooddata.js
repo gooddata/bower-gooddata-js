@@ -1,7 +1,7 @@
 /* Copyright (C) 2007-2015, GoodData(R) Corporation. All rights reserved. */
-/* gooddata - v4.0.0 */
-/* 2017-09-14 13:24:01 */
-/* Latest git commit: "92d9097" */
+/* gooddata - v4.2.0 */
+/* 2017-10-09 16:15:05 */
+/* Latest git commit: "41d04d5" */
 
 
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -189,7 +189,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	      headers.forEach(function(value, name) {
 	        this.append(name, value)
 	      }, this)
-
+	    } else if (Array.isArray(headers)) {
+	      headers.forEach(function(header) {
+	        this.append(header[0], header[1])
+	      }, this)
 	    } else if (headers) {
 	      Object.getOwnPropertyNames(headers).forEach(function(name) {
 	        this.append(name, headers[name])
@@ -408,9 +411,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    options = options || {}
 	    var body = options.body
 
-	    if (typeof input === 'string') {
-	      this.url = input
-	    } else {
+	    if (input instanceof Request) {
 	      if (input.bodyUsed) {
 	        throw new TypeError('Already read')
 	      }
@@ -425,6 +426,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        body = input._bodyInit
 	        input.bodyUsed = true
 	      }
+	    } else {
+	      this.url = String(input)
 	    }
 
 	    this.credentials = options.credentials || this.credentials || 'omit'
@@ -460,7 +463,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  function parseHeaders(rawHeaders) {
 	    var headers = new Headers()
-	    rawHeaders.split('\r\n').forEach(function(line) {
+	    rawHeaders.split(/\r?\n/).forEach(function(line) {
 	      var parts = line.split(':')
 	      var key = parts.shift().trim()
 	      if (key) {
@@ -824,6 +827,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	process.removeListener = noop;
 	process.removeAllListeners = noop;
 	process.emit = noop;
+	process.prependListener = noop;
+	process.prependOnceListener = noop;
+
+	process.listeners = function (name) { return [] }
 
 	process.binding = function (name) {
 	    throw new Error('process.binding is not supported');
@@ -18506,6 +18513,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.getObjects = getObjects;
 	exports.getObjectUsing = getObjectUsing;
 	exports.getObjectUsingMany = getObjectUsingMany;
+	exports.getVisualizations = getVisualizations;
 	exports.getAttributes = getAttributes;
 	exports.getDimensions = getDimensions;
 	exports.getFolders = getFolders;
@@ -18671,10 +18679,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 	/**
-	* Reutrns all attributes in a project specified by projectId param
+	 * Returns all visualizations metadata in a project specified by projectId param
+	 *
+	 * @method getVisualizations
+	 * @param {string} projectId Project identifier
+	 * @return {Array} An array of visualization objects
+	 */
+	function getVisualizations(projectId) {
+	    return (0, _xhr.get)('/gdc/md/' + projectId + '/query/visualizations').then(function (r) {
+	        return r.ok ? r.json() : r;
+	    }).then((0, _util.getIn)('query.entries'));
+	}
+
+	/**
+	* Returns all attributes in a project specified by projectId param
 	*
 	* @method getAttributes
-	* @param projectId Project identifier
+	* @param {string} projectId Project identifier
 	* @return {Array} An array of attribute objects
 	*/
 	function getAttributes(projectId) {
@@ -18687,7 +18708,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Returns all dimensions in a project specified by projectId param
 	 *
 	 * @method getDimensions
-	 * @param projectId Project identifier
+	 * @param {string} projectId Project identifier
 	 * @return {Array} An array of dimension objects
 	 * @see getFolders
 	 */
@@ -18735,7 +18756,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Returns all facts in a project specified by the given projectId
 	 *
 	 * @method getFacts
-	 * @param projectId Project identifier
+	 * @param {string} projectId Project identifier
 	 * @return {Array} An array of fact objects
 	 */
 	function getFacts(projectId) {
@@ -18748,7 +18769,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Returns all metrics in a project specified by the given projectId
 	 *
 	 * @method getMetrics
-	 * @param projectId Project identifier
+	 * @param {string} projectId Project identifier
 	 * @return {Array} An array of metric objects
 	 */
 	function getMetrics(projectId) {
@@ -19019,7 +19040,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Get uri of an metadata object, specified by its identifier and project id it belongs to
 	 *
 	 * @method getObjectUri
-	 * @param projectId id of the project
+	 * @param {string} projectId id of the project
 	 * @param identifier identifier of the metadata object
 	 * @return {String} uri of the metadata object
 	 */
@@ -19109,7 +19130,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Get valid elements of an attribute, specified by its identifier and project id it belongs to
 	 *
 	 * @method getValidElements
-	 * @param projectId id of the project
+	 * @param {string} projectId id of the project
 	 * @param id display form identifier of the metadata object
 	 * @param {Object} options objects with options:
 	 *      - limit {Number}
