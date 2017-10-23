@@ -1,7 +1,7 @@
 /* Copyright (C) 2007-2015, GoodData(R) Corporation. All rights reserved. */
-/* gooddata - v4.2.0 */
-/* 2017-10-09 16:15:05 */
-/* Latest git commit: "41d04d5" */
+/* gooddata - v4.3.1 */
+/* 2017-10-23 15:08:49 */
+/* Latest git commit: "ff63114" */
 
 
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -18507,10 +18507,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: true
 	});
 
-	var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }(); // Copyright (C) 2007-2014, GoodData(R) Corporation. All rights reserved.
+	var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
 
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 	exports.getObjects = getObjects;
+	exports.getObjectsByQuery = getObjectsByQuery;
 	exports.getObjectUsing = getObjectUsing;
 	exports.getObjectUsingMany = getObjectUsingMany;
 	exports.getVisualizations = getVisualizations;
@@ -18540,6 +18542,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	var _xhr = __webpack_require__(7);
 
 	var _util = __webpack_require__(13);
+
+	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } } // Copyright (C) 2007-2014, GoodData(R) Corporation. All rights reserved.
+
 
 	/**
 	 * Functions for working with metadata objects
@@ -18586,6 +18591,34 @@ return /******/ (function(modules) { // webpackBootstrap
 	    });
 
 	    return Promise.all(promises).then(_lodash.flatten);
+	}
+
+	/**
+	 * Loads all objects by query (fetches all pages, one by one)
+	 *
+	 * @method getObjectsByQuery
+	 * @param {String} projectId id of the project
+	 * @param {Object} options (see https://developer.gooddata.com/api endpoint: /gdc/md/{project_id}/objects/query)
+	 *        - category {String} for example 'dataSets' or 'projectDashboard'
+	 *        - mode {String} 'enriched' or 'raw'
+	 *        - author {String} the URI of the author of the metadata objects
+	 *        - limit {number} default is 50 (also maximum)
+	 * @return {Promise<Array>} array of returned objects
+	 */
+	function getObjectsByQuery(projectId, options) {
+	    function getOnePage(uri) {
+	        var items = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
+
+	        return (0, _xhr.get)(uri).then(function (r) {
+	            items.push.apply(items, _toConsumableArray(r.objects.items));
+	            var nextUri = r.objects.paging.next;
+	            return nextUri ? getOnePage(nextUri, items) : items;
+	        });
+	    }
+
+	    var uri = '/gdc/md/' + projectId + '/objects/query';
+	    var query = (0, _lodash.pick)(_extends({ limit: 50 }, options), ['category', 'mode', 'author', 'limit']);
+	    return getOnePage(uri + (0, _util.queryString)(query));
 	}
 
 	/**
@@ -19151,12 +19184,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
 	    var query = (0, _lodash.pick)(options, ['limit', 'offset', 'order', 'filter', 'prompt']);
-	    var queryParams = Object.keys(query).map(function (option) {
-	        return option + '=' + encodeURIComponent(query[option]);
-	    }).join('&');
+	    var queryParams = (0, _util.queryString)(query);
 
 	    var requestBody = (0, _lodash.pick)(options, ['uris', 'complement', 'includeTotalCountWithoutFilters', 'restrictiveDefinition']);
-	    return (0, _xhr.post)(('/gdc/md/' + projectId + '/obj/' + id + '/validElements?' + queryParams).replace(/\?$/, ''), {
+	    return (0, _xhr.post)(('/gdc/md/' + projectId + '/obj/' + id + '/validElements' + queryParams).replace(/\?$/, ''), {
 	        data: JSON.stringify({
 	            validElementsRequest: requestBody
 	        })
@@ -19257,6 +19288,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; // Copyright (C) 2007-2017, GoodData(R) Corporation. All rights reserved.
 
+	exports.queryString = queryString;
+
 	var _lodash = __webpack_require__(8);
 
 	var _xhr = __webpack_require__(7);
@@ -19313,6 +19346,25 @@ return /******/ (function(modules) { // webpackBootstrap
 	        });
 	    });
 	};
+
+	/**
+	 * Builds query string from plain object
+	 * (Refactored from admin/routes.js)
+	 *
+	 * @param {Object} query parameters possibly including arrays inside
+	 * @returns {string} querystring
+	 */
+	function queryString(query) {
+	    function getSingleParam(key, value) {
+	        return Array.isArray(value) ? value.map(function (item) {
+	            return encodeURIComponent(key) + '=' + encodeURIComponent(item);
+	        }).join('&') : encodeURIComponent(key) + '=' + encodeURIComponent(value);
+	    }
+
+	    return query ? '?' + Object.keys(query).map(function (k) {
+	        return getSingleParam(k, query[k]);
+	    }).join('&') : '';
+	}
 
 /***/ },
 /* 14 */
@@ -20984,15 +21036,18 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 26 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
+	exports.interpolate = exports.parse = exports.DEPLOY_SEGMENT = exports.USER_CONTRACTS = exports.CONTRACT_USERS = exports.CONTRACT_DOMAIN_PROJECT = exports.CONTRACT_DOMAIN_PROJECTS = exports.CONTRACT_DOMAIN_USERS = exports.CONTRACT_DOMAIN = exports.CONTRACT_DOMAINS = exports.CONTRACT_DATA_PRODUCT_DOMAIN_SEGMENT_CLIENT_USERS = exports.CONTRACT_DATA_PRODUCT_DOMAIN_SEGMENT_CLIENT = exports.CONTRACT_DATA_PRODUCT_DOMAIN_SEGMENT_CLIENTS = exports.CONTRACT_DATA_PRODUCT_DOMAIN_SEGMENT_LOG = exports.CONTRACT_DATA_PRODUCT_DOMAIN_SEGMENT_SYNC = exports.CONTRACT_DATA_PRODUCT_DOMAIN_SEGMENT_RENAME = exports.CONTRACT_DATA_PRODUCT_DOMAIN_SEGMENT_CLONE = exports.CONTRACT_DATA_PRODUCT_DOMAIN_SEGMENT = exports.CONTRACT_DATA_PRODUCT_DOMAIN_SEGMENTS = exports.CONTRACT_DATA_PRODUCT_SEGMENT_RENAME = exports.CONTRACT_DATA_PRODUCT_SEGMENT = exports.CONTRACT_DATA_PRODUCT_SEGMENTS = exports.CONTRACT_DATA_PRODUCT_RENAME = exports.CONTRACT_DATA_PRODUCT_DOMAIN_DATA_PRODUCT = exports.CONTRACT_DATA_PRODUCT_DOMAIN_DATA_PRODUCTS = exports.CONTRACT_DATA_PRODUCT = exports.CONTRACT_DATA_PRODUCTS = exports.CONTRACT = exports.CONTRACTS = exports.ROOT = undefined;
 
 	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+	var _util = __webpack_require__(13);
 
 	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
@@ -21051,25 +21106,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {});
 	};
 
-	var getSingleQueryString = exports.getSingleQueryString = function getSingleQueryString(key, value) {
-	    return Array.isArray(value) ? value.map(function (item) {
-	        return encodeURIComponent(key) + '=' + encodeURIComponent(item);
-	    }).join('&') : encodeURIComponent(key) + '=' + encodeURIComponent(value);
-	};
-
-	// creates a query string from a plain js object
-	var queryString = exports.queryString = function queryString(query) {
-	    return query ? '?' + Object.keys(query).map(function (k) {
-	        return getSingleQueryString(k, query[k]);
-	    }).join('&') : '';
-	};
-
 	// interpolates specified parameters from params into
 	// the specified route string and returns the result
 	var interpolate = exports.interpolate = function interpolate(route, params, query) {
 	    return route.split('/').map(function (view) {
 	        return view[0] === ':' ? params[view.substr(1)] : view;
-	    }).join('/') + queryString(query);
+	    }).join('/') + (0, _util.queryString)(query);
 	};
 
 /***/ },
